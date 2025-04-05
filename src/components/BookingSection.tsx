@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Clock, Users } from "lucide-react";
+import { MapPin, Clock, Users, Navigation } from "lucide-react";
 import { BookingInfo, Island, Time } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
 
@@ -32,6 +32,7 @@ interface BookingSectionProps {
 
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [booking, setBooking] = useState<BookingInfo>({
+    from: 'Male\' Airport',
     island: '',
     time: '',
     seats: 1
@@ -60,7 +61,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!booking.island || !booking.time || booking.seats < 1) {
+    if (!booking.from || !booking.island || !booking.time || booking.seats < 1) {
       toast({
         title: "Invalid booking",
         description: "Please fill in all the fields correctly.",
@@ -80,6 +81,30 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         <PopularDestinations onSelectDestination={handleSelectDestination} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              From
+            </label>
+            <div className="relative">
+              <Navigation className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Select
+                value={booking.from}
+                onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
+              >
+                <SelectTrigger className="pl-10 form-input">
+                  <SelectValue placeholder="Select departure island" />
+                </SelectTrigger>
+                <SelectContent>
+                  {islands.map((island) => (
+                    <SelectItem key={island} value={island}>
+                      {island}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Destination Island

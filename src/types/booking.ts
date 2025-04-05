@@ -21,6 +21,7 @@ export type Time =
   | '8:00 PM';
 
 export interface BookingInfo {
+  from: Island | '';
   island: Island | '';
   time: Time | '';
   seats: number;
