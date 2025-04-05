@@ -5,7 +5,6 @@ import { BookingInfo, Passenger } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import PassengerFormItem from "./PassengerFormItem";
-import TripSummaryHeader from "./TripSummaryHeader";
 import AddPassengerButton from "./AddPassengerButton";
 
 interface PassengerFormProps {
@@ -98,8 +97,6 @@ const PassengerForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <TripSummaryHeader bookingInfo={bookingInfo} />
-      
       {passengers.map((passenger, index) => (
         <PassengerFormItem
           key={passenger.id}

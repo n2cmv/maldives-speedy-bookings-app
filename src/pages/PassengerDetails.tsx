@@ -5,6 +5,7 @@ import { BookingInfo, Passenger } from "@/types/booking";
 import Header from "@/components/Header";
 import TripSummaryCard from "@/components/TripSummaryCard";
 import PassengerForm from "@/components/PassengerForm";
+import TripSummaryHeader from "@/components/TripSummaryHeader";
 
 const PassengerDetails = () => {
   const location = useLocation();
@@ -85,6 +86,9 @@ const PassengerDetails = () => {
           <div className="md:col-span-2">
             <div className="booking-card mb-6">
               <h2 className="text-2xl font-bold text-ocean-dark mb-6">Passenger Details</h2>
+              
+              {/* Trip Summary Header is now placed here, outside the form */}
+              <TripSummaryHeader bookingInfo={bookingInfo} />
               
               <PassengerForm 
                 bookingInfo={bookingInfo}
