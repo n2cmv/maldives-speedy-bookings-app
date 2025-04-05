@@ -49,6 +49,7 @@ export interface BookingInfo {
   island: Island | '';
   time: Time | '';
   seats: number;
+  date?: Date;
   passengerCounts?: PassengerCount;
   passengers?: Passenger[];
   returnTrip?: boolean;
