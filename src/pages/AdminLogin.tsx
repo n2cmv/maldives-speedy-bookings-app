@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -41,9 +41,9 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      // Step 1: Sign in with email and password
+      // Step 1: Sign in with username as the email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
+        email: username,
         password
       });
 
@@ -100,13 +100,13 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input 
-                id="email"
-                placeholder="admin@example.com"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                placeholder="retouradmin"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
