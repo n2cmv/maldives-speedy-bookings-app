@@ -46,26 +46,33 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
 export async function sendBookingConfirmationEmail(booking: BookingInfo): Promise<{ success: boolean; error?: any }> {
   try {
     if (!booking.passengers || booking.passengers.length === 0) {
+      console.error("No passenger information provided for email");
       return { success: false, error: "No passenger information provided" };
     }
 
     const primaryPassenger = booking.passengers[0];
-    const { error } = await supabase.functions.invoke("send-confirmation", {
-      body: {
-        email: primaryPassenger.email,
-        name: primaryPassenger.name,
-        bookingDetails: {
-          from: booking.from,
-          to: booking.island,
-          date: booking.date ? new Date(booking.date).toLocaleDateString() : "",
-          time: booking.time,
-          returnTrip: booking.returnTrip,
-          returnDate: booking.returnTripDetails?.date ? new Date(booking.returnTripDetails.date).toLocaleDateString() : undefined,
-          returnTime: booking.returnTripDetails?.time,
-          passengerCount: booking.seats,
-          paymentReference: booking.paymentReference || "Unknown"
-        }
+    console.log("Sending confirmation email to:", primaryPassenger.email);
+    
+    const emailData = {
+      email: primaryPassenger.email,
+      name: primaryPassenger.name,
+      bookingDetails: {
+        from: booking.from,
+        to: booking.island,
+        date: booking.date ? new Date(booking.date).toLocaleDateString() : "",
+        time: booking.time,
+        returnTrip: booking.returnTrip,
+        returnDate: booking.returnTripDetails?.date ? new Date(booking.returnTripDetails.date).toLocaleDateString() : undefined,
+        returnTime: booking.returnTripDetails?.time,
+        passengerCount: booking.seats,
+        paymentReference: booking.paymentReference || "Unknown"
       }
+    };
+    
+    console.log("Email payload:", emailData);
+    
+    const { error } = await supabase.functions.invoke("send-confirmation", {
+      body: emailData
     });
 
     if (error) {
@@ -73,6 +80,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
       return { success: false, error };
     }
 
+    console.log("Confirmation email sent successfully");
     return { success: true };
   } catch (error) {
     console.error("Exception sending confirmation email:", error);
