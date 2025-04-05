@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
 interface BookingFormFooterProps {
-  onSubmit: () => void;
+  onSubmit: (e?: React.FormEvent) => void;
   isDisabled?: boolean;
 }
 
