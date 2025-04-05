@@ -84,45 +84,27 @@ const MyBookings = () => {
     setVerifying(true);
     
     try {
-      // Use a raw query with service role client to verify OTP directly
-      // This avoids type issues since the booking_otps table isn't in the generated types yet
-      const { data, error } = await supabase
-        .rpc('verify_booking_otp', { 
-          user_email: email.toLowerCase(),
-          code: otpValue
-        })
-        .single();
+      // Use a direct query to check the OTP
+      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
+        "validate-booking-otp",
+        {
+          body: { 
+            email: email.toLowerCase(),
+            code: otpValue
+          }
+        }
+      );
       
-      // If we get an error or no valid response, check via the edge function
-      if (error || !data) {
-        // Try another approach - direct query without types
-        const { data: directData, error: directError } = await supabase
-          .from('booking_otps')
-          .select('*')
-          .eq('email', email.toLowerCase())
-          .eq('otp_code', otpValue)
-          .limit(1)
-          .single();
-
-        if (directError || !directData) {
-          toast.error("Invalid verification code", {
-            description: "Please check the code and try again"
-          });
-          setVerifying(false);
-          return;
-        }
-        
-        // Check if OTP has expired by safely accessing the expires_at property 
-        const expiresAt = directData?.expires_at;
-        if (expiresAt && new Date(expiresAt) < new Date()) {
-          toast.error("Verification code has expired", {
-            description: "Please request a new code"
-          });
-          setVerifying(false);
-          return;
-        }
+      // If there's an error or the OTP is invalid
+      if (validationError || !validationResult || !validationResult.valid) {
+        toast.error("Invalid verification code", {
+          description: "Please check the code and try again"
+        });
+        setVerifying(false);
+        return;
       }
       
+      // OTP is valid, set verified state to true
       setVerified(true);
       
       // Fetch bookings

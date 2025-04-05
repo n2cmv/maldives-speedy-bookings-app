@@ -3,3 +3,6 @@ project_id = "fbgeiasbtjfpqfqmllde"
 
 [functions.process-booking-otp]
 verify_jwt = false
+
+[functions.validate-booking-otp]
+verify_jwt = false
