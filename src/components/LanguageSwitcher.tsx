@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -18,32 +18,12 @@ const languages = [
 ];
 
 const LanguageSwitcher = () => {
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+  const { currentLanguage, changeLanguage } = useLanguage();
   
-  // Force re-render when language changes to ensure UI updates
-  useEffect(() => {
-    setCurrentLanguage(i18n.language);
-  }, [i18n.language]);
-  
-  const changeLanguage = (lng: string) => {
-    if (lng === currentLanguage) return; // Don't change if it's the same language
-    
-    i18n.changeLanguage(lng).then(() => {
-      // Successfully changed language
-      setCurrentLanguage(lng);
-      localStorage.setItem('i18nextLng', lng); // Store language preference
-      
-      // Show toast notification
-      toast.success(lng === 'en' ? 'Language set to English' : 'Idioma cambiado a Español');
-      
-      // No need to refresh the whole page, React will re-render components
-    }).catch(error => {
-      console.error("Failed to change language:", error);
-      toast.error("Failed to change language");
-    });
-    
+  const handleLanguageChange = (lng: string) => {
+    changeLanguage(lng);
     setIsOpen(false);
   };
 
@@ -66,7 +46,7 @@ const LanguageSwitcher = () => {
           {languages.map((language) => (
             <DropdownMenuItem
               key={language.code}
-              onClick={() => changeLanguage(language.code)}
+              onClick={() => handleLanguageChange(language.code)}
               className={`cursor-pointer ${
                 currentLanguage === language.code ? "bg-ocean/10 text-ocean-dark" : ""
               }`}

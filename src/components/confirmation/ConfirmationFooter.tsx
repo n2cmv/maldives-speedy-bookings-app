@@ -15,11 +15,12 @@ const ConfirmationFooter = ({ island, isReturnTrip }: ConfirmationFooterProps) =
   return (
     <div className="border-t border-gray-200 pt-6">
       <p className="text-center text-gray-700 mb-6">
-        {t("confirmation.thankYou", "Thank you for booking with us. Your journey{{s}} to {{island}}{{return}} await{{s}}!", {
+        {t("confirmation.thankYou", {
           s: isReturnTrip ? 's' : '',
           island: island,
-          return: isReturnTrip ? ' ' + t("confirmation.andBack", "and back") : '',
-          s2: isReturnTrip ? '' : 's'
+          return: isReturnTrip ? ' ' + t("confirmation.andBack") : '',
+          s2: isReturnTrip ? '' : 's',
+          defaultValue: "Thank you for booking with us. Your journey{{s}} to {{island}}{{return}} await{{s2}}!"
         })}
       </p>
       
