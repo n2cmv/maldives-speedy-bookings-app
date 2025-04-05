@@ -1,15 +1,5 @@
 
-export type Island = 
-  | 'Male' 
-  | 'Hulhumale' 
-  | 'Maafushi' 
-  | 'Baa Atoll'
-  | 'Ari Atoll'
-  | 'A.Dh Dhigurah'
-  | 'A.Dh Dhangethi'
-  | 'Aa. Mathiveri'
-  | 'Male\' City'
-  | 'Male\' Airport';
+export type Island = string;
 
 export type Time = 
   | '6:30 AM'
