@@ -1,19 +1,40 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Users, Check, Calendar, ArrowLeft, ArrowRight } from "lucide-react";
+import { MapPin, Clock, Users, Check, Calendar, ArrowLeft, ArrowRight, CreditCard } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { format } from "date-fns";
+import { useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 const Confirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const booking = location.state as BookingInfo;
+  const booking = location.state as BookingInfo & { paymentComplete?: boolean; paymentReference?: string };
   
-  // Redirect if no booking data
-  if (!booking?.island || !booking?.passengers) {
-    navigate("/booking");
+  // Redirect if no booking data or if payment not complete
+  useEffect(() => {
+    if (!booking?.island || !booking?.passengers) {
+      navigate("/booking");
+      return;
+    }
+    
+    if (!booking.paymentComplete) {
+      // If someone tries to access confirmation without payment
+      navigate("/passenger-details");
+      return;
+    }
+    
+    // Show success toast when page loads
+    toast({
+      title: "Payment Successful!",
+      description: "Your booking has been confirmed.",
+      variant: "default",
+    });
+  }, [booking, navigate]);
+  
+  if (!booking?.paymentComplete) {
     return null;
   }
   
@@ -47,6 +68,17 @@ const Confirmation = () => {
             </h2>
             
             <div className="space-y-6 mb-8">
+              {/* Payment Information */}
+              <div className="bg-green-50 border border-green-100 rounded-lg p-4 flex items-start">
+                <CreditCard className="h-5 w-5 text-green-600 mr-3 mt-0.5" />
+                <div>
+                  <p className="font-medium text-green-800">Payment Successful</p>
+                  <p className="text-sm text-green-700">
+                    Payment Reference: {booking.paymentReference}
+                  </p>
+                </div>
+              </div>
+            
               {/* Outbound Journey */}
               <div className="border-t border-gray-100 pt-4">
                 <h3 className="font-medium mb-4 flex items-center">

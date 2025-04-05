@@ -58,4 +58,6 @@ export interface BookingInfo {
   passengers?: Passenger[];
   returnTrip?: boolean;
   returnTripDetails?: TripDetails;
+  paymentComplete?: boolean;
+  paymentReference?: string;
 }

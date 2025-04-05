@@ -91,8 +91,8 @@ const PassengerForm = ({
       passengers
     };
     
-    // Navigate to confirmation page with updated booking info
-    navigate("/confirmation", { state: updatedBookingInfo });
+    // Navigate to payment gateway instead of directly to confirmation
+    navigate("/payment", { state: updatedBookingInfo });
   };
 
   return (
@@ -118,7 +118,7 @@ const PassengerForm = ({
         type="submit" 
         className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
       >
-        Continue to Confirmation
+        Continue to Payment
       </Button>
     </form>
   );

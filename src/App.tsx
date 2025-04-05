@@ -8,6 +8,7 @@ import { useState } from "react";
 import Index from "./pages/Index";
 import BookingForm from "./pages/BookingForm";
 import PassengerDetails from "./pages/PassengerDetails";
+import PaymentGateway from "./pages/PaymentGateway";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/booking" element={<BookingForm />} />
             <Route path="/passenger-details" element={<PassengerDetails />} />
+            <Route path="/payment" element={<PaymentGateway />} />
             <Route path="/confirmation" element={<Confirmation />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
