@@ -1,10 +1,8 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
-    // Format booking data for database storage
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
       from_location: booking.from,
@@ -21,7 +19,6 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
-      // Explicitly cast passenger_info to match Json type required by Supabase
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : []
     };
 
@@ -53,7 +50,6 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     const primaryPassenger = booking.passengers[0];
     console.log("Attempting to send confirmation email to:", primaryPassenger.email);
     
-    // Validate email format with a more comprehensive check
     if (!primaryPassenger.email || !isValidEmail(primaryPassenger.email)) {
       console.error("Invalid email address:", primaryPassenger.email);
       return { 
@@ -64,7 +60,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     }
     
     const emailData = {
-      email: primaryPassenger.email.trim().toLowerCase(), // Normalize email
+      email: primaryPassenger.email.trim().toLowerCase(),
       name: primaryPassenger.name,
       bookingDetails: {
         from: booking.from,
@@ -120,22 +116,19 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
   }
 }
 
-// Enhanced email validation function
 function isValidEmail(email: string): boolean {
   if (!email) return false;
   
-  // Basic format check with regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) return false;
   
-  // Check for common issues
-  if (email.length > 320) return false; // Too long
+  if (email.length > 320) return false;
   if (email.indexOf('@') === -1) return false;
   
   const [localPart, domain] = email.split('@');
   if (!localPart || !domain) return false;
-  if (localPart.length > 64) return false; // Local part too long
-  if (domain.length > 255) return false; // Domain too long
+  if (localPart.length > 64) return false;
+  if (domain.length > 255) return false;
   
   return true;
 }
@@ -155,7 +148,6 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
   }
 }
 
-// New function to get booking by reference number
 export async function getBookingByReference(reference: string): Promise<{ data: any; error: any }> {
   try {
     console.log("Looking up booking with reference:", reference);
@@ -180,6 +172,36 @@ export async function getBookingByReference(reference: string): Promise<{ data: 
     return { data, error: null };
   } catch (error) {
     console.error("Exception fetching booking by reference:", error);
+    return { data: null, error };
+  }
+}
+
+export async function getAllRoutes(): Promise<{ data: any[]; error: any }> {
+  try {
+    const { data, error } = await supabase
+      .from('routes')
+      .select('*')
+      .order('from_location', { ascending: true });
+      
+    return { data: data || [], error };
+  } catch (error) {
+    console.error("Exception fetching routes:", error);
+    return { data: [], error };
+  }
+}
+
+export async function getRouteDetails(fromLocation: string, toLocation: string): Promise<{ data: any; error: any }> {
+  try {
+    const { data, error } = await supabase
+      .from('routes')
+      .select('*')
+      .eq('from_location', fromLocation)
+      .eq('to_location', toLocation)
+      .maybeSingle();
+      
+    return { data, error };
+  } catch (error) {
+    console.error("Exception fetching route details:", error);
     return { data: null, error };
   }
 }

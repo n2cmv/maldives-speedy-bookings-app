@@ -114,6 +114,36 @@ export type Database = {
         }
         Relationships: []
       }
+      routes: {
+        Row: {
+          created_at: string
+          duration: number
+          from_location: string
+          id: string
+          price: number
+          to_location: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration: number
+          from_location: string
+          id?: string
+          price: number
+          to_location: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration?: number
+          from_location?: string
+          id?: string
+          price?: number
+          to_location?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
