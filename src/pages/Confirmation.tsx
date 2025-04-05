@@ -22,6 +22,7 @@ const Confirmation = () => {
   const booking = location.state as BookingInfo & { paymentComplete?: boolean; paymentReference?: string };
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   
   // Redirect if no booking data or if payment not complete
   useEffect(() => {
@@ -48,16 +49,32 @@ const Confirmation = () => {
           toast.error(t("error.savingBooking", "Error saving booking"), {
             description: t("error.tryAgainLater", "Please try again later")
           });
+          setIsProcessing(false);
         } else {
           // Send confirmation email
-          sendBookingConfirmationEmail(booking).then(({ success, error }) => {
-            if (!success) {
-              console.error("Error sending confirmation email:", error);
-              toast.error(t("error.emailSending", "Error sending confirmation email"), {
-                description: t("error.tryAgainLater", "Please try again later")
+          if (!emailSent) {
+            sendBookingConfirmationEmail(booking).then(({ success, error }) => {
+              if (!success) {
+                console.error("Error sending confirmation email:", error);
+                toast.error(t("error.emailSending", "Error sending confirmation email"), {
+                  description: t("error.tryAgainLater", "Please try again later")
+                });
+              } else {
+                setEmailSent(true);
+                toast.success(t("email.sent", "Confirmation email sent!"), {
+                  description: t("email.check", "Please check your inbox")
+                });
+              }
+              
+              setIsProcessing(false);
+              setIsSaved(true);
+              
+              // Show success toast when page loads and data is saved
+              toast.success(t("payment.success", "Payment Successful!"), {
+                description: t("payment.description", "Your booking has been confirmed.")
               });
-            }
-            
+            });
+          } else {
             setIsProcessing(false);
             setIsSaved(true);
             
@@ -65,11 +82,11 @@ const Confirmation = () => {
             toast.success(t("payment.success", "Payment Successful!"), {
               description: t("payment.description", "Your booking has been confirmed.")
             });
-          });
+          }
         }
       });
     }
-  }, [booking, navigate, t, isSaved]);
+  }, [booking, navigate, t, isSaved, emailSent]);
   
   if (!booking?.paymentComplete || isProcessing) {
     return (
