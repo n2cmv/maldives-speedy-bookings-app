@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
 import { Time } from "@/types/booking";
+import { toast } from "sonner";
 import PopularDestinations from "./PopularDestinations";
 import { allTimes, fallbackIslands } from "./booking/constants";
 import BookingForm from "./booking/BookingForm";
@@ -74,7 +75,25 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       }
     };
     
+    // Set up real-time subscription to listen for route changes
+    const channel = supabase
+      .channel('routes-changes')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'routes' },
+        () => {
+          // Refresh the islands data when routes are updated
+          fetchIslands();
+        }
+      )
+      .subscribe();
+    
     fetchIslands();
+    
+    // Clean up subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
   
   const islandNames = islandsData.length > 0 

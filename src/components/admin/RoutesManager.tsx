@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,7 @@ import RouteForm, { Route, RouteFormValues } from "@/components/admin/routes/Rou
 import { RouteData } from "@/types/database";
 
 const RoutesManager = () => {
-  const { toast } = useToast();
+  const { toast: legacyToast } = useToast();
   const [routes, setRoutes] = useState<Route[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -63,11 +64,7 @@ const RoutesManager = () => {
       setRoutes(routesWithTimings);
     } catch (error) {
       console.error("Error fetching routes:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch routes",
-        variant: "destructive",
-      });
+      toast.error("Failed to fetch routes");
     } finally {
       setIsLoading(false);
     }
@@ -120,17 +117,10 @@ const RoutesManager = () => {
           if (error) throw error;
         }
         
-        toast({
-          title: "Success",
-          description: "Route order updated successfully",
-        });
+        toast.success("Route order updated successfully");
       } catch (error) {
         console.error("Error updating route order:", error);
-        toast({
-          title: "Error",
-          description: "Failed to update route order",
-          variant: "destructive",
-        });
+        toast.error("Failed to update route order");
         // Fetch routes again to restore from server state
         fetchRoutes();
       }
@@ -161,17 +151,10 @@ const RoutesManager = () => {
       }
 
       setRoutes(routes.filter(route => route.id !== routeToDelete));
-      toast({
-        title: "Success",
-        description: "Route has been deleted",
-      });
+      toast.success("Route has been deleted");
     } catch (error) {
       console.error("Error deleting route:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete route",
-        variant: "destructive",
-      });
+      toast.error("Failed to delete route");
     } finally {
       setIsDeleteDialogOpen(false);
       setRouteToDelete(null);
@@ -205,10 +188,7 @@ const RoutesManager = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Success",
-          description: "Route updated successfully",
-        });
+        toast.success("Route updated successfully");
       } else {
         // Get highest display order
         const maxDisplayOrder = Math.max(0, ...routes.map(r => r.display_order || 0));
@@ -230,10 +210,7 @@ const RoutesManager = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Success",
-          description: "New route created successfully",
-        });
+        toast.success("New route created successfully");
       }
 
       setIsRouteFormOpen(false);
@@ -241,11 +218,7 @@ const RoutesManager = () => {
       fetchRoutes();
     } catch (error: any) {
       console.error("Error saving route:", error);
-      toast({
-        title: "Error",
-        description: `Failed to save route: ${error.message || "Unknown error"}`,
-        variant: "destructive",
-      });
+      toast.error(`Failed to save route: ${error.message || "Unknown error"}`);
     }
   };
 
