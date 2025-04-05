@@ -55,16 +55,16 @@ const PassengerFormItem = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Full Name <span className="text-red-500">*</span>
           </label>
-          <div className="passenger-picker relative">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <User className="h-5 w-5 text-ocean/70" />
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <User className="h-5 w-5" />
             </div>
             <Input
               type="text"
               value={passenger.name}
               onChange={(e) => onChange(passenger.id, "name", e.target.value)}
               placeholder="Enter full name"
-              className="pl-10"
+              className="h-[60px] pl-10 border-gray-300 hover:border-ocean focus:border-ocean focus:ring-ocean bg-white text-base"
               required
             />
           </div>
@@ -76,16 +76,16 @@ const PassengerFormItem = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address <span className="text-red-500">*</span>
             </label>
-            <div className="passenger-picker relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <Mail className="h-5 w-5 text-ocean/70" />
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <Mail className="h-5 w-5" />
               </div>
               <Input
                 type="email"
                 value={passenger.email}
                 onChange={(e) => onChange(passenger.id, "email", e.target.value)}
                 placeholder="Enter email address"
-                className="pl-10"
+                className="h-[60px] pl-10 border-gray-300 hover:border-ocean focus:border-ocean focus:ring-ocean bg-white text-base"
                 required
               />
             </div>
@@ -103,16 +103,16 @@ const PassengerFormItem = ({
                 value={passenger.countryCode}
                 onChange={(value) => onChange(passenger.id, "countryCode", value)}
               />
-              <div className="passenger-picker relative flex-1">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <Phone className="h-5 w-5 text-ocean/70" />
+              <div className="relative flex-1">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <Phone className="h-5 w-5" />
                 </div>
                 <Input
                   type="tel"
                   value={passenger.phone}
                   onChange={(e) => onChange(passenger.id, "phone", e.target.value)}
                   placeholder="Enter phone number"
-                  className="pl-10"
+                  className="h-[60px] pl-10 border-gray-300 hover:border-ocean focus:border-ocean focus:ring-ocean bg-white text-base"
                   required
                 />
               </div>
@@ -124,16 +124,16 @@ const PassengerFormItem = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Passport Number <span className="text-red-500">*</span>
           </label>
-          <div className="passenger-picker relative">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-              <FileText className="h-5 w-5 text-ocean/70" />
+          <div className="relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+              <FileText className="h-5 w-5" />
             </div>
             <Input
               type="text"
               value={passenger.passport}
               onChange={(e) => onChange(passenger.id, "passport", e.target.value)}
               placeholder="Enter passport number"
-              className="pl-10"
+              className="h-[60px] pl-10 border-gray-300 hover:border-ocean focus:border-ocean focus:ring-ocean bg-white text-base"
               required
             />
           </div>
