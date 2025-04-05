@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Select,
@@ -26,7 +27,10 @@ const islands: Island[] = [
   'Baa Atoll', 
   'Ari Atoll', 
   'Male\' City', 
-  'Male\' Airport'
+  'Male\' Airport',
+  'A.Dh Dhigurah',
+  'A.Dh Dhangethi',
+  'Aa. Mathiveri'
 ];
 const times: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
 
@@ -47,6 +51,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     }
   });
   const navigate = useNavigate();
+  // Reference to island select trigger for programmatic clicking
+  const islandSelectRef = useRef<HTMLButtonElement>(null);
   
   useEffect(() => {
     if (preSelectedIsland) {
@@ -59,7 +65,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   }, [preSelectedIsland]);
 
   const handleSelectDestination = (island: Island) => {
-    setBooking({ ...booking, island });
+    setBooking(prev => ({ ...prev, island }));
     toast({
       title: "Destination selected",
       description: `You selected ${island}`,
@@ -146,7 +152,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                 value={booking.island}
                 onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
               >
-                <SelectTrigger id="island-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
+                <SelectTrigger 
+                  ref={islandSelectRef}
+                  id="island-select" 
+                  className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" 
+                />
                 <SelectContent className="select-content">
                   {islands.map((island) => (
                     <SelectItem 
