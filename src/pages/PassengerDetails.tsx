@@ -77,6 +77,24 @@ const PassengerDetails = () => {
     );
   };
   
+  const handleRemovePassenger = (id: number) => {
+    setPassengers(prevPassengers => prevPassengers.filter(passenger => passenger.id !== id));
+  };
+  
+  const handleAddPassenger = () => {
+    const newId = Math.max(...passengers.map(p => p.id), 0) + 1;
+    setPassengers(prevPassengers => [
+      ...prevPassengers, 
+      {
+        id: newId,
+        name: "",
+        email: "",
+        phone: "",
+        type: "adult" // Default type
+      }
+    ]);
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -146,6 +164,18 @@ const PassengerDetails = () => {
                       Passenger {index + 1} ({passenger.type})
                     </h3>
                   </div>
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemovePassenger(passenger.id)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Remove
+                    </Button>
+                  )}
                 </div>
                 
                 <div className="space-y-4">
@@ -184,6 +214,18 @@ const PassengerDetails = () => {
                 </div>
               </div>
             ))}
+            
+            <div className="mb-6">
+              <Button 
+                type="button" 
+                onClick={handleAddPassenger}
+                variant="outline"
+                className="w-full border-dashed border-gray-300 py-3 flex items-center justify-center text-ocean hover:bg-ocean/5"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Another Passenger
+              </Button>
+            </div>
             
             <Button 
               type="submit" 
