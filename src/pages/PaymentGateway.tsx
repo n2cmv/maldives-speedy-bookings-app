@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -136,14 +137,6 @@ const PaymentGateway = () => {
             </div>
             
             <div className="p-6 space-y-6">
-              <div className="flex justify-center mb-6">
-                <img 
-                  src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
-                  alt="Bank of Maldives Payment Gateway" 
-                  className="h-12 md:h-14"
-                />
-              </div>
-              
               <div className="border-b border-gray-200 pb-4">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-gray-700">Booking Reference:</span>
@@ -160,13 +153,6 @@ const PaymentGateway = () => {
                 <p className="text-sm text-blue-800">
                   You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
                 </p>
-                <div className="flex justify-center mt-4">
-                  <img 
-                    src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
-                    alt="Bank of Maldives" 
-                    className="h-10 w-auto"
-                  />
-                </div>
               </div>
               
               <Button
