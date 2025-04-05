@@ -59,38 +59,44 @@ const PassengerFormItem = ({
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address {isPrimaryPassenger && <span className="text-red-500">*</span>}
-          </label>
-          <Input
-            type="email"
-            value={passenger.email}
-            onChange={(e) => onChange(passenger.id, "email", e.target.value)}
-            placeholder="Enter email address"
-            required={isPrimaryPassenger}
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number {isPrimaryPassenger && <span className="text-red-500">*</span>}
-          </label>
-          <div className="flex items-center gap-2">
-            <CountryCodeSelector 
-              value={passenger.countryCode}
-              onChange={(value) => onChange(passenger.id, "countryCode", value)}
-            />
+        {/* Only show email field for primary passenger */}
+        {isPrimaryPassenger && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address <span className="text-red-500">*</span>
+            </label>
             <Input
-              type="tel"
-              value={passenger.phone}
-              onChange={(e) => onChange(passenger.id, "phone", e.target.value)}
-              placeholder="Enter phone number"
-              required={isPrimaryPassenger}
-              className="flex-1"
+              type="email"
+              value={passenger.email}
+              onChange={(e) => onChange(passenger.id, "email", e.target.value)}
+              placeholder="Enter email address"
+              required
             />
           </div>
-        </div>
+        )}
+        
+        {/* Only show phone field for primary passenger */}
+        {isPrimaryPassenger && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number <span className="text-red-500">*</span>
+            </label>
+            <div className="flex items-center gap-2">
+              <CountryCodeSelector 
+                value={passenger.countryCode}
+                onChange={(value) => onChange(passenger.id, "countryCode", value)}
+              />
+              <Input
+                type="tel"
+                value={passenger.phone}
+                onChange={(e) => onChange(passenger.id, "phone", e.target.value)}
+                placeholder="Enter phone number"
+                required
+                className="flex-1"
+              />
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
