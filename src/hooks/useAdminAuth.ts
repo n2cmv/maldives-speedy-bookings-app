@@ -28,7 +28,8 @@ export const useAdminAuth = () => {
             .maybeSingle();
             
           if (data) {
-            navigate("/admin");
+            // Force navigation to admin dashboard
+            window.location.href = "/admin";
           }
         }
       } catch (error) {
@@ -82,7 +83,9 @@ export const useAdminAuth = () => {
         title: "Login successful",
         description: "Welcome to the admin dashboard",
       });
-      navigate("/admin");
+      
+      // Use window.location.href instead of navigate for a full page refresh
+      window.location.href = "/admin";
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
