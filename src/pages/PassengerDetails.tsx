@@ -8,7 +8,6 @@ import PassengerForm from "@/components/PassengerForm";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
-import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -90,10 +89,6 @@ const PassengerDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="absolute top-4 right-4 z-20">
-        <HeaderExtras />
-      </div>
-      
       <Header />
       
       <div className="pt-24 pb-12 px-4">

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,7 +52,13 @@ const RoutesManager = () => {
         throw error;
       }
 
-      setRoutes(data || []);
+      // Ensure timings field exists for all routes
+      const routesWithTimings = (data || []).map(route => ({
+        ...route,
+        timings: route.timings || []
+      }));
+
+      setRoutes(routesWithTimings);
     } catch (error) {
       console.error("Error fetching routes:", error);
       toast({
@@ -109,6 +116,7 @@ const RoutesManager = () => {
           to_location: values.to_location,
           price: Number(values.price),
           duration: Number(values.duration),
+          timings: values.timings,
           created_at: currentRoute.created_at,
           updated_at: currentRoute.updated_at
         };
@@ -129,7 +137,8 @@ const RoutesManager = () => {
           from_location: values.from_location,
           to_location: values.to_location,
           price: Number(values.price),
-          duration: Number(values.duration)
+          duration: Number(values.duration),
+          timings: values.timings
         };
         
         const { error } = await supabase

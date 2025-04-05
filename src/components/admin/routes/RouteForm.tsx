@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { DialogFooter } from "@/components/ui/dialog";
+import RouteTimings from "./RouteTimings";
 
 export interface Route {
   id: string;
@@ -21,6 +22,7 @@ export interface Route {
   to_location: string;
   price: number;
   duration: number;
+  timings: string[];
   created_at: string;
   updated_at: string;
 }
@@ -30,6 +32,7 @@ const routeSchema = z.object({
   to_location: z.string().min(1, "To location is required"),
   price: z.coerce.number().positive("Price must be positive"),
   duration: z.coerce.number().positive("Duration must be positive"),
+  timings: z.array(z.string()).default([]),
 });
 
 export type RouteFormValues = z.infer<typeof routeSchema>;
@@ -48,6 +51,7 @@ const RouteForm = ({ route, onSave, onCancel }: RouteFormProps) => {
       to_location: "",
       price: 0,
       duration: 0,
+      timings: [],
     },
   });
 
@@ -58,6 +62,7 @@ const RouteForm = ({ route, onSave, onCancel }: RouteFormProps) => {
         to_location: route.to_location,
         price: route.price,
         duration: route.duration,
+        timings: route.timings || [],
       });
     } else {
       form.reset({
@@ -65,6 +70,7 @@ const RouteForm = ({ route, onSave, onCancel }: RouteFormProps) => {
         to_location: "",
         price: 0,
         duration: 0,
+        timings: [],
       });
     }
   }, [route, form]);
@@ -132,6 +138,20 @@ const RouteForm = ({ route, onSave, onCancel }: RouteFormProps) => {
                   {...field} 
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="timings"
+          render={({ field }) => (
+            <FormItem>
+              <RouteTimings 
+                timings={field.value} 
+                onChange={field.onChange}
+              />
               <FormMessage />
             </FormItem>
           )}

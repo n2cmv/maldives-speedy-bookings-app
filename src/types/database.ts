@@ -4,7 +4,8 @@ export interface RouteData {
   from_location: string;
   to_location: string;
   price: number;
-  duration: number; 
+  duration: number;
+  timings?: string[];
   created_at: string;
   updated_at: string;
 }
