@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -106,17 +105,17 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('from-select')?.click()}>
                 <div className="flex items-center">
-                  <Navigation className="h-5 w-5 text-gray-400 mr-2" />
+                  <Navigation className="h-5 w-5 text-ocean mr-2" />
                   <span className="text-base">{booking.from || 'Select departure island'}</span>
                 </div>
-                <ChevronDown className="h-5 w-5" />
+                <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
               <Select
                 value={booking.from}
                 onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
               >
                 <SelectTrigger id="from-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
-                <SelectContent className="custom-dropdown">
+                <SelectContent className="select-content">
                   {fromLocations.map((location) => (
                     <SelectItem 
                       key={location} 
@@ -138,17 +137,17 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('island-select')?.click()}>
                 <div className="flex items-center">
-                  <MapPin className="h-5 w-5 text-gray-400 mr-2" />
+                  <MapPin className="h-5 w-5 text-ocean mr-2" />
                   <span className="text-base">{booking.island || 'Select an island'}</span>
                 </div>
-                <ChevronDown className="h-5 w-5" />
+                <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
               <Select
                 value={booking.island}
                 onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
               >
                 <SelectTrigger id="island-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
-                <SelectContent className="custom-dropdown">
+                <SelectContent className="select-content">
                   {islands.map((island) => (
                     <SelectItem 
                       key={island} 
@@ -170,17 +169,17 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('time-select')?.click()}>
                 <div className="flex items-center">
-                  <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                  <Clock className="h-5 w-5 text-ocean mr-2" />
                   <span className="text-base">{booking.time || 'Select a time'}</span>
                 </div>
-                <ChevronDown className="h-5 w-5" />
+                <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
               <Select
                 value={booking.time}
                 onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
               >
                 <SelectTrigger id="time-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
-                <SelectContent className="custom-dropdown">
+                <SelectContent className="select-content">
                   {times.map((time) => (
                     <SelectItem 
                       key={time} 
