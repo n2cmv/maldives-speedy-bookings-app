@@ -15,7 +15,7 @@ const WelcomeSection = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 mt-16">
       <div className="max-w-4xl mx-auto mb-8">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-ocean-dark mb-6">
           Explore the Maldives <br />
