@@ -11,7 +11,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search } from "lucide-react";
 import Header from "@/components/Header";
-import HeaderExtras from "@/components/HeaderExtras";
 import { useTranslation } from "react-i18next";
 import { getBookingByReference } from "@/services/bookingService";
 import { BookingInfo } from "@/types/booking";
@@ -83,10 +82,6 @@ const BookingLookup = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
-      <div className="absolute top-4 right-4 z-20">
-        <HeaderExtras />
-      </div>
-      
       <Header />
       
       <main className="container mx-auto pt-28 pb-12 px-4">
