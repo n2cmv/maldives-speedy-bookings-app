@@ -28,7 +28,11 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
     onChange(counts);
   }, [counts, onChange]);
 
-  const updateCount = (type: keyof PassengerCount, delta: number) => {
+  const updateCount = (type: keyof PassengerCount, delta: number, e: React.MouseEvent) => {
+    // Prevent event propagation to stop form submission
+    e.preventDefault();
+    e.stopPropagation();
+    
     setCounts(prev => {
       const newCount = Math.max(type === 'adults' ? 1 : 0, prev[type] + delta);
       return { ...prev, [type]: newCount };
@@ -57,11 +61,12 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                onClick={() => updateCount('adults', -1)}
+                onClick={(e) => updateCount('adults', -1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.adults <= 1}
+                type="button" // Explicitly set type to button
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -69,10 +74,11 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
               <span className="text-xl w-8 text-center">{counts.adults}</span>
               
               <Button
-                onClick={() => updateCount('adults', 1)}
+                onClick={(e) => updateCount('adults', 1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -87,11 +93,12 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                onClick={() => updateCount('children', -1)}
+                onClick={(e) => updateCount('children', -1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.children <= 0}
+                type="button" // Explicitly set type to button
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -99,10 +106,11 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
               <span className="text-xl w-8 text-center">{counts.children}</span>
               
               <Button
-                onClick={() => updateCount('children', 1)}
+                onClick={(e) => updateCount('children', 1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -117,11 +125,12 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                onClick={() => updateCount('seniors', -1)}
+                onClick={(e) => updateCount('seniors', -1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.seniors <= 0}
+                type="button" // Explicitly set type to button
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -129,10 +138,11 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
               <span className="text-xl w-8 text-center">{counts.seniors}</span>
               
               <Button
-                onClick={() => updateCount('seniors', 1)}
+                onClick={(e) => updateCount('seniors', 1, e)}
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
               </Button>
