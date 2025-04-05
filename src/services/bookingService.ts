@@ -21,8 +21,8 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
-      // Convert passengers array to JSON type as required by Supabase
-      passenger_info: booking.passengers || []
+      // Explicitly cast passenger_info to match Json type required by Supabase
+      passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : []
     };
 
     const { data, error } = await supabase
