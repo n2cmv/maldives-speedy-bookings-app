@@ -26,20 +26,19 @@ const WelcomeSection = () => {
           enter the number of seats you wish to book. Enjoy your journey!
         </p>
         
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+        <div className="flex justify-center mb-8">
           <Link to="/booking" className="inline-flex items-center bg-ocean hover:bg-ocean-dark text-white font-medium py-3 px-6 rounded-lg shadow-lg transition-all duration-300">
             Book Now
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
         
-        <div className="max-w-md mx-auto">
-          <h3 className="text-lg font-semibold text-ocean-dark mb-3">Popular Destinations</h3>
+        <div className="w-full max-w-md mx-auto">
           <PopularDestinations onSelectDestination={handleSelectDestination} />
         </div>
       </div>
       
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white/30 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white/30 to-transparent"></div>
     </div>
   );
 };

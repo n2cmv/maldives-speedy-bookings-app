@@ -15,9 +15,9 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
   ];
 
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">Popular Destinations</h3>
-      <div className="flex flex-wrap gap-2">
+    <div className="mb-6 flex flex-col items-center">
+      <h3 className="text-lg font-semibold text-ocean-dark mb-3">Popular Destinations</h3>
+      <div className="flex flex-wrap justify-center gap-2">
         {destinations.map((dest) => (
           <Button 
             key={dest.name} 
