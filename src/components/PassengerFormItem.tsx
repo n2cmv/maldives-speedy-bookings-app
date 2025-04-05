@@ -23,8 +23,8 @@ const PassengerFormItem = ({
   const isPrimaryPassenger = index === 0;
 
   return (
-    <div className="mb-8 border border-ocean/20 rounded-lg p-6 bg-white shadow-sm relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-2 bg-ocean-light opacity-60"></div>
+    <div className="mb-8 border border-ocean/20 rounded-lg p-6 bg-white shadow-sm relative">
+      {/* Removing the blue line that was here */}
       
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
