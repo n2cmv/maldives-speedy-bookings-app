@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Minus, Plus, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from "react-i18next";
 
 interface PassengerCount {
   adults: number;
@@ -17,6 +18,7 @@ interface SeatPickerProps {
 const MAX_PASSENGERS = 15;
 
 const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [counts, setCounts] = useState<PassengerCount>({
     adults: initialCount?.adults || 1,
@@ -75,7 +77,9 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
         onClick={() => setIsOpen(!isOpen)}
         className="passenger-picker"
       >
-        <span className="text-base">{totalPassengers} Passenger{totalPassengers !== 1 ? 's' : ''}</span>
+        <span className="text-base">
+          {totalPassengers} {totalPassengers === 1 ? t("booking.passenger.singular", "Passenger") : t("booking.passenger.plural", "Passengers")}
+        </span>
         <ChevronDown
           className={`h-5 w-5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
@@ -86,7 +90,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
           {/* Adult row */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium">Adult</h3>
+              <h3 className="text-lg font-medium">{t("booking.passenger.adult", "Adult")}</h3>
               <p className="text-gray-500 text-sm">18-59</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -119,7 +123,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
           {/* Child row */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium">Child</h3>
+              <h3 className="text-lg font-medium">{t("booking.passenger.child", "Child")}</h3>
               <p className="text-gray-500 text-sm">0-17</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -152,7 +156,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
           {/* Senior row */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium">Senior</h3>
+              <h3 className="text-lg font-medium">{t("booking.passenger.senior", "Senior")}</h3>
               <p className="text-gray-500 text-sm">60+</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -182,7 +186,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
             </div>
           </div>
           
-          <p className="text-xs text-gray-500">Maximum {MAX_PASSENGERS} passengers per booking</p>
+          <p className="text-xs text-gray-500">{t("booking.form.maxPassengersInfo", "Maximum {{max}} passengers per booking", {max: MAX_PASSENGERS})}</p>
         </div>
       )}
     </div>

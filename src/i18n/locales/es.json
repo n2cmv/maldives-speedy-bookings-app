@@ -36,7 +36,18 @@
       "passengers": "Número de Pasajeros",
       "returnTrip": "Viaje de Regreso",
       "selectDate": "Seleccionar fecha",
-      "selectTime": "Seleccionar hora"
+      "selectTime": "Seleccionar hora",
+      "bookSpeedboat": "Reserva Tu Lancha Rápida",
+      "selectDeparture": "Selecciona isla de salida",
+      "selectIsland": "Selecciona una isla",
+      "destinationIsland": "Isla de Destino",
+      "invalidBooking": "Reserva inválida",
+      "fillOutboundFields": "Por favor completa todos los campos del viaje de ida correctamente.",
+      "invalidReturn": "Reserva de regreso inválida",
+      "fillReturnFields": "Por favor completa todos los campos del viaje de regreso correctamente.",
+      "tooManyPassengers": "Demasiados pasajeros",
+      "maxPassengers": "Máximo {{max}} pasajeros permitidos por reserva.",
+      "maxPassengersInfo": "Máximo {{max}} asientos por reserva"
     },
     "summary": {
       "title": "Resumen de Reserva",
@@ -56,7 +67,18 @@
       "email": "Correo Electrónico",
       "phone": "Número de Teléfono",
       "passport": "Número de Pasaporte",
-      "countryCode": "Código de País"
+      "countryCode": "Código de País",
+      "adult": "Adulto",
+      "child": "Niño",
+      "senior": "Persona Mayor",
+      "singular": "Pasajero",
+      "plural": "Pasajeros",
+      "maxReached": "Número máximo de pasajeros alcanzado",
+      "cannotAddMore": "No puedes agregar más de {{max}} pasajeros.",
+      "missingInfo": "Información faltante",
+      "fillPrimaryFields": "Por favor completa todos los campos requeridos para el pasajero principal",
+      "fillNamePassport": "Por favor completa el nombre y número de pasaporte para todos los pasajeros",
+      "continueToPayment": "Continuar al Pago"
     }
   },
   "confirmation": {
@@ -77,5 +99,10 @@
     "popular": "Destinos Populares",
     "travelTime": "Tiempo de Viaje",
     "bestFor": "Mejor para"
+  },
+  "payment": {
+    "title": "Detalles de Pago",
+    "success": "¡Pago Exitoso!",
+    "description": "Tu reserva ha sido confirmada."
   }
 }

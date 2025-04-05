@@ -2,6 +2,7 @@
 import { MapPin, Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { TripDetails as TripDetailsType } from "@/types/booking";
+import { useTranslation } from "react-i18next";
 
 interface TripDetailsProps {
   title: string;
@@ -14,6 +15,7 @@ interface TripDetailsProps {
 }
 
 const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: TripDetailsProps) => {
+  const { t } = useTranslation();
   const formattedDate = date ? format(new Date(date), 'PPPP') : '';
   
   return (
@@ -27,7 +29,7 @@ const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: Trip
       <div className="flex items-start">
         <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
         <div>
-          <p className="text-sm text-gray-500">From</p>
+          <p className="text-sm text-gray-500">{t("booking.summary.from", "From")}</p>
           <p className="font-medium text-gray-900">{from}</p>
         </div>
       </div>
@@ -35,7 +37,7 @@ const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: Trip
       <div className="flex items-start mt-3">
         <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
         <div>
-          <p className="text-sm text-gray-500">To</p>
+          <p className="text-sm text-gray-500">{t("booking.summary.to", "To")}</p>
           <p className="font-medium text-gray-900">{to}</p>
         </div>
       </div>
@@ -44,7 +46,7 @@ const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: Trip
         <div className="flex items-start mt-3">
           <Calendar className="h-5 w-5 text-ocean mr-3 mt-0.5" />
           <div>
-            <p className="text-sm text-gray-500">Date</p>
+            <p className="text-sm text-gray-500">{t("booking.summary.date", "Date")}</p>
             <p className="font-medium text-gray-900">{formattedDate}</p>
           </div>
         </div>
@@ -53,7 +55,7 @@ const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: Trip
       <div className="flex items-start mt-3">
         <Clock className="h-5 w-5 text-ocean mr-3 mt-0.5" />
         <div>
-          <p className="text-sm text-gray-500">{isReturn ? 'Return Time' : 'Departure Time'}</p>
+          <p className="text-sm text-gray-500">{isReturn ? t("booking.form.returnTime", "Return Time") : t("booking.form.departureTime", "Departure Time")}</p>
           <p className="font-medium text-gray-900">{time}</p>
         </div>
       </div>

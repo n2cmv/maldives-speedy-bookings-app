@@ -36,7 +36,18 @@
       "passengers": "Number of Passengers",
       "returnTrip": "Return Trip",
       "selectDate": "Select date",
-      "selectTime": "Select a time"
+      "selectTime": "Select a time",
+      "bookSpeedboat": "Book Your Speedboat",
+      "selectDeparture": "Select departure island",
+      "selectIsland": "Select an island",
+      "destinationIsland": "Destination Island",
+      "invalidBooking": "Invalid booking",
+      "fillOutboundFields": "Please fill in all the outbound journey fields correctly.",
+      "invalidReturn": "Invalid return booking",
+      "fillReturnFields": "Please fill in all the return journey fields correctly.",
+      "tooManyPassengers": "Too many passengers",
+      "maxPassengers": "Maximum {{max}} passengers allowed per booking.",
+      "maxPassengersInfo": "Maximum {{max}} seats per booking"
     },
     "summary": {
       "title": "Booking Summary",
@@ -56,7 +67,18 @@
       "email": "Email Address",
       "phone": "Phone Number",
       "passport": "Passport Number",
-      "countryCode": "Country Code"
+      "countryCode": "Country Code",
+      "adult": "Adult",
+      "child": "Child",
+      "senior": "Senior",
+      "singular": "Passenger",
+      "plural": "Passengers",
+      "maxReached": "Maximum passengers reached",
+      "cannotAddMore": "You cannot add more than {{max}} passengers.",
+      "missingInfo": "Missing information",
+      "fillPrimaryFields": "Please fill in all required fields for the primary passenger",
+      "fillNamePassport": "Please fill in name and passport number for all passengers",
+      "continueToPayment": "Continue to Payment"
     }
   },
   "confirmation": {
@@ -77,5 +99,10 @@
     "popular": "Popular Destinations",
     "travelTime": "Travel Time",
     "bestFor": "Best for"
+  },
+  "payment": {
+    "title": "Payment Details",
+    "success": "Payment Successful!",
+    "description": "Your booking has been confirmed."
   }
 }

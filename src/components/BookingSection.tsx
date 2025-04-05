@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -18,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const fromLocations: Island[] = [
   'Male\' City',
@@ -58,6 +60,7 @@ interface BookingSectionProps {
 }
 
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
+  const { t } = useTranslation();
   const [booking, setBooking] = useState<BookingInfo>({
     from: 'Male\' Airport',
     island: '',
@@ -159,8 +162,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     
     if (!booking.from || !booking.island || !booking.time || booking.seats < 1 || !departureDate) {
       toast({
-        title: "Invalid booking",
-        description: "Please fill in all the outbound journey fields correctly.",
+        title: t("booking.form.invalidBooking", "Invalid booking"),
+        description: t("booking.form.fillOutboundFields", "Please fill in all the outbound journey fields correctly."),
         variant: "destructive"
       });
       return;
@@ -168,8 +171,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     
     if (booking.returnTrip && (!booking.returnTripDetails?.time || !returnDate)) {
       toast({
-        title: "Invalid return booking",
-        description: "Please fill in all the return journey fields correctly.",
+        title: t("booking.form.invalidReturn", "Invalid return booking"),
+        description: t("booking.form.fillReturnFields", "Please fill in all the return journey fields correctly."),
         variant: "destructive"
       });
       return;
@@ -177,8 +180,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     
     if (booking.seats > MAX_PASSENGERS) {
       toast({
-        title: "Too many passengers",
-        description: `Maximum ${MAX_PASSENGERS} passengers allowed per booking.`,
+        title: t("booking.form.tooManyPassengers", "Too many passengers"),
+        description: t("booking.form.maxPassengers", `Maximum ${MAX_PASSENGERS} passengers allowed per booking.`),
         variant: "destructive"
       });
       return;
@@ -209,14 +212,14 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-md mx-auto booking-card">
-        <h2 className="text-2xl font-bold text-ocean-dark mb-6">Book Your Speedboat</h2>
+        <h2 className="text-2xl font-bold text-ocean-dark mb-6">{t("booking.form.bookSpeedboat", "Book Your Speedboat")}</h2>
         
         <PopularDestinations onSelectDestination={handleSelectDestination} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex items-center justify-between">
             <Label htmlFor="return-trip" className="text-sm font-medium text-gray-700">
-              Return Trip
+              {t("booking.form.returnTrip", "Return Trip")}
             </Label>
             <Switch
               id="return-trip"
@@ -227,13 +230,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              From
+              {t("booking.form.from", "From")}
             </label>
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('from-select')?.click()}>
                 <div className="flex items-center">
                   <Navigation className="h-5 w-5 text-ocean mr-2" />
-                  <span className="text-base">{booking.from || 'Select departure island'}</span>
+                  <span className="text-base">{booking.from || t("booking.form.selectDeparture", "Select departure island")}</span>
                 </div>
                 <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
@@ -259,13 +262,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Destination Island
+              {t("booking.form.destinationIsland", "Destination Island")}
             </label>
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('island-select')?.click()}>
                 <div className="flex items-center">
                   <MapPin className="h-5 w-5 text-ocean mr-2" />
-                  <span className="text-base">{booking.island || 'Select an island'}</span>
+                  <span className="text-base">{booking.island || t("booking.form.selectIsland", "Select an island")}</span>
                 </div>
                 <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
@@ -295,7 +298,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Departure Date
+              {t("booking.form.departureDate", "Departure Date")}
             </label>
             <div className="relative">
               <Popover open={departureDateOpen} onOpenChange={setDepartureDateOpen}>
@@ -304,7 +307,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                     <div className="flex items-center">
                       <Calendar className="h-5 w-5 text-ocean mr-2" />
                       <span className="text-base">
-                        {departureDate ? format(departureDate, 'PPP') : 'Select date'}
+                        {departureDate ? format(departureDate, 'PPP') : t("booking.form.selectDate", "Select date")}
                       </span>
                     </div>
                     <ChevronDown className="h-5 w-5 text-ocean/70" />
@@ -325,13 +328,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Departure Time
+              {t("booking.form.departureTime", "Departure Time")}
             </label>
             <div className="relative">
               <div className="passenger-picker" onClick={() => document.getElementById('time-select')?.click()}>
                 <div className="flex items-center">
                   <Clock className="h-5 w-5 text-ocean mr-2" />
-                  <span className="text-base">{booking.time || 'Select a time'}</span>
+                  <span className="text-base">{booking.time || t("booking.form.selectTime", "Select a time")}</span>
                 </div>
                 <ChevronDown className="h-5 w-5 text-ocean/70" />
               </div>
@@ -358,12 +361,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           {booking.returnTrip && (
             <>
               <div className="border-t border-gray-200 pt-4 mt-4">
-                <h3 className="font-medium text-ocean-dark mb-4">Return Journey</h3>
+                <h3 className="font-medium text-ocean-dark mb-4">{t("booking.summary.returnJourney", "Return Journey")}</h3>
               </div>
               
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Return Date
+                  {t("booking.form.returnDate", "Return Date")}
                 </label>
                 <div className="relative">
                   <Popover open={returnDateOpen} onOpenChange={setReturnDateOpen}>
@@ -372,7 +375,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                         <div className="flex items-center">
                           <Calendar className="h-5 w-5 text-ocean mr-2" />
                           <span className="text-base">
-                            {returnDate ? format(returnDate, 'PPP') : 'Select date'}
+                            {returnDate ? format(returnDate, 'PPP') : t("booking.form.selectDate", "Select date")}
                           </span>
                         </div>
                         <ChevronDown className="h-5 w-5 text-ocean/70" />
@@ -393,13 +396,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Return Time
+                  {t("booking.form.returnTime", "Return Time")}
                 </label>
                 <div className="relative">
                   <div className="passenger-picker" onClick={() => document.getElementById('return-time-select')?.click()}>
                     <div className="flex items-center">
                       <Clock className="h-5 w-5 text-ocean mr-2" />
-                      <span className="text-base">{booking.returnTripDetails?.time || 'Select a time'}</span>
+                      <span className="text-base">{booking.returnTripDetails?.time || t("booking.form.selectTime", "Select a time")}</span>
                     </div>
                     <ChevronDown className="h-5 w-5 text-ocean/70" />
                   </div>
@@ -433,20 +436,20 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Number of Passengers
+              {t("booking.form.passengers", "Number of Passengers")}
             </label>
             <SeatPicker 
               onChange={handlePassengerCountChange}
               initialCount={booking.passengerCounts}
             />
-            <p className="text-xs text-gray-500 mt-1">Maximum {MAX_PASSENGERS} seats per booking</p>
+            <p className="text-xs text-gray-500 mt-1">{t("booking.form.maxPassengersInfo", "Maximum {{max}} seats per booking", {max: MAX_PASSENGERS})}</p>
           </div>
           
           <Button 
             type="submit" 
             className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
           >
-            Book Now
+            {t("common.bookNow", "Book Now")}
           </Button>
         </form>
       </div>

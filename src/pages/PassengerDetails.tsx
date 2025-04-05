@@ -10,8 +10,10 @@ import { ChevronLeft } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const PassengerDetails = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
@@ -111,22 +113,22 @@ const PassengerDetails = () => {
             className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Booking
+            {t("common.previous", "Previous")}
           </Button>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100 mb-6">
                 <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold text-ocean-dark">Passenger Details</h2>
+                  <h2 className="text-2xl font-bold text-ocean-dark">{t("booking.passenger.details", "Passenger Details")}</h2>
                 </div>
                 
                 <div className="p-6">
                   <div className="border-b border-gray-200 pb-4 mb-6">
                     <p className="text-sm text-gray-600">
-                      Please fill in details for all passengers
+                      {t("booking.passenger.fillDetails", "Please fill in details for all passengers")}
                       <span className="block mt-1 text-xs text-gray-500">
-                        (Email and phone number only required for primary passenger)
+                        {t("booking.passenger.primaryOnly", "(Email and phone number only required for primary passenger)")}
                       </span>
                     </p>
                   </div>

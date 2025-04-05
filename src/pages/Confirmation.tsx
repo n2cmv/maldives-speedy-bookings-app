@@ -39,10 +39,10 @@ const Confirmation = () => {
     }
     
     // Show success toast when page loads
-    toast.success("Payment Successful!", {
-      description: "Your booking has been confirmed."
+    toast.success(t("payment.success", "Payment Successful!"), {
+      description: t("payment.description", "Your booking has been confirmed.")
     });
-  }, [booking, navigate]);
+  }, [booking, navigate, t]);
   
   if (!booking?.paymentComplete) {
     return null;

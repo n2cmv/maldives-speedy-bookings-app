@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import PassengerFormItem from "./PassengerFormItem";
 import AddPassengerButton from "./AddPassengerButton";
+import { useTranslation } from "react-i18next";
 
 interface PassengerFormProps {
   bookingInfo: BookingInfo;
@@ -21,6 +22,7 @@ const PassengerForm = ({
   setPassengers 
 }: PassengerFormProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const handlePassengerChange = (id: number, field: keyof Passenger, value: string) => {
     setPassengers(prevPassengers => 
@@ -37,8 +39,8 @@ const PassengerForm = ({
   const handleAddPassenger = () => {
     if (passengers.length >= MAX_PASSENGERS) {
       toast({
-        title: "Maximum passengers reached",
-        description: `You cannot add more than ${MAX_PASSENGERS} passengers.`,
+        title: t("booking.passenger.maxReached", "Maximum passengers reached"),
+        description: t("booking.passenger.cannotAddMore", "You cannot add more than {{max}} passengers.", {max: MAX_PASSENGERS}),
         variant: "destructive"
       });
       return;
@@ -66,8 +68,8 @@ const PassengerForm = ({
     const firstPassenger = passengers[0];
     if (!firstPassenger?.name || !firstPassenger?.email || !firstPassenger?.phone || !firstPassenger?.passport) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields for the primary passenger",
+        title: t("booking.passenger.missingInfo", "Missing information"),
+        description: t("booking.passenger.fillPrimaryFields", "Please fill in all required fields for the primary passenger"),
         variant: "destructive"
       });
       return;
@@ -78,8 +80,8 @@ const PassengerForm = ({
     
     if (missingRequiredInfo) {
       toast({
-        title: "Missing information",
-        description: "Please fill in name and passport number for all passengers",
+        title: t("booking.passenger.missingInfo", "Missing information"),
+        description: t("booking.passenger.fillNamePassport", "Please fill in name and passport number for all passengers"),
         variant: "destructive"
       });
       return;
@@ -118,7 +120,7 @@ const PassengerForm = ({
         type="submit" 
         className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
       >
-        Continue to Payment
+        {t("booking.passenger.continueToPayment", "Continue to Payment")}
       </Button>
     </form>
   );
