@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -30,33 +31,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Edit, Trash2, Plus, Search } from "lucide-react";
-
-interface Island {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import {
+  Card,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Search, Edit, Trash2, Plus } from "lucide-react";
+import { Island } from "@/types/island";
 
 const IslandsManager = () => {
   const { toast } = useToast();
   const [islands, setIslands] = useState<Island[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [isIslandFormOpen, setIsIslandFormOpen] = useState<boolean>(false);
   const [currentIsland, setCurrentIsland] = useState<Island | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [islandToDelete, setIslandToDelete] = useState<string | null>(null);
-
-  // Form state
-  const [islandName, setIslandName] = useState<string>("");
-  const [islandDescription, setIslandDescription] = useState<string>("");
-  const [islandImageUrl, setIslandImageUrl] = useState<string>("");
+  const [islandForm, setIslandForm] = useState<Island>({
+    name: "",
+    description: "",
+    image_url: "",
+  });
 
   useEffect(() => {
     fetchIslands();
@@ -66,9 +62,9 @@ const IslandsManager = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('islands')
-        .select('*')
-        .order('name', { ascending: true });
+        .from("islands")
+        .select("*")
+        .order("name");
 
       if (error) {
         throw error;
@@ -87,76 +83,14 @@ const IslandsManager = () => {
     }
   };
 
-  const handleEditIsland = (island: Island) => {
+  const handleEdit = (island: Island) => {
     setCurrentIsland(island);
-    setIslandName(island.name);
-    setIslandDescription(island.description);
-    setIslandImageUrl(island.image_url || "");
-    setIsDialogOpen(true);
-  };
-
-  const handleAddNew = () => {
-    setCurrentIsland(null);
-    setIslandName("");
-    setIslandDescription("");
-    setIslandImageUrl("");
-    setIsDialogOpen(true);
-  };
-
-  const handleSaveIsland = async () => {
-    if (!islandName || !islandDescription) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const islandData = {
-        name: islandName,
-        description: islandDescription,
-        image_url: islandImageUrl || null,
-      };
-
-      if (currentIsland) {
-        // Update existing island
-        const { error } = await supabase
-          .from('islands')
-          .update(islandData)
-          .eq('id', currentIsland.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "Success",
-          description: "Island has been updated",
-        });
-      } else {
-        // Create new island
-        const { error } = await supabase
-          .from('islands')
-          .insert(islandData);
-
-        if (error) throw error;
-
-        toast({
-          title: "Success",
-          description: "New island has been created",
-        });
-      }
-
-      setIsDialogOpen(false);
-      fetchIslands();
-    } catch (error) {
-      console.error("Error saving island:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save island",
-        variant: "destructive",
-      });
-    }
+    setIslandForm({
+      name: island.name,
+      description: island.description,
+      image_url: island.image_url || "",
+    });
+    setIsIslandFormOpen(true);
   };
 
   const handleDelete = async () => {
@@ -164,15 +98,15 @@ const IslandsManager = () => {
 
     try {
       const { error } = await supabase
-        .from('islands')
+        .from("islands")
         .delete()
-        .eq('id', islandToDelete);
+        .eq("id", islandToDelete);
 
       if (error) {
         throw error;
       }
 
-      setIslands(islands.filter(island => island.id !== islandToDelete));
+      setIslands(islands.filter((island) => island.id !== islandToDelete));
       toast({
         title: "Success",
         description: "Island has been deleted",
@@ -190,13 +124,76 @@ const IslandsManager = () => {
     }
   };
 
-  const filteredIslands = islands.filter(island => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setIslandForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (currentIsland?.id) {
+        // Update existing island
+        const { error } = await supabase
+          .from("islands")
+          .update({
+            name: islandForm.name,
+            description: islandForm.description,
+            image_url: islandForm.image_url || null,
+          })
+          .eq("id", currentIsland.id);
+
+        if (error) {
+          throw error;
+        }
+
+        toast({
+          title: "Success",
+          description: "Island has been updated",
+        });
+      } else {
+        // Create new island
+        const { error } = await supabase
+          .from("islands")
+          .insert({
+            name: islandForm.name,
+            description: islandForm.description,
+            image_url: islandForm.image_url || null,
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        toast({
+          title: "Success",
+          description: "Island has been created",
+        });
+      }
+
+      // Reset form and fetch updated islands
+      setIsIslandFormOpen(false);
+      setCurrentIsland(null);
+      setIslandForm({ name: "", description: "", image_url: "" });
+      fetchIslands();
+    } catch (error) {
+      console.error("Error saving island:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save island",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredIslands = islands.filter((island) => {
     if (!searchQuery) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
-      island.name.toLowerCase().includes(query) ||
-      island.description.toLowerCase().includes(query)
+      island.name?.toLowerCase().includes(query) ||
+      island.description?.toLowerCase().includes(query)
     );
   });
 
@@ -212,7 +209,13 @@ const IslandsManager = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button onClick={handleAddNew}>
+        <Button
+          onClick={() => {
+            setCurrentIsland(null);
+            setIslandForm({ name: "", description: "", image_url: "" });
+            setIsIslandFormOpen(true);
+          }}
+        >
           <Plus className="mr-2 h-4 w-4" /> Add Island
         </Button>
       </div>
@@ -228,6 +231,7 @@ const IslandsManager = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Image URL</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -236,15 +240,18 @@ const IslandsManager = () => {
                 filteredIslands.map((island) => (
                   <TableRow key={island.id}>
                     <TableCell className="font-medium">{island.name}</TableCell>
-                    <TableCell className="max-w-md truncate">
+                    <TableCell className="max-w-xs truncate">
                       {island.description}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {island.image_url || "N/A"}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
                           size="icon"
-                          onClick={() => handleEditIsland(island)}
+                          onClick={() => handleEdit(island)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -264,7 +271,7 @@ const IslandsManager = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-4">
+                  <TableCell colSpan={4} className="text-center py-4">
                     No islands found
                   </TableCell>
                 </TableRow>
@@ -274,8 +281,8 @@ const IslandsManager = () => {
         </div>
       )}
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+      <Dialog open={isIslandFormOpen} onOpenChange={setIsIslandFormOpen}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {currentIsland ? "Edit Island" : "Add New Island"}
@@ -288,30 +295,48 @@ const IslandsManager = () => {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="islandName">Island Name</Label>
+              <label
+                htmlFor="name"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Island Name
+              </label>
               <Input
-                id="islandName"
-                value={islandName}
-                onChange={(e) => setIslandName(e.target.value)}
-                placeholder="e.g., Maafushi"
+                id="name"
+                name="name"
+                value={islandForm.name}
+                onChange={handleFormChange}
+                placeholder="Island name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="islandDescription">Description</Label>
+              <label
+                htmlFor="description"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Description
+              </label>
               <Textarea
-                id="islandDescription"
-                value={islandDescription}
-                onChange={(e) => setIslandDescription(e.target.value)}
-                placeholder="Describe the island..."
+                id="description"
+                name="description"
+                value={islandForm.description}
+                onChange={handleFormChange}
+                placeholder="Describe the island"
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="islandImageUrl">Image URL (optional)</Label>
+              <label
+                htmlFor="image_url"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Image URL
+              </label>
               <Input
-                id="islandImageUrl"
-                value={islandImageUrl}
-                onChange={(e) => setIslandImageUrl(e.target.value)}
+                id="image_url"
+                name="image_url"
+                value={islandForm.image_url || ""}
+                onChange={handleFormChange}
                 placeholder="https://example.com/image.jpg"
               />
             </div>
@@ -319,13 +344,14 @@ const IslandsManager = () => {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsDialogOpen(false)}
+              onClick={() => {
+                setIsIslandFormOpen(false);
+                setCurrentIsland(null);
+              }}
             >
               Cancel
             </Button>
-            <Button onClick={handleSaveIsland}>
-              {currentIsland ? "Update Island" : "Add Island"}
-            </Button>
+            <Button onClick={handleSubmit}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,3 +1,4 @@
+
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -14,6 +15,8 @@ import NotFound from "./pages/NotFound";
 import MyBookings from "./pages/MyBookings";
 import BookingLookup from "./pages/BookingLookup";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminInit from "./pages/AdminInit";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -64,6 +67,8 @@ const App = () => {
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/lookup" element={<BookingLookup />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/init" element={<AdminInit />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
