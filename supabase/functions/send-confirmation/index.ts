@@ -39,11 +39,11 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log("Email function triggered");
+    console.log("[send-confirmation] Email function triggered");
     
     // Check if Resend is properly initialized
     if (!resend) {
-      console.error("Resend client not initialized - missing API key");
+      console.error("[send-confirmation] Resend client not initialized - missing API key");
       return new Response(
         JSON.stringify({ error: "Email service not configured" }),
         {
@@ -56,9 +56,9 @@ const handler = async (req: Request): Promise<Response> => {
     let requestData;
     try {
       requestData = await req.json();
-      console.log("Request data received:", JSON.stringify(requestData));
+      console.log("[send-confirmation] Request data received:", JSON.stringify(requestData));
     } catch (error) {
-      console.error("Failed to parse request JSON:", error);
+      console.error("[send-confirmation] Failed to parse request JSON:", error);
       return new Response(
         JSON.stringify({ error: "Invalid JSON in request" }),
         {
@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { email, name, bookingDetails }: BookingEmailRequest = requestData;
 
     if (!email || !name || !bookingDetails) {
-      console.error("Missing required email data:", { email, name, bookingDetails });
+      console.error("[send-confirmation] Missing required email data:", { email, name, bookingDetails });
       return new Response(
         JSON.stringify({ error: "Missing required email data" }),
         {
@@ -83,9 +83,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Validate email format
     if (!isValidEmail(email)) {
-      console.error("Invalid email address format:", email);
+      console.error("[send-confirmation] Invalid email address format:", email);
       return new Response(
-        JSON.stringify({ error: "Invalid email address format" }),
+        JSON.stringify({ error: "Invalid email address format: " + email }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -101,9 +101,13 @@ const handler = async (req: Request): Promise<Response> => {
       ? `<p><strong>Return Trip:</strong> ${bookingDetails.to} to ${bookingDetails.from} on ${bookingDetails.returnDate} at ${bookingDetails.returnTime}</p>`
       : '';
 
-    console.log("Preparing to send email to:", email);
+    console.log("[send-confirmation] Preparing to send email to:", email);
     
     try {
+      console.log("[send-confirmation] Calling Resend API with from: Island Ferry Bookings <onboarding@resend.dev>");
+      console.log("[send-confirmation] Sending to:", email);
+      
+      // Attempt to send the email
       const emailResponse = await resend.emails.send({
         from: "Island Ferry Bookings <onboarding@resend.dev>",
         to: [email],
@@ -137,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      console.log("Email sent successfully:", emailResponse);
+      console.log("[send-confirmation] Email sent successfully. Resend response:", JSON.stringify(emailResponse));
 
       return new Response(JSON.stringify(emailResponse), {
         status: 200,
@@ -147,11 +151,22 @@ const handler = async (req: Request): Promise<Response> => {
         },
       });
     } catch (emailError: any) {
-      console.error("Resend API error:", emailError);
+      console.error("[send-confirmation] Resend API error:", emailError);
+      console.error("[send-confirmation] Error details:", JSON.stringify(emailError));
+      
+      // Extract the most relevant error message
+      let errorMessage = "Failed to send email";
+      if (emailError.message) {
+        errorMessage = emailError.message;
+      } else if (typeof emailError === 'object') {
+        errorMessage = JSON.stringify(emailError);
+      }
+      
       return new Response(
         JSON.stringify({ 
-          error: emailError.message,
-          errorDetails: emailError 
+          error: errorMessage,
+          errorDetails: emailError,
+          emailAddress: email 
         }),
         {
           status: 500,
@@ -160,9 +175,12 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
   } catch (error: any) {
-    console.error("Error in send-confirmation function:", error);
+    console.error("[send-confirmation] Uncaught error in send-confirmation function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message || "Unknown error occurred",
+        stack: error.stack
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -171,10 +189,38 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-// Helper function to validate email format
+// Enhanced email validation function
 function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  
+  // Trim and convert to lowercase for consistency
+  const cleanEmail = email.trim().toLowerCase();
+  
+  // Basic format check with regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(cleanEmail)) return false;
+  
+  // Check for common issues
+  if (cleanEmail.length > 320) return false; // Too long
+  if (cleanEmail.indexOf('@') === -1) return false;
+  
+  const [localPart, domain] = cleanEmail.split('@');
+  if (!localPart || !domain) return false;
+  if (localPart.length > 64) return false; // Local part too long
+  if (domain.length > 255) return false; // Domain too long
+  
+  // Check for Gmail-specific errors (if applicable)
+  if (domain === 'gmail.com') {
+    // Gmail ignores dots in the local part
+    const noDots = localPart.replace(/\./g, '');
+    if (noDots.length < 1) return false;
+    
+    // Gmail ignores anything after a plus sign
+    const beforePlus = localPart.split('+')[0];
+    if (beforePlus.length < 1) return false;
+  }
+  
+  return true;
 }
 
 serve(handler);

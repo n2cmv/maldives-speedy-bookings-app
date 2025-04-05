@@ -30,7 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Search, Edit, Trash2, Send, Plus } from "lucide-react";
+import { Search, Edit, Trash2, Send, Plus, AlertCircle } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import { sendBookingConfirmationEmail } from "@/services/bookingService";
 import BookingForm from "@/components/admin/BookingForm";
@@ -44,7 +44,9 @@ const BookingsManager = () => {
   const [currentBooking, setCurrentBooking] = useState<any | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookingToDelete, setBookingToDelete] = useState<string | null>(null);
-  const [isSendingEmail, setIsSendingEmail] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<Record<string, { sending: boolean; error?: string }>>({});
+  const [emailDetailsDialogOpen, setEmailDetailsDialogOpen] = useState<boolean>(false);
+  const [emailErrorDetails, setEmailErrorDetails] = useState<string>("");
 
   useEffect(() => {
     fetchBookings();
@@ -112,7 +114,12 @@ const BookingsManager = () => {
   };
 
   const handleResendEmail = async (booking: any) => {
-    setIsSendingEmail(booking.id);
+    // Update email status to sending
+    setEmailStatus(prev => ({
+      ...prev,
+      [booking.id]: { sending: true }
+    }));
+    
     try {
       // Check if passenger info contains valid email
       if (!booking.passenger_info || booking.passenger_info.length === 0 || !booking.passenger_info[0].email) {
@@ -143,25 +150,48 @@ const BookingsManager = () => {
       }
 
       console.log("Attempting to send email to:", booking.passenger_info[0].email);
-      const { success, error } = await sendBookingConfirmationEmail(bookingInfo);
+      const { success, error, emailSentTo } = await sendBookingConfirmationEmail(bookingInfo);
 
       if (!success || error) {
+        // Store error details for potential viewing
+        const errorMessage = typeof error === 'object' 
+          ? JSON.stringify(error, null, 2) 
+          : String(error);
+          
+        setEmailStatus(prev => ({
+          ...prev,
+          [booking.id]: { sending: false, error: errorMessage }
+        }));
+        
         throw error || new Error("Failed to send email");
       }
 
+      // Email sent successfully
+      setEmailStatus(prev => ({
+        ...prev,
+        [booking.id]: { sending: false }
+      }));
+      
       toast({
         title: "Success",
-        description: `Confirmation email sent to ${booking.passenger_info[0].email}`,
+        description: `Confirmation email sent to ${emailSentTo || booking.passenger_info[0].email}`,
       });
     } catch (error: any) {
       console.error("Error sending confirmation email:", error);
+      
       toast({
         title: "Error",
         description: `Failed to send email: ${error.message || "Unknown error"}`,
         variant: "destructive",
       });
-    } finally {
-      setIsSendingEmail(null);
+    }
+  };
+  
+  const showEmailError = (bookingId: string) => {
+    const error = emailStatus[bookingId]?.error;
+    if (error) {
+      setEmailErrorDetails(error);
+      setEmailDetailsDialogOpen(true);
     }
   };
 
@@ -250,15 +280,31 @@ const BookingsManager = () => {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleResendEmail(booking)}
-                          disabled={isSendingEmail !== null}
-                          className={isSendingEmail === booking.id ? "opacity-50" : ""}
-                        >
-                          <Send className={`h-4 w-4 ${isSendingEmail === booking.id ? "animate-pulse" : ""}`} />
-                        </Button>
+                        <div className="relative">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleResendEmail(booking)}
+                            disabled={emailStatus[booking.id]?.sending}
+                            className={emailStatus[booking.id]?.sending ? "opacity-50" : ""}
+                          >
+                            {emailStatus[booking.id]?.sending ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                            ) : (
+                              <Send className="h-4 w-4" />
+                            )}
+                          </Button>
+                          {emailStatus[booking.id]?.error && (
+                            <Button
+                              variant="ghost" 
+                              size="icon"
+                              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-100 p-0 text-red-600 hover:bg-red-200"
+                              onClick={() => showEmailError(booking.id)}
+                            >
+                              <AlertCircle className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -313,6 +359,22 @@ const BookingsManager = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <Dialog open={emailDetailsDialogOpen} onOpenChange={setEmailDetailsDialogOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Email Error Details</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-auto">
+            <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md text-sm">
+              {emailErrorDetails}
+            </pre>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setEmailDetailsDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

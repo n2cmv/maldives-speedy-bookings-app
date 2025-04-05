@@ -43,7 +43,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
   }
 }
 
-export async function sendBookingConfirmationEmail(booking: BookingInfo): Promise<{ success: boolean; error?: any }> {
+export async function sendBookingConfirmationEmail(booking: BookingInfo): Promise<{ success: boolean; error?: any; emailSentTo?: string }> {
   try {
     if (!booking.passengers || booking.passengers.length === 0) {
       console.error("No passenger information provided for email");
@@ -51,16 +51,20 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     }
 
     const primaryPassenger = booking.passengers[0];
-    console.log("Sending confirmation email to:", primaryPassenger.email);
+    console.log("Attempting to send confirmation email to:", primaryPassenger.email);
     
-    // Validate email format
+    // Validate email format with a more comprehensive check
     if (!primaryPassenger.email || !isValidEmail(primaryPassenger.email)) {
       console.error("Invalid email address:", primaryPassenger.email);
-      return { success: false, error: "Invalid email address" };
+      return { 
+        success: false, 
+        error: "Invalid email address: " + primaryPassenger.email,
+        emailSentTo: primaryPassenger.email
+      };
     }
     
     const emailData = {
-      email: primaryPassenger.email,
+      email: primaryPassenger.email.trim().toLowerCase(), // Normalize email
       name: primaryPassenger.name,
       bookingDetails: {
         from: booking.from,
@@ -75,29 +79,65 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
       }
     };
     
-    console.log("Email payload:", emailData);
+    console.log("Preparing email payload:", JSON.stringify(emailData));
     
     const response = await supabase.functions.invoke("send-confirmation", {
       body: emailData
     });
 
+    console.log("Edge function raw response:", JSON.stringify(response));
+
     if (response.error) {
-      console.error("Error sending confirmation email:", response.error);
-      return { success: false, error: response.error };
+      console.error("Error from send-confirmation edge function:", response.error);
+      return { 
+        success: false, 
+        error: response.error,
+        emailSentTo: primaryPassenger.email
+      };
     }
 
-    console.log("Confirmation email response:", response.data);
-    return { success: true };
+    if (response.data?.error) {
+      console.error("Error in send-confirmation response data:", response.data.error);
+      return { 
+        success: false, 
+        error: response.data.error,
+        emailSentTo: primaryPassenger.email
+      };
+    }
+
+    console.log("Confirmation email sent successfully to:", primaryPassenger.email, "Response:", response.data);
+    return { 
+      success: true,
+      emailSentTo: primaryPassenger.email 
+    };
   } catch (error) {
     console.error("Exception sending confirmation email:", error);
-    return { success: false, error };
+    return { 
+      success: false, 
+      error,
+      emailSentTo: booking.passengers?.[0].email
+    };
   }
 }
 
-// Helper function to validate email format
+// Enhanced email validation function
 function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  
+  // Basic format check with regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(email)) return false;
+  
+  // Check for common issues
+  if (email.length > 320) return false; // Too long
+  if (email.indexOf('@') === -1) return false;
+  
+  const [localPart, domain] = email.split('@');
+  if (!localPart || !domain) return false;
+  if (localPart.length > 64) return false; // Local part too long
+  if (domain.length > 255) return false; // Domain too long
+  
+  return true;
 }
 
 export async function getBookingsByEmail(email: string): Promise<{ data: any[]; error: any }> {
