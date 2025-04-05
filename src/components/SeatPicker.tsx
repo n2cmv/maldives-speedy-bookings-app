@@ -69,7 +69,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('adults', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
                 disabled={counts.adults <= 1}
               >
                 <Minus className="h-4 w-4 text-gray-500" />
@@ -81,7 +81,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('adults', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
               >
                 <Plus className="h-4 w-4 text-primary" />
               </Button>
@@ -99,7 +99,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('children', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
                 disabled={counts.children <= 0}
               >
                 <Minus className="h-4 w-4 text-gray-500" />
@@ -111,7 +111,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('children', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
               >
                 <Plus className="h-4 w-4 text-primary" />
               </Button>
@@ -129,7 +129,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('seniors', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
                 disabled={counts.seniors <= 0}
               >
                 <Minus className="h-4 w-4 text-gray-500" />
@@ -141,7 +141,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('seniors', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
               >
                 <Plus className="h-4 w-4 text-primary" />
               </Button>
