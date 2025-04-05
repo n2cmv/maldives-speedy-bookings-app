@@ -99,23 +99,27 @@ const PassengerDetails = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
-              <div className="booking-card mb-6">
-                <h2 className="text-2xl font-bold text-ocean-dark mb-6">Passenger Details</h2>
-                
-                <div className="border-t border-gray-200 pt-2 mb-6">
-                  <p className="text-sm text-gray-600">
-                    Please fill in details for all passengers
-                    <span className="block mt-1 text-xs text-gray-500">
-                      (Email and phone number only required for primary passenger)
-                    </span>
-                  </p>
+              <div className="booking-card mb-6 border border-ocean/10 rounded-xl overflow-hidden">
+                <div className="bg-ocean/5 py-4 px-6 border-b border-ocean/10">
+                  <h2 className="text-2xl font-bold text-ocean-dark">Passenger Details</h2>
                 </div>
                 
-                <PassengerForm 
-                  bookingInfo={bookingInfo}
-                  passengers={passengers}
-                  setPassengers={setPassengers}
-                />
+                <div className="p-6">
+                  <div className="border-b border-gray-200 pb-4 mb-6">
+                    <p className="text-sm text-gray-600">
+                      Please fill in details for all passengers
+                      <span className="block mt-1 text-xs text-gray-500">
+                        (Email and phone number only required for primary passenger)
+                      </span>
+                    </p>
+                  </div>
+                  
+                  <PassengerForm 
+                    bookingInfo={bookingInfo}
+                    passengers={passengers}
+                    setPassengers={setPassengers}
+                  />
+                </div>
               </div>
             </div>
             

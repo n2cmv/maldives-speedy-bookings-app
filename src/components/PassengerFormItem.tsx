@@ -2,7 +2,7 @@
 import { Passenger } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, User } from "lucide-react";
+import { Trash2, User, Mail, Phone, FileText } from "lucide-react";
 import CountryCodeSelector from "@/components/CountryCodeSelector";
 
 interface PassengerFormItemProps {
@@ -23,21 +23,26 @@ const PassengerFormItem = ({
   const isPrimaryPassenger = index === 0;
 
   return (
-    <div className="mb-8 border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="mb-8 border border-ocean/20 rounded-lg p-6 bg-white shadow-sm relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-2 bg-ocean-light opacity-60"></div>
+      
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <User className="h-5 w-5 text-ocean mr-2" />
-          <h3 className="font-medium">
-            {isPrimaryPassenger ? "Primary Passenger" : `Passenger ${index + 1}`} ({passenger.type})
+          <div className="bg-ocean/10 p-2 rounded-full mr-3">
+            <User className="h-5 w-5 text-ocean" />
+          </div>
+          <h3 className="font-medium text-lg text-ocean-dark">
+            {isPrimaryPassenger ? "Primary Passenger" : `Passenger ${index + 1}`} 
+            <span className="ml-2 text-sm font-normal text-gray-500">({passenger.type})</span>
           </h3>
         </div>
         {isRemovable && (
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => onRemove(passenger.id)}
-            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+            className="text-red-500 border-red-200 hover:text-red-700 hover:bg-red-50 hover:border-red-300"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Remove
@@ -45,39 +50,51 @@ const PassengerFormItem = ({
         )}
       </div>
       
-      <div className="space-y-4">
-        <div>
+      <div className="space-y-5">
+        <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Full Name <span className="text-red-500">*</span>
           </label>
-          <Input
-            type="text"
-            value={passenger.name}
-            onChange={(e) => onChange(passenger.id, "name", e.target.value)}
-            placeholder="Enter full name"
-            required
-          />
+          <div className="passenger-picker relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+              <User className="h-5 w-5 text-ocean/70" />
+            </div>
+            <Input
+              type="text"
+              value={passenger.name}
+              onChange={(e) => onChange(passenger.id, "name", e.target.value)}
+              placeholder="Enter full name"
+              className="pl-10"
+              required
+            />
+          </div>
         </div>
         
         {/* Only show email field for primary passenger */}
         {isPrimaryPassenger && (
-          <div>
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address <span className="text-red-500">*</span>
             </label>
-            <Input
-              type="email"
-              value={passenger.email}
-              onChange={(e) => onChange(passenger.id, "email", e.target.value)}
-              placeholder="Enter email address"
-              required
-            />
+            <div className="passenger-picker relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <Mail className="h-5 w-5 text-ocean/70" />
+              </div>
+              <Input
+                type="email"
+                value={passenger.email}
+                onChange={(e) => onChange(passenger.id, "email", e.target.value)}
+                placeholder="Enter email address"
+                className="pl-10"
+                required
+              />
+            </div>
           </div>
         )}
         
         {/* Only show phone field for primary passenger */}
         {isPrimaryPassenger && (
-          <div>
+          <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number <span className="text-red-500">*</span>
             </label>
@@ -86,29 +103,40 @@ const PassengerFormItem = ({
                 value={passenger.countryCode}
                 onChange={(value) => onChange(passenger.id, "countryCode", value)}
               />
-              <Input
-                type="tel"
-                value={passenger.phone}
-                onChange={(e) => onChange(passenger.id, "phone", e.target.value)}
-                placeholder="Enter phone number"
-                required
-                className="flex-1"
-              />
+              <div className="passenger-picker relative flex-1">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <Phone className="h-5 w-5 text-ocean/70" />
+                </div>
+                <Input
+                  type="tel"
+                  value={passenger.phone}
+                  onChange={(e) => onChange(passenger.id, "phone", e.target.value)}
+                  placeholder="Enter phone number"
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
           </div>
         )}
 
-        <div>
+        <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Passport Number <span className="text-red-500">*</span>
           </label>
-          <Input
-            type="text"
-            value={passenger.passport}
-            onChange={(e) => onChange(passenger.id, "passport", e.target.value)}
-            placeholder="Enter passport number"
-            required
-          />
+          <div className="passenger-picker relative">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+              <FileText className="h-5 w-5 text-ocean/70" />
+            </div>
+            <Input
+              type="text"
+              value={passenger.passport}
+              onChange={(e) => onChange(passenger.id, "passport", e.target.value)}
+              placeholder="Enter passport number"
+              className="pl-10"
+              required
+            />
+          </div>
         </div>
       </div>
     </div>
