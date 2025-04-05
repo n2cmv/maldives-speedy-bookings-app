@@ -40,7 +40,7 @@ const Confirmation = () => {
     return null;
   }
   
-  const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
+  const isReturnTrip = Boolean(booking.returnTrip && booking.returnTripDetails);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 overflow-hidden relative">
