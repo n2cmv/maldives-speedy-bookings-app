@@ -121,6 +121,7 @@ export type Database = {
           from_location: string
           id: string
           price: number
+          timings: string[] | null
           to_location: string
           updated_at: string
         }
@@ -130,6 +131,7 @@ export type Database = {
           from_location: string
           id?: string
           price: number
+          timings?: string[] | null
           to_location: string
           updated_at?: string
         }
@@ -139,6 +141,7 @@ export type Database = {
           from_location?: string
           id?: string
           price?: number
+          timings?: string[] | null
           to_location?: string
           updated_at?: string
         }

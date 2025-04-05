@@ -109,17 +109,22 @@ const RoutesManager = () => {
 
   const handleSaveRoute = async (values: RouteFormValues) => {
     try {
+      console.log("Saving route with values:", values);
+      
       if (currentRoute) {
+        // Make sure we have the correct type
         const updatedRoute: RouteData = {
           id: currentRoute.id,
           from_location: values.from_location,
           to_location: values.to_location,
           price: Number(values.price),
           duration: Number(values.duration),
-          timings: values.timings,
+          timings: values.timings || [],
           created_at: currentRoute.created_at,
           updated_at: currentRoute.updated_at
         };
+        
+        console.log("Updating route with data:", updatedRoute);
         
         const { error } = await supabase
           .from('routes')
@@ -138,8 +143,10 @@ const RoutesManager = () => {
           to_location: values.to_location,
           price: Number(values.price),
           duration: Number(values.duration),
-          timings: values.timings
+          timings: values.timings || []
         };
+        
+        console.log("Creating new route with data:", newRoute);
         
         const { error } = await supabase
           .from('routes')
