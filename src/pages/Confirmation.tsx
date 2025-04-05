@@ -1,12 +1,14 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Users, Check, Calendar, ArrowLeft, ArrowRight, CreditCard } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
-import { format } from "date-fns";
 import { useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
+import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
+import PaymentInfo from "@/components/confirmation/PaymentInfo";
+import TripDetails from "@/components/confirmation/TripDetails";
+import PassengerInfo from "@/components/confirmation/PassengerInfo";
+import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
 
 const Confirmation = () => {
   const location = useLocation();
@@ -39,10 +41,6 @@ const Confirmation = () => {
   }
   
   const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
-  const departureDate = booking.date ? format(new Date(booking.date), 'PPPP') : '';
-  const returnDate = booking.returnTripDetails?.date 
-    ? format(new Date(booking.returnTripDetails.date), 'PPPP') 
-    : '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 overflow-hidden relative">
@@ -57,146 +55,45 @@ const Confirmation = () => {
         <Header />
         <main className="pt-24 pb-12 px-4">
           <div className="max-w-md mx-auto booking-card">
-            <div className="flex items-center justify-center mb-6">
-              <div className="bg-green-100 rounded-full p-3">
-                <Check className="h-8 w-8 text-green-600" />
-              </div>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-ocean-dark text-center mb-6">
-              Booking Confirmed!
-            </h2>
+            <ConfirmationHeader />
             
             <div className="space-y-6 mb-8">
               {/* Payment Information */}
-              <div className="bg-green-50 border border-green-100 rounded-lg p-4 flex items-start">
-                <CreditCard className="h-5 w-5 text-green-600 mr-3 mt-0.5" />
-                <div>
-                  <p className="font-medium text-green-800">Payment Successful</p>
-                  <p className="text-sm text-green-700">
-                    Payment Reference: {booking.paymentReference}
-                  </p>
-                </div>
-              </div>
+              <PaymentInfo paymentReference={booking.paymentReference} />
             
               {/* Outbound Journey - Changed to Your Trip */}
-              <div className="border-t border-gray-100 pt-4">
-                <h3 className="font-medium mb-4 flex items-center">
-                  {isReturnTrip && <ArrowRight className="h-4 w-4 mr-1.5 text-blue-500" />}
-                  Your Trip
-                </h3>
-                <div className="flex items-start">
-                  <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">From</p>
-                    <p className="font-medium text-gray-900">{booking.from}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start mt-3">
-                  <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">To</p>
-                    <p className="font-medium text-gray-900">{booking.island}</p>
-                  </div>
-                </div>
-                
-                {departureDate && (
-                  <div className="flex items-start mt-3">
-                    <Calendar className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Date</p>
-                      <p className="font-medium text-gray-900">{departureDate}</p>
-                    </div>
-                  </div>
-                )}
-                
-                <div className="flex items-start mt-3">
-                  <Clock className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">Departure Time</p>
-                    <p className="font-medium text-gray-900">{booking.time}</p>
-                  </div>
-                </div>
-              </div>
+              <TripDetails
+                title="Your Trip"
+                from={booking.from}
+                to={booking.island}
+                time={booking.time}
+                date={booking.date}
+                isOutbound={isReturnTrip}
+              />
               
               {/* Return Journey (if applicable) */}
               {isReturnTrip && booking.returnTripDetails && (
-                <div className="border-t border-gray-100 pt-4">
-                  <h3 className="font-medium mb-4 flex items-center">
-                    <ArrowLeft className="h-4 w-4 mr-1.5 text-green-500" />
-                    Return Journey
-                  </h3>
-                  <div className="flex items-start">
-                    <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">From</p>
-                      <p className="font-medium text-gray-900">{booking.returnTripDetails.from}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start mt-3">
-                    <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">To</p>
-                      <p className="font-medium text-gray-900">{booking.returnTripDetails.island}</p>
-                    </div>
-                  </div>
-                  
-                  {returnDate && (
-                    <div className="flex items-start mt-3">
-                      <Calendar className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-gray-500">Date</p>
-                        <p className="font-medium text-gray-900">{returnDate}</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start mt-3">
-                    <Clock className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-gray-500">Return Time</p>
-                      <p className="font-medium text-gray-900">{booking.returnTripDetails.time}</p>
-                    </div>
-                  </div>
-                </div>
+                <TripDetails
+                  title="Return Journey"
+                  from={booking.returnTripDetails.from}
+                  to={booking.returnTripDetails.island}
+                  time={booking.returnTripDetails.time}
+                  date={booking.returnTripDetails.date}
+                  isReturn
+                />
               )}
               
-              <div className="flex items-start mt-3">
-                <Users className="h-5 w-5 text-ocean mr-3 mt-0.5" />
-                <div>
-                  <p className="text-sm text-gray-500">Number of Seats</p>
-                  <p className="font-medium text-gray-900">{booking.seats}</p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <h3 className="font-medium mb-4">Passenger Information</h3>
-                {booking.passengers && booking.passengers.map((passenger, index) => (
-                  <div key={passenger.id} className="mb-3 border-b border-gray-100 pb-3 last:border-0">
-                    <p className="font-medium">{passenger.name} <span className="text-xs text-gray-500">({passenger.type})</span></p>
-                    <p className="text-sm text-gray-600">{passenger.email}</p>
-                    <p className="text-sm text-gray-600">{passenger.phone}</p>
-                  </div>
-                ))}
-              </div>
+              {/* Passenger Information */}
+              <PassengerInfo 
+                seats={booking.seats}
+                passengers={booking.passengers}
+              />
             </div>
             
-            <div className="border-t border-gray-200 pt-6">
-              <p className="text-center text-gray-700 mb-6">
-                Thank you for booking with us. Your journey{isReturnTrip ? 's' : ''} to {booking.island}{isReturnTrip ? ' and back' : ''} await{isReturnTrip ? '' : 's'}!
-              </p>
-              
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => navigate("/booking")}
-                  className="bg-ocean hover:bg-ocean-dark text-white"
-                >
-                  Book Another Trip
-                </Button>
-              </div>
-            </div>
+            <ConfirmationFooter 
+              island={booking.island}
+              isReturnTrip={!!isReturnTrip}
+            />
           </div>
         </main>
       </div>
