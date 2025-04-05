@@ -26,6 +26,7 @@ const MyBookings = () => {
   const [otpValue, setOtpValue] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleGoBack = () => {
     navigate("/");
@@ -33,6 +34,7 @@ const MyBookings = () => {
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
     
     if (!email) {
       toast.error("Please enter your email address");
@@ -47,8 +49,10 @@ const MyBookings = () => {
         body: { email }
       });
       
+      console.log("OTP response:", response);
+      
       if (response.error) {
-        console.error("Error from edge function:", response.error);
+        console.error("Error from process-booking-otp function:", response.error);
         toast.error("Error sending verification code", {
           description: "Please try again later"
         });
@@ -57,7 +61,7 @@ const MyBookings = () => {
       
       if (!response.data?.success) {
         const errorMsg = response.data?.error || "Please try again later";
-        console.error("Error response:", errorMsg);
+        console.error("Error response from process-booking-otp:", errorMsg);
         toast.error("Error sending verification code", {
           description: errorMsg
         });
@@ -86,22 +90,28 @@ const MyBookings = () => {
     }
     
     setVerifying(true);
+    setErrorMessage("");
     
     try {
+      console.log("Sending validation request with:", { 
+        email: email.toLowerCase(), 
+        code: otpValue 
+      });
+      
       // Use the validate-booking-otp edge function
-      const { data: validationResult, error: validationError } = await supabase.functions.invoke(
-        "validate-booking-otp",
-        {
-          body: { 
-            email: email.toLowerCase(),
-            code: otpValue
-          }
+      const response = await supabase.functions.invoke("validate-booking-otp", {
+        body: { 
+          email: email.toLowerCase(),
+          code: otpValue
         }
-      );
+      });
+      
+      console.log("Validation response:", response);
       
       // Handle validation errors
-      if (validationError) {
-        console.error("Edge function error:", validationError);
+      if (response.error) {
+        console.error("Edge function error:", response.error);
+        setErrorMessage(`Error: ${response.error.message || "Failed to verify code"}`);
         toast.error("Error verifying code", {
           description: "Please try again later"
         });
@@ -110,8 +120,10 @@ const MyBookings = () => {
       }
       
       // If the OTP is invalid
-      if (!validationResult?.valid) {
-        const errorMessage = validationResult?.error || "Please check the code and try again";
+      if (!response.data?.valid) {
+        const errorMessage = response.data?.error || "Please check the code and try again";
+        console.error("Invalid OTP response:", response.data);
+        setErrorMessage(`Error: ${errorMessage}`);
         toast.error("Invalid verification code", {
           description: errorMessage
         });
@@ -123,26 +135,34 @@ const MyBookings = () => {
       setVerified(true);
       
       // Fetch bookings
-      const { data: bookingsData, error: bookingsError } = await getBookingsByEmail(email);
-      
-      if (bookingsError) {
-        console.error("Error fetching bookings:", bookingsError);
+      try {
+        const { data: bookingsData, error: bookingsError } = await getBookingsByEmail(email);
+        
+        if (bookingsError) {
+          console.error("Error fetching bookings:", bookingsError);
+          toast.error("Error fetching bookings", {
+            description: "Please try again later"
+          });
+          setVerifying(false);
+          return;
+        }
+        
+        setBookings(bookingsData || []);
+        
+        if (bookingsData && bookingsData.length === 0) {
+          toast.info("No bookings found", {
+            description: "No bookings were found with this email address"
+          });
+        }
+      } catch (bookingErr) {
+        console.error("Exception fetching bookings:", bookingErr);
         toast.error("Error fetching bookings", {
           description: "Please try again later"
-        });
-        setVerifying(false);
-        return;
-      }
-      
-      setBookings(bookingsData || []);
-      
-      if (bookingsData && bookingsData.length === 0) {
-        toast.info("No bookings found", {
-          description: "No bookings were found with this email address"
         });
       }
     } catch (err) {
       console.error("Exception verifying code:", err);
+      setErrorMessage(`Error: ${err instanceof Error ? err.message : "Failed to verify code"}`);
       toast.error("Error verifying code", {
         description: "Please try again later"
       });
@@ -247,6 +267,12 @@ const MyBookings = () => {
                         </InputOTP>
                       </Card>
                     </div>
+                    
+                    {errorMessage && (
+                      <div className="text-sm text-red-500 mb-4">
+                        {errorMessage}
+                      </div>
+                    )}
                     
                     <div className="flex flex-col sm:flex-row justify-center gap-3">
                       <Button
