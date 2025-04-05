@@ -77,26 +77,26 @@
   
   .select-item {
     @apply py-3 px-4 rounded-md cursor-pointer text-base flex items-center;
-    @apply hover:bg-primary/10 hover:text-primary transition-colors;
-    @apply data-[highlighted]:bg-primary/10 data-[highlighted]:text-primary;
-    @apply focus:bg-primary/10 focus:text-primary outline-none;
+    @apply hover:bg-ocean/10 hover:text-ocean transition-colors;
+    @apply data-[highlighted]:bg-ocean/15 data-[highlighted]:text-ocean-dark;
+    @apply focus:bg-ocean/10 focus:text-ocean outline-none;
   }
   
   .booking-select-trigger {
     @apply h-[60px] w-full border border-gray-300 rounded-[0.5rem] bg-white transition-all duration-200;
-    @apply hover:border-primary hover:bg-white hover:text-primary;
-    @apply focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary;
+    @apply hover:border-ocean hover:bg-white hover:text-ocean;
+    @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
   }
   
   .passenger-button {
     @apply w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200;
-    @apply border border-gray-200 hover:border-primary hover:bg-primary/10 hover:text-primary;
+    @apply border border-gray-200 hover:border-ocean hover:bg-ocean/10 hover:text-ocean;
   }
   
   .custom-select-trigger {
     @apply flex h-[60px] w-full items-center justify-between pl-3 pr-3 rounded-[0.5rem] border border-gray-300 bg-white text-base;
-    @apply hover:border-primary hover:bg-white hover:text-primary transition-colors;
-    @apply focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary;
+    @apply hover:border-ocean hover:bg-white hover:text-ocean transition-colors;
+    @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
     @apply data-[placeholder]:text-gray-500;
   }
   
@@ -106,7 +106,8 @@
   
   .passenger-picker {
     @apply h-[60px] w-full border border-gray-300 rounded-[0.5rem] pl-3 pr-3 flex items-center justify-between bg-white cursor-pointer text-base;
-    @apply hover:border-primary hover:text-primary transition-colors;
-    @apply focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary;
+    @apply hover:border-ocean hover:text-ocean transition-colors;
+    @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
   }
 }
+
