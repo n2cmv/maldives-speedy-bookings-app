@@ -27,6 +27,30 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_otps: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          otp_code: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          otp_code: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          otp_code?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
