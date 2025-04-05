@@ -7,6 +7,9 @@ import TripSummaryCard from "@/components/TripSummaryCard";
 import PassengerForm from "@/components/PassengerForm";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import StepIndicator from "@/components/StepIndicator";
+import HeaderExtras from "@/components/HeaderExtras";
+import { motion } from "framer-motion";
 
 const PassengerDetails = () => {
   const location = useLocation();
@@ -85,9 +88,23 @@ const PassengerDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="absolute top-4 right-4 z-20">
+        <HeaderExtras />
+      </div>
+      
       <Header />
+      
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="max-w-4xl mx-auto mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <StepIndicator />
+          </motion.div>
+          
           <Button 
             variant="outline" 
             onClick={handleGoBack}

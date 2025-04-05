@@ -6,6 +6,9 @@ import Header from "@/components/Header";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, CreditCard } from "lucide-react";
+import StepIndicator from "@/components/StepIndicator";
+import HeaderExtras from "@/components/HeaderExtras";
+import { motion } from "framer-motion";
 
 const PaymentGateway = () => {
   const location = useLocation();
@@ -115,75 +118,91 @@ const PaymentGateway = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="absolute top-4 right-4 z-20">
+        <HeaderExtras />
+      </div>
+      
       <Header />
+      
       <div className="pt-24 pb-12 px-4">
-        <div className="max-w-lg mx-auto">
-          <Button 
-            variant="outline" 
-            onClick={handleGoBack}
-            className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
-            disabled={isProcessing}
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="max-w-4xl mx-auto mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Passenger Details
-          </Button>
-          
-          <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-            <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-ocean-dark">Payment</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Bank of Maldives Payment Gateway
-              </p>
-            </div>
+            <StepIndicator />
+          </motion.div>
+
+          <div className="max-w-lg mx-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleGoBack}
+              className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
+              disabled={isProcessing}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back to Passenger Details
+            </Button>
             
-            <div className="p-6 space-y-6">
-              <div className="border-b border-gray-200 pb-4">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-gray-700">Booking Reference:</span>
-                  <span className="font-medium">{`MV-${Date.now().toString().slice(-6)}`}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Total Amount:</span>
-                  <span className="text-lg font-bold text-ocean-dark">${calculateTotal().toFixed(2)}</span>
-                </div>
-              </div>
-              
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <p className="text-sm text-blue-800">
-                  You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
+            <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+              <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
+                <h2 className="text-2xl font-bold text-ocean-dark">Payment</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Bank of Maldives Payment Gateway
                 </p>
               </div>
               
-              <Button
-                onClick={handlePayment}
-                disabled={isProcessing}
-                className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
-              >
-                {isProcessing ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Proceed to Payment
-                  </>
-                )}
-              </Button>
-              
-              <div className="flex items-center justify-center mt-6">
-                <img 
-                  src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
-                  alt="Payment Methods" 
-                  className="h-8 md:h-10 w-auto"
-                />
+              <div className="p-6 space-y-6">
+                <div className="border-b border-gray-200 pb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-gray-700">Booking Reference:</span>
+                    <span className="font-medium">{`MV-${Date.now().toString().slice(-6)}`}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-700">Total Amount:</span>
+                    <span className="text-lg font-bold text-ocean-dark">${calculateTotal().toFixed(2)}</span>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                  <p className="text-sm text-blue-800">
+                    You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
+                  </p>
+                </div>
+                
+                <Button
+                  onClick={handlePayment}
+                  disabled={isProcessing}
+                  className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Proceed to Payment
+                    </>
+                  )}
+                </Button>
+                
+                <div className="flex items-center justify-center mt-6">
+                  <img 
+                    src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
+                    alt="Payment Methods" 
+                    className="h-8 md:h-10 w-auto"
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-500 text-center mt-4">
+                  Your payment information is encrypted and securely processed by Bank of Maldives.
+                </p>
               </div>
-              
-              <p className="text-xs text-gray-500 text-center mt-4">
-                Your payment information is encrypted and securely processed by Bank of Maldives.
-              </p>
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
 import StepIndicator from "@/components/StepIndicator";
 import { saveBookingToLocalStorage } from "@/services/bookingStorage";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
 
 const Confirmation = () => {
@@ -78,17 +78,22 @@ const Confirmation = () => {
       
       <div className="relative z-10">
         <div className="absolute top-4 right-4 z-20">
-          <LanguageSwitcher />
+          <HeaderExtras />
         </div>
         
         <Header />
         <main className="pt-20 pb-12 px-4">
-          <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <StepIndicator />
-          </div>
+          </motion.div>
           
           <motion.div 
-            className="max-w-md mx-auto booking-card"
+            className="max-w-md mx-auto booking-card mt-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
