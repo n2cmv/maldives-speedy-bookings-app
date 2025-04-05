@@ -35,6 +35,7 @@ const RoutesManager = () => {
   const [currentRoute, setCurrentRoute] = useState<Route | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchRoutes();
@@ -46,16 +47,17 @@ const RoutesManager = () => {
       const { data, error } = await supabase
         .from('routes')
         .select('*')
-        .order('from_location', { ascending: true }) as unknown as { data: Route[], error: any };
+        .order('display_order', { ascending: true, nullsLast: true }) as unknown as { data: Route[], error: any };
 
       if (error) {
         throw error;
       }
 
       // Ensure timings field exists for all routes
-      const routesWithTimings = (data || []).map(route => ({
+      const routesWithTimings = (data || []).map((route, index) => ({
         ...route,
-        timings: route.timings || []
+        timings: route.timings || [],
+        display_order: route.display_order || index + 1
       }));
 
       setRoutes(routesWithTimings);
@@ -69,6 +71,75 @@ const RoutesManager = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedItemIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragEnter = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedItemIndex === null || draggedItemIndex === index) return;
+    
+    const newRoutes = [...routes];
+    const draggedItem = newRoutes[draggedItemIndex];
+    
+    // Remove the dragged item
+    newRoutes.splice(draggedItemIndex, 1);
+    // Insert it at the new position
+    newRoutes.splice(index, 0, draggedItem);
+    
+    // Update the display order for each route
+    const reorderedRoutes = newRoutes.map((route, idx) => ({
+      ...route,
+      display_order: idx + 1
+    }));
+    
+    setRoutes(reorderedRoutes);
+    setDraggedItemIndex(index);
+  };
+
+  const handleDragEnd = async () => {
+    // Save the new order to the database
+    if (draggedItemIndex !== null) {
+      try {
+        // Prepare updates for batch operation
+        const updates = routes.map(route => ({
+          id: route.id,
+          display_order: route.display_order
+        }));
+        
+        for (const update of updates) {
+          // Execute update for each route
+          const { error } = await supabase
+            .from('routes')
+            .update({ display_order: update.display_order })
+            .eq('id', update.id) as any;
+            
+          if (error) throw error;
+        }
+        
+        toast({
+          title: "Success",
+          description: "Route order updated successfully",
+        });
+      } catch (error) {
+        console.error("Error updating route order:", error);
+        toast({
+          title: "Error",
+          description: "Failed to update route order",
+          variant: "destructive",
+        });
+        // Fetch routes again to restore from server state
+        fetchRoutes();
+      }
+      setDraggedItemIndex(null);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   const handleEdit = (route: Route) => {
@@ -121,7 +192,8 @@ const RoutesManager = () => {
           duration: Number(values.duration),
           timings: values.timings || [],
           created_at: currentRoute.created_at,
-          updated_at: currentRoute.updated_at
+          updated_at: currentRoute.updated_at,
+          display_order: currentRoute.display_order
         };
         
         console.log("Updating route with data:", updatedRoute);
@@ -138,12 +210,16 @@ const RoutesManager = () => {
           description: "Route updated successfully",
         });
       } else {
+        // Get highest display order
+        const maxDisplayOrder = Math.max(0, ...routes.map(r => r.display_order || 0));
+        
         const newRoute = {
           from_location: values.from_location,
           to_location: values.to_location,
           price: Number(values.price),
           duration: Number(values.duration),
-          timings: values.timings || []
+          timings: values.timings || [],
+          display_order: maxDisplayOrder + 1
         };
         
         console.log("Creating new route with data:", newRoute);
@@ -211,6 +287,10 @@ const RoutesManager = () => {
             setRouteToDelete(routeId);
             setIsDeleteDialogOpen(true);
           }}
+          onDragStart={handleDragStart}
+          onDragEnter={handleDragEnter}
+          onDragEnd={handleDragEnd}
+          onDragOver={handleDragOver}
         />
       )}
 

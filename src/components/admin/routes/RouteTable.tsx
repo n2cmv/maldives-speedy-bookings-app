@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Clock } from "lucide-react";
+import { Edit, Trash2, Clock, GripVertical } from "lucide-react";
 import { Route } from "./RouteForm";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,14 +18,27 @@ interface RouteTableProps {
   routes: Route[];
   onEdit: (route: Route) => void;
   onDelete: (routeId: string) => void;
+  onDragStart: (e: React.DragEvent, index: number) => void;
+  onDragEnter: (e: React.DragEvent, index: number) => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
 }
 
-const RouteTable = ({ routes, onEdit, onDelete }: RouteTableProps) => {
+const RouteTable = ({ 
+  routes, 
+  onEdit, 
+  onDelete, 
+  onDragStart,
+  onDragEnter,
+  onDragEnd,
+  onDragOver
+}: RouteTableProps) => {
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border" onDragOver={onDragOver}>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10"></TableHead>
             <TableHead>From</TableHead>
             <TableHead>To</TableHead>
             <TableHead>Price</TableHead>
@@ -36,8 +49,21 @@ const RouteTable = ({ routes, onEdit, onDelete }: RouteTableProps) => {
         </TableHeader>
         <TableBody>
           {routes.length > 0 ? (
-            routes.map((route) => (
-              <TableRow key={route.id}>
+            routes.map((route, index) => (
+              <TableRow 
+                key={route.id}
+                draggable
+                onDragStart={(e) => onDragStart(e, index)}
+                onDragEnter={(e) => onDragEnter(e, index)}
+                onDragEnd={onDragEnd}
+                className="cursor-move"
+                data-route-id={route.id}
+              >
+                <TableCell className="w-10">
+                  <div className="flex items-center justify-center">
+                    <GripVertical className="h-5 w-5 text-gray-400" />
+                  </div>
+                </TableCell>
                 <TableCell>{route.from_location}</TableCell>
                 <TableCell>{route.to_location}</TableCell>
                 <TableCell>${route.price.toFixed(2)}</TableCell>
@@ -105,7 +131,7 @@ const RouteTable = ({ routes, onEdit, onDelete }: RouteTableProps) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 No routes found
               </TableCell>
             </TableRow>

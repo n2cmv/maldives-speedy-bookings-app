@@ -19,6 +19,27 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     const fetchIslands = async () => {
       setIsLoading(true);
       try {
+        // First get routes in the correct display order
+        const { data: routesData, error: routesError } = await supabase
+          .from('routes')
+          .select('from_location, to_location')
+          .order('display_order', { ascending: true, nullsLast: true });
+          
+        if (routesError) {
+          console.error('Error fetching routes:', routesError);
+          throw routesError;
+        }
+        
+        // Extract unique islands from routes
+        const uniqueIslands = new Set<string>();
+        if (routesData) {
+          routesData.forEach(route => {
+            uniqueIslands.add(route.from_location);
+            uniqueIslands.add(route.to_location);
+          });
+        }
+        
+        // Then get island details from islands table
         const { data, error } = await supabase
           .from('islands')
           .select('*')
@@ -30,7 +51,21 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         }
         
         if (data && data.length > 0) {
-          setIslandsData(data);
+          // Sort islands according to route display order if possible
+          const sortedIslands = [...data];
+          if (uniqueIslands.size > 0) {
+            sortedIslands.sort((a, b) => {
+              // If island is in routes, sort by route order
+              const aIndex = Array.from(uniqueIslands).indexOf(a.name);
+              const bIndex = Array.from(uniqueIslands).indexOf(b.name);
+              if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
+              if (aIndex >= 0) return -1;
+              if (bIndex >= 0) return 1;
+              return a.name.localeCompare(b.name);
+            });
+          }
+          
+          setIslandsData(sortedIslands);
         }
       } catch (error) {
         console.error('Error fetching islands:', error);

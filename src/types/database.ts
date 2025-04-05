@@ -8,6 +8,7 @@ export interface RouteData {
   timings?: string[];
   created_at: string;
   updated_at: string;
+  display_order?: number;
 }
 
 export interface BookingData {
