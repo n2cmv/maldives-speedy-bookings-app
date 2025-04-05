@@ -7,7 +7,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import SavedBookings from "./SavedBookings";
 
 const HeaderExtras = () => {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="flex space-x-2">
@@ -22,7 +22,7 @@ const HeaderExtras = () => {
         variant="ghost"
         size="icon"
         onClick={() => {
-          setTheme(theme => (theme === "light" ? "dark" : "light"));
+          setTheme(theme === "light" ? "dark" : "light");
         }}
       >
         <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
