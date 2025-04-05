@@ -16,7 +16,6 @@ const AdminLogin = () => {
   const [email, setEmail] = useState<string>("natteynattson@gmail.com");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isInitializing, setIsInitializing] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
   
   useEffect(() => {
@@ -104,36 +103,6 @@ const AdminLogin = () => {
     }
   };
 
-  const handleInitializeAdmin = async () => {
-    setIsInitializing(true);
-    setAuthError(null);
-    try {
-      const { success, error } = await initializeAdminUser();
-      if (success) {
-        toast({
-          title: "Admin initialized",
-          description: "Admin user has been set up successfully. You can now login."
-        });
-      } else {
-        setAuthError(error || "Initialization failed");
-        toast({
-          title: "Initialization failed",
-          description: error || "Could not initialize admin user",
-          variant: "destructive"
-        });
-      }
-    } catch (error: any) {
-      setAuthError(error.message || "An unexpected error occurred");
-      toast({
-        title: "Initialization error",
-        description: error.message || "An unexpected error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsInitializing(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 p-4">
       <Card className="w-full max-w-md">
@@ -194,21 +163,6 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-          <div className="mt-4 pt-4 border-t">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleInitializeAdmin}
-              disabled={isInitializing}
-            >
-              {isInitializing ? (
-                <span className="flex items-center gap-2">
-                  <div className="h-4 w-4 border-2 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
-                  Setting up admin...
-                </span>
-              ) : "Initialize Admin User"}
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
