@@ -24,6 +24,9 @@ const TripLocationSelector = ({
 }: TripLocationSelectorProps) => {
   const { t } = useTranslation();
   
+  // Filter out the currently selected fromLocation from toLocations
+  const filteredToLocations = toLocations.filter(island => island !== fromLocation);
+  
   return (
     <>
       <IslandSelector
@@ -31,7 +34,14 @@ const TripLocationSelector = ({
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={fromLocation}
         islandNames={fromLocations}
-        onIslandChange={onFromChange}
+        onIslandChange={(value) => {
+          onFromChange(value);
+          // If the newly selected 'from' location is the same as the current 'to' location,
+          // clear the 'to' location to avoid having the same island as both departure and destination
+          if (value === toLocation) {
+            onToChange('');
+          }
+        }}
         placeholder={t("booking.form.selectDeparture", "Select departure island")}
         isLoading={isLoading}
         id="from-select"
@@ -41,7 +51,7 @@ const TripLocationSelector = ({
         label={t("booking.form.destinationIsland", "Destination Island")}
         icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={toLocation}
-        islandNames={toLocations}
+        islandNames={filteredToLocations}
         onIslandChange={onToChange}
         isLoading={isLoading}
         id="island-select"

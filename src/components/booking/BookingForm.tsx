@@ -4,7 +4,6 @@ import { BookingInfo, Time, PassengerCount } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
-import PopularDestinations from "../PopularDestinations";
 import ReturnTripSwitch from "./ReturnTripSwitch";
 import TripLocationSelector from "./TripLocationSelector";
 import TripDateTimeSelector from "./TripDateTimeSelector";
@@ -99,9 +98,31 @@ const BookingForm = ({
     };
 
     fetchRoutes();
+    
+    // Set up real-time subscription to listen for route changes
+    const channel = supabase
+      .channel('booking-routes-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'routes' },
+        (payload) => {
+          console.log('Route update detected in booking form:', payload);
+          // Refresh routes data when changes are detected
+          fetchRoutes();
+          toast({
+            title: t("booking.routesUpdated", "Routes Updated"),
+            description: t("booking.routesRefreshed", "Available routes have been refreshed")
+          });
+        }
+      )
+      .subscribe();
+    
+    // Clean up subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [allTimes]);
 
-  // Get available times based on the selected route
   const getRouteTimings = (from: string, to: string): Time[] => {
     if (availableTimesMap[from] && availableTimesMap[from][to] && availableTimesMap[from][to].length > 0) {
       return availableTimesMap[from][to];
@@ -141,18 +162,20 @@ const BookingForm = ({
   }, [booking.returnTrip, booking.island, booking.from, returnDate]);
 
   const handleSelectDestination = (island: string) => {
-    setBooking(prev => ({ ...prev, island }));
-    
-    if (booking.returnTrip) {
-      setBooking(prev => ({
-        ...prev,
-        island,
-        returnTripDetails: {
-          ...prev.returnTripDetails!,
-          island: prev.from,
-          from: island
-        }
-      }));
+    if (island !== booking.from) {
+      setBooking(prev => ({ ...prev, island }));
+      
+      if (booking.returnTrip) {
+        setBooking(prev => ({
+          ...prev,
+          island,
+          returnTripDetails: {
+            ...prev.returnTripDetails!,
+            island: prev.from,
+            from: island
+          }
+        }));
+      }
     }
   };
 
