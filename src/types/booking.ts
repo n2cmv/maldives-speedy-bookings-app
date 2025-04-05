@@ -37,6 +37,13 @@ export interface Passenger {
   type: 'adult' | 'child' | 'senior';
 }
 
+export interface TripDetails {
+  from: Island | '';
+  island: Island | '';
+  time: Time | '';
+  date?: Date;
+}
+
 export interface BookingInfo {
   from: Island | '';
   island: Island | '';
@@ -44,4 +51,6 @@ export interface BookingInfo {
   seats: number;
   passengerCounts?: PassengerCount;
   passengers?: Passenger[];
+  returnTrip?: boolean;
+  returnTripDetails?: TripDetails;
 }

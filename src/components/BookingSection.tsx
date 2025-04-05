@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -9,10 +10,15 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Clock, Navigation, ChevronDown } from "lucide-react";
+import { MapPin, Clock, Navigation, ChevronDown, Calendar } from "lucide-react";
 import { BookingInfo, Island, Time, PassengerCount } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
 import SeatPicker from "./SeatPicker";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 const fromLocations: Island[] = [
   'Male\' City',
@@ -62,13 +68,23 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       adults: 1,
       children: 0,
       seniors: 0,
-    }
+    },
+    returnTrip: false
   });
   const navigate = useNavigate();
   const islandSelectRef = useRef<HTMLButtonElement>(null);
+  
+  // Get today's date for the date picker
+  const today = new Date();
+  const [departureDate, setDepartureDate] = useState<Date | undefined>(today);
+  const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
 
   const availableTimes = booking.island ? 
     (islandTimeRestrictions[booking.island] || allTimes) : 
+    allTimes;
+  
+  const returnAvailableTimes = booking.returnTripDetails?.from ? 
+    (islandTimeRestrictions[booking.returnTripDetails.from] || allTimes) : 
     allTimes;
   
   useEffect(() => {
@@ -85,9 +101,37 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       }
     }
   }, [booking.island]);
+  
+  useEffect(() => {
+    if (booking.returnTrip && booking.island && booking.from) {
+      // Initialize return trip details when returnTrip is toggled on
+      setBooking(prev => ({
+        ...prev,
+        returnTripDetails: {
+          from: prev.island,
+          island: prev.from,
+          time: '',
+          date: returnDate
+        }
+      }));
+    }
+  }, [booking.returnTrip, booking.island, booking.from, returnDate]);
 
   const handleSelectDestination = (island: Island) => {
     setBooking(prev => ({ ...prev, island }));
+    
+    // Update return trip details if return trip is enabled
+    if (booking.returnTrip) {
+      setBooking(prev => ({
+        ...prev,
+        island,
+        returnTripDetails: {
+          ...prev.returnTripDetails!,
+          island: prev.from,
+          from: island
+        }
+      }));
+    }
   };
 
   const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
@@ -98,14 +142,36 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       passengerCounts 
     });
   };
+  
+  const handleReturnToggle = (isChecked: boolean) => {
+    setBooking(prev => ({ 
+      ...prev, 
+      returnTrip: isChecked,
+      returnTripDetails: isChecked ? {
+        from: prev.island || '',
+        island: prev.from || '',
+        time: '',
+        date: returnDate
+      } : undefined
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!booking.from || !booking.island || !booking.time || booking.seats < 1) {
+    if (!booking.from || !booking.island || !booking.time || booking.seats < 1 || !departureDate) {
       toast({
         title: "Invalid booking",
-        description: "Please fill in all the fields correctly.",
+        description: "Please fill in all the outbound journey fields correctly.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (booking.returnTrip && (!booking.returnTripDetails?.time || !returnDate)) {
+      toast({
+        title: "Invalid return booking",
+        description: "Please fill in all the return journey fields correctly.",
         variant: "destructive"
       });
       return;
@@ -120,7 +186,17 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       return;
     }
     
-    navigate("/passenger-details", { state: booking });
+    // Add date to booking information
+    const bookingWithDates = {
+      ...booking,
+      date: departureDate,
+      returnTripDetails: booking.returnTripDetails ? {
+        ...booking.returnTripDetails,
+        date: returnDate
+      } : undefined
+    };
+    
+    navigate("/passenger-details", { state: bookingWithDates });
   };
 
   return (
@@ -131,6 +207,18 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         <PopularDestinations onSelectDestination={handleSelectDestination} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Return trip toggle */}
+          <div className="flex items-center justify-between">
+            <Label htmlFor="return-trip" className="text-sm font-medium text-gray-700">
+              Return Trip
+            </Label>
+            <Switch
+              id="return-trip"
+              checked={booking.returnTrip}
+              onCheckedChange={handleReturnToggle}
+            />
+          </div>
+
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               From
@@ -199,6 +287,37 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             </div>
           </div>
           
+          {/* Departure Date */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Departure Date
+            </label>
+            <div className="relative">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="passenger-picker cursor-pointer">
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 text-ocean mr-2" />
+                      <span className="text-base">
+                        {departureDate ? format(departureDate, 'PPP') : 'Select date'}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-ocean/70" />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <CalendarComponent
+                    mode="single"
+                    selected={departureDate}
+                    onSelect={setDepartureDate}
+                    initialFocus
+                    disabled={(date) => date < today}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Departure Time
@@ -230,6 +349,85 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               </Select>
             </div>
           </div>
+          
+          {/* Return Trip Fields (conditional) */}
+          {booking.returnTrip && (
+            <>
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <h3 className="font-medium text-ocean-dark mb-4">Return Journey</h3>
+              </div>
+              
+              {/* Return Date */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Return Date
+                </label>
+                <div className="relative">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div className="passenger-picker cursor-pointer">
+                        <div className="flex items-center">
+                          <Calendar className="h-5 w-5 text-ocean mr-2" />
+                          <span className="text-base">
+                            {returnDate ? format(returnDate, 'PPP') : 'Select date'}
+                          </span>
+                        </div>
+                        <ChevronDown className="h-5 w-5 text-ocean/70" />
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={returnDate}
+                        onSelect={setReturnDate}
+                        initialFocus
+                        disabled={(date) => departureDate ? date < departureDate : date < today}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+              
+              {/* Return Time */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Return Time
+                </label>
+                <div className="relative">
+                  <div className="passenger-picker" onClick={() => document.getElementById('return-time-select')?.click()}>
+                    <div className="flex items-center">
+                      <Clock className="h-5 w-5 text-ocean mr-2" />
+                      <span className="text-base">{booking.returnTripDetails?.time || 'Select a time'}</span>
+                    </div>
+                    <ChevronDown className="h-5 w-5 text-ocean/70" />
+                  </div>
+                  <Select
+                    value={booking.returnTripDetails?.time || ''}
+                    onValueChange={(value) => setBooking({ 
+                      ...booking, 
+                      returnTripDetails: { 
+                        ...booking.returnTripDetails!, 
+                        time: value as Time 
+                      } 
+                    })}
+                  >
+                    <SelectTrigger id="return-time-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
+                    <SelectContent className="select-content">
+                      {returnAvailableTimes.map((time) => (
+                        <SelectItem 
+                          key={time} 
+                          value={time}
+                          className="select-item"
+                        >
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </>
+          )}
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">

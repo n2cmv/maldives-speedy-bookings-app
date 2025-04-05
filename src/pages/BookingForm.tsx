@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import BookingSection from "@/components/BookingSection";
 import Header from "@/components/Header";
