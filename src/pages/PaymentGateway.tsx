@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -14,7 +13,6 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Initialize from location state
   useEffect(() => {
     const booking = location.state as BookingInfo | null;
     if (!booking) {
@@ -32,33 +30,25 @@ const PaymentGateway = () => {
   const handlePayment = () => {
     setIsProcessing(true);
     
-    // Simulate redirect to Bank of Maldives payment gateway
     toast({
       title: "Redirecting to payment gateway",
       description: "You will be redirected to the Bank of Maldives payment page",
     });
     
-    // Simulate 2 second delay before redirecting to payment gateway
     setTimeout(() => {
       setIsProcessing(false);
       setIsRedirecting(true);
       
-      // In production, this would be replaced with a form submission or redirect to the actual payment gateway
       simulatePaymentGateway();
     }, 2000);
   };
 
-  // Simulate external payment gateway process
   const simulatePaymentGateway = () => {
-    // This simulates the user being on the external payment gateway
-    // In reality, this would happen on the bank's website, not in our app
     setTimeout(() => {
-      // After payment is complete, redirect back to our app with success status
       handlePaymentCompletion(true);
     }, 3000);
   };
 
-  // Handle payment completion and redirect to confirmation page
   const handlePaymentCompletion = (success: boolean) => {
     if (success && bookingInfo) {
       navigate("/confirmation", { 
@@ -106,7 +96,6 @@ const PaymentGateway = () => {
     );
   }
 
-  // Calculate total price
   const calculateTotal = () => {
     if (!bookingInfo.passengerCounts) return 0;
     
@@ -115,7 +104,6 @@ const PaymentGateway = () => {
     const childTotal = bookingInfo.passengerCounts.children * (basePrice * 0.7); // 30% discount
     const seniorTotal = bookingInfo.passengerCounts.seniors * (basePrice * 0.8); // 20% discount
     
-    // Add return trip cost if applicable
     let total = adultTotal + childTotal + seniorTotal;
     if (bookingInfo.returnTrip) {
       total = total * 2;
@@ -172,6 +160,13 @@ const PaymentGateway = () => {
                 <p className="text-sm text-blue-800">
                   You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
                 </p>
+                <div className="flex justify-center mt-4">
+                  <img 
+                    src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
+                    alt="Bank of Maldives" 
+                    className="h-10 w-auto"
+                  />
+                </div>
               </div>
               
               <Button
