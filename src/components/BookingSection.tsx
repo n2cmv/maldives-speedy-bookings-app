@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -14,6 +13,11 @@ import { toast } from "@/components/ui/use-toast";
 import { MapPin, Clock, Users, Navigation } from "lucide-react";
 import { BookingInfo, Island, Time } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
+
+const fromLocations: Island[] = [
+  'Male\' City',
+  'Male\' Airport'
+];
 
 const islands: Island[] = [
   'Male', 
@@ -95,9 +99,9 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                   <SelectValue placeholder="Select departure island" />
                 </SelectTrigger>
                 <SelectContent>
-                  {islands.map((island) => (
-                    <SelectItem key={island} value={island}>
-                      {island}
+                  {fromLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
                     </SelectItem>
                   ))}
                 </SelectContent>
