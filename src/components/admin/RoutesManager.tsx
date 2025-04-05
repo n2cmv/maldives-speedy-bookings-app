@@ -47,7 +47,7 @@ const RoutesManager = () => {
       const { data, error } = await supabase
         .from('routes')
         .select('*')
-        .order('display_order', { ascending: true, nullsLast: true }) as unknown as { data: Route[], error: any };
+        .order('display_order', { ascending: true }) as unknown as { data: Route[], error: any };
 
       if (error) {
         throw error;

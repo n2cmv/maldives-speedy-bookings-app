@@ -23,7 +23,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         const { data: routesData, error: routesError } = await supabase
           .from('routes')
           .select('from_location, to_location')
-          .order('display_order', { ascending: true, nullsLast: true });
+          .order('display_order', { ascending: true });
           
         if (routesError) {
           console.error('Error fetching routes:', routesError);

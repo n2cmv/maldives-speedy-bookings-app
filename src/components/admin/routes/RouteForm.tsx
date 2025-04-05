@@ -25,6 +25,7 @@ export interface Route {
   timings: string[];
   created_at: string;
   updated_at: string;
+  display_order?: number;
 }
 
 const routeSchema = z.object({

@@ -117,6 +117,7 @@ export type Database = {
       routes: {
         Row: {
           created_at: string
+          display_order: number | null
           duration: number
           from_location: string
           id: string
@@ -127,6 +128,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_order?: number | null
           duration: number
           from_location: string
           id?: string
@@ -137,6 +139,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_order?: number | null
           duration?: number
           from_location?: string
           id?: string
