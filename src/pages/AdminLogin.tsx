@@ -8,27 +8,29 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { initializeAdminUser } from "@/services/adminService";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>("natteynattson@gmail.com");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const [isInitializing, setIsInitializing] = useState<boolean>(false);
+  
   useEffect(() => {
     // Check if already logged in as admin
     const checkAdminSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { data } = await supabase
-          .from('admin_users')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-        
-        if (data) {
-          navigate("/admin");
+        try {
+          // Use service role function to check admin status to avoid RLS issues
+          const { success } = await initializeAdminUser();
+          if (success) {
+            navigate("/admin");
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
         }
       }
     };
@@ -59,18 +61,14 @@ const AdminLogin = () => {
 
       console.log("Auth successful, checking if admin");
       
-      // Step 2: Check if the user is in the admin_users table
-      const { data: adminData, error: adminError } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('user_id', authData.user.id)
-        .single();
-
-      if (adminError || !adminData) {
-        console.error("Admin check failed:", adminError || "No admin data");
-        // Sign out if not an admin
+      // Step 2: Initialize admin user (which will add them to admin_users if not already there)
+      const { success, error } = await initializeAdminUser();
+      
+      if (!success) {
+        console.error("Admin initialization failed:", error);
+        // Sign out if admin initialization fails
         await supabase.auth.signOut();
-        throw new Error("Not authorized as admin");
+        throw new Error(error || "Not authorized as admin");
       }
 
       // Success - redirect to admin dashboard
@@ -89,6 +87,33 @@ const AdminLogin = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleInitializeAdmin = async () => {
+    setIsInitializing(true);
+    try {
+      const { success, error } = await initializeAdminUser();
+      if (success) {
+        toast({
+          title: "Admin initialized",
+          description: "Admin user has been set up successfully"
+        });
+      } else {
+        toast({
+          title: "Initialization failed",
+          description: error || "Could not initialize admin user",
+          variant: "destructive"
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Initialization error",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsInitializing(false);
     }
   };
 
@@ -116,9 +141,6 @@ const AdminLogin = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <p className="text-xs text-gray-500">
-                Use the email address of your admin account
-              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -149,6 +171,21 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
+          <div className="mt-4 pt-4 border-t">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleInitializeAdmin}
+              disabled={isInitializing}
+            >
+              {isInitializing ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+                  Setting up admin...
+                </span>
+              ) : "Initialize Admin User"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
