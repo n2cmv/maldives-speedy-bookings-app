@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Clock, Navigation } from "lucide-react";
+import { MapPin, Clock, Navigation, ChevronDown } from "lucide-react";
 import { BookingInfo, Island, Time, PassengerCount } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
 import SeatPicker from "./SeatPicker";
@@ -104,28 +103,28 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               From
             </label>
             <div className="relative">
-              <Navigation className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-              <div className="w-full">
-                <Select
-                  value={booking.from}
-                  onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
-                >
-                  <SelectTrigger className="booking-select-trigger">
+              <Select
+                value={booking.from}
+                onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
+              >
+                <SelectTrigger className="custom-select-trigger">
+                  <div className="flex items-center">
+                    <Navigation className="h-5 w-5 text-gray-400 mr-2" />
                     <SelectValue placeholder="Select departure island" />
-                  </SelectTrigger>
-                  <SelectContent className="select-content">
-                    {fromLocations.map((location) => (
-                      <SelectItem 
-                        key={location} 
-                        value={location}
-                        className="select-item"
-                      >
-                        {location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="custom-dropdown">
+                  {fromLocations.map((location) => (
+                    <SelectItem 
+                      key={location} 
+                      value={location}
+                      className="select-item"
+                    >
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
@@ -134,28 +133,28 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Destination Island
             </label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-              <div className="w-full">
-                <Select
-                  value={booking.island}
-                  onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
-                >
-                  <SelectTrigger className="booking-select-trigger">
+              <Select
+                value={booking.island}
+                onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
+              >
+                <SelectTrigger className="custom-select-trigger">
+                  <div className="flex items-center">
+                    <MapPin className="h-5 w-5 text-gray-400 mr-2" />
                     <SelectValue placeholder="Select an island" />
-                  </SelectTrigger>
-                  <SelectContent className="select-content">
-                    {islands.map((island) => (
-                      <SelectItem 
-                        key={island} 
-                        value={island}
-                        className="select-item"
-                      >
-                        {island}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="custom-dropdown">
+                  {islands.map((island) => (
+                    <SelectItem 
+                      key={island} 
+                      value={island}
+                      className="select-item"
+                    >
+                      {island}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
@@ -164,28 +163,28 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Departure Time
             </label>
             <div className="relative">
-              <Clock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-              <div className="w-full">
-                <Select
-                  value={booking.time}
-                  onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
-                >
-                  <SelectTrigger className="booking-select-trigger">
+              <Select
+                value={booking.time}
+                onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
+              >
+                <SelectTrigger className="custom-select-trigger">
+                  <div className="flex items-center">
+                    <Clock className="h-5 w-5 text-gray-400 mr-2" />
                     <SelectValue placeholder="Select a time" />
-                  </SelectTrigger>
-                  <SelectContent className="select-content">
-                    {times.map((time) => (
-                      <SelectItem 
-                        key={time} 
-                        value={time}
-                        className="select-item"
-                      >
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="custom-dropdown">
+                  {times.map((time) => (
+                    <SelectItem 
+                      key={time} 
+                      value={time}
+                      className="select-item"
+                    >
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
@@ -202,7 +201,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <Button 
             type="submit" 
-            className="w-full bg-ocean hover:bg-ocean-dark text-white"
+            className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
           >
             Book Now
           </Button>

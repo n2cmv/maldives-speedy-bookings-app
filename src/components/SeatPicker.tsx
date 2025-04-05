@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PassengerCount {
@@ -39,25 +39,16 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
     <div className="w-full space-y-2">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer w-full border border-gray-300 rounded-lg p-3 flex items-center justify-between"
+        className="passenger-picker"
       >
         <span className="text-base">{totalPassengers} Passenger{totalPassengers !== 1 ? 's' : ''}</span>
-        <svg
+        <ChevronDown
           className={`h-5 w-5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
+        />
       </div>
 
       {isOpen && (
-        <div className="border border-gray-200 rounded-lg p-4 space-y-6 bg-white shadow-sm">
+        <div className="border border-gray-200 rounded-lg p-4 space-y-6 bg-white shadow-lg">
           {/* Adult row */}
           <div className="flex items-center justify-between">
             <div>
@@ -69,10 +60,10 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('adults', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.adults <= 1}
               >
-                <Minus className="h-4 w-4 text-gray-500" />
+                <Minus className="h-4 w-4" />
               </Button>
               
               <span className="text-xl w-8 text-center">{counts.adults}</span>
@@ -81,9 +72,9 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('adults', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
               >
-                <Plus className="h-4 w-4 text-primary" />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -99,10 +90,10 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('children', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.children <= 0}
               >
-                <Minus className="h-4 w-4 text-gray-500" />
+                <Minus className="h-4 w-4" />
               </Button>
               
               <span className="text-xl w-8 text-center">{counts.children}</span>
@@ -111,9 +102,9 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('children', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
               >
-                <Plus className="h-4 w-4 text-primary" />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -129,10 +120,10 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('seniors', -1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-muted hover:text-muted-foreground"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
                 disabled={counts.seniors <= 0}
               >
-                <Minus className="h-4 w-4 text-gray-500" />
+                <Minus className="h-4 w-4" />
               </Button>
               
               <span className="text-xl w-8 text-center">{counts.seniors}</span>
@@ -141,9 +132,9 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 onClick={() => updateCount('seniors', 1)}
                 variant="outline"
                 size="icon"
-                className="rounded-full h-10 w-10 border-gray-300 hover:bg-primary/10 hover:border-primary"
+                className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
               >
-                <Plus className="h-4 w-4 text-primary" />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
