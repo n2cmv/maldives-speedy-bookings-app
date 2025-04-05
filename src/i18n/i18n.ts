@@ -22,7 +22,7 @@ i18n
         translation: esTranslations
       }
     },
-    lng: 'en', // Force default language to English
+    lng: localStorage.getItem('i18nextLng') || 'en', // Check localStorage first, default to English
     fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
     interpolation: {
@@ -32,9 +32,10 @@ i18n
       useSuspense: false, // Prevents issues with suspense
     },
     detection: {
-      // Disable auto detection to always use English by default
-      order: [],
-      caches: [],
+      // Configure language detection
+      order: ['localStorage', 'navigator'],
+      lookupLocalStorage: 'i18nextLng',
+      caches: ['localStorage']
     }
   });
 
