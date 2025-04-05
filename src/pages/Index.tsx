@@ -21,7 +21,7 @@ const Index = () => {
       </div>
 
       <div className="absolute bottom-0 left-0 w-full flex justify-center pb-8 text-sm text-gray-500">
-        © 2025 Maldives Speedboat Bookings
+        © 2025 Retour Maldives
       </div>
     </div>
   );

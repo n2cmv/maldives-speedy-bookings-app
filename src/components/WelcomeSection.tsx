@@ -17,11 +17,11 @@ const WelcomeSection = () => {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-ocean-dark mb-6">
           Explore the Maldives <br />
-          by <span className="text-ocean">Speedboat</span>
+          with <span className="text-ocean">Retour</span>
         </h1>
         
         <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-          Welcome to the Speedboat Booking App for Maldivian Islands! To get started, 
+          Welcome to Retour Maldives! To get started, 
           please select your destination island, choose your preferred timing, and 
           enter the number of seats you wish to book. Enjoy your journey!
         </p>

@@ -8,7 +8,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <Ship className="h-6 w-6 text-ocean" />
-          <span className="text-xl font-bold text-ocean-dark">Maldives Speedboat</span>
+          <span className="text-xl font-bold text-ocean-dark">Retour Maldives</span>
         </Link>
         <nav>
           <Link to="/booking" className="text-ocean-dark hover:text-ocean transition-colors">
