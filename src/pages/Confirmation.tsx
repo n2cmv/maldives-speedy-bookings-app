@@ -79,11 +79,11 @@ const Confirmation = () => {
                 </div>
               </div>
             
-              {/* Outbound Journey */}
+              {/* Outbound Journey - Changed to Your Trip */}
               <div className="border-t border-gray-100 pt-4">
                 <h3 className="font-medium mb-4 flex items-center">
                   {isReturnTrip && <ArrowRight className="h-4 w-4 mr-1.5 text-blue-500" />}
-                  Outbound Journey
+                  Your Trip
                 </h3>
                 <div className="flex items-start">
                   <MapPin className="h-5 w-5 text-ocean mr-3 mt-0.5" />
