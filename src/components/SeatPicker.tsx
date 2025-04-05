@@ -83,7 +83,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300"
               >
-                <Plus className="h-4 w-4 text-orange-500" />
+                <Plus className="h-4 w-4 text-ocean" />
               </Button>
             </div>
           </div>
@@ -113,7 +113,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300"
               >
-                <Plus className="h-4 w-4 text-orange-500" />
+                <Plus className="h-4 w-4 text-ocean" />
               </Button>
             </div>
           </div>
@@ -143,7 +143,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300"
               >
-                <Plus className="h-4 w-4 text-orange-500" />
+                <Plus className="h-4 w-4 text-ocean" />
               </Button>
             </div>
           </div>
