@@ -64,7 +64,13 @@
     "message": "Your booking has been confirmed. We have sent you an email with your booking details.",
     "reference": "Booking Reference",
     "yourTrip": "Your Trip",
-    "returnTrip": "Return Trip"
+    "returnTrip": "Return Trip",
+    "paymentSuccessful": "Payment Successful",
+    "seatsNumber": "Number of Seats",
+    "passengerInformation": "Passenger Information",
+    "thankYou": "Thank you for booking with us. Your journey{{s}} to {{island}}{{return}} await{{s2}}!",
+    "andBack": "and back",
+    "bookAnother": "Book Another Trip"
   },
   "islands": {
     "featured": "Featured Destinations",

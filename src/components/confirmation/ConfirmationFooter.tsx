@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmationFooterProps {
   island: string;
@@ -9,11 +10,17 @@ interface ConfirmationFooterProps {
 
 const ConfirmationFooter = ({ island, isReturnTrip }: ConfirmationFooterProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <div className="border-t border-gray-200 pt-6">
       <p className="text-center text-gray-700 mb-6">
-        Thank you for booking with us. Your journey{isReturnTrip ? 's' : ''} to {island}{isReturnTrip ? ' and back' : ''} await{isReturnTrip ? '' : 's'}!
+        {t("confirmation.thankYou", "Thank you for booking with us. Your journey{{s}} to {{island}}{{return}} await{{s}}!", {
+          s: isReturnTrip ? 's' : '',
+          island: island,
+          return: isReturnTrip ? ' ' + t("confirmation.andBack", "and back") : '',
+          s2: isReturnTrip ? '' : 's'
+        })}
       </p>
       
       <div className="flex justify-center">
@@ -21,7 +28,7 @@ const ConfirmationFooter = ({ island, isReturnTrip }: ConfirmationFooterProps) =
           onClick={() => navigate("/booking")}
           className="bg-ocean hover:bg-ocean-dark text-white"
         >
-          Book Another Trip
+          {t("confirmation.bookAnother", "Book Another Trip")}
         </Button>
       </div>
     </div>

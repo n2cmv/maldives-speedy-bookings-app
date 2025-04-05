@@ -64,7 +64,13 @@
     "message": "Su reserva ha sido confirmada. Le hemos enviado un correo electrónico con los detalles de su reserva.",
     "reference": "Referencia de Reserva",
     "yourTrip": "Tu Viaje",
-    "returnTrip": "Viaje de Regreso"
+    "returnTrip": "Viaje de Regreso",
+    "paymentSuccessful": "Pago Exitoso",
+    "seatsNumber": "Número de Asientos",
+    "passengerInformation": "Información de Pasajeros",
+    "thankYou": "Gracias por reservar con nosotros. Su viaje{{s}} a {{island}}{{return}} le espera{{s2}}!",
+    "andBack": "y regreso",
+    "bookAnother": "Reservar Otro Viaje"
   },
   "islands": {
     "featured": "Destinos Destacados",

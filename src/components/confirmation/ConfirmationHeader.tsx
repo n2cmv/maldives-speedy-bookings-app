@@ -1,7 +1,10 @@
 
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const ConfirmationHeader = () => {
+  const { t } = useTranslation();
+  
   return (
     <>
       <div className="flex items-center justify-center mb-6">
@@ -11,7 +14,7 @@ const ConfirmationHeader = () => {
       </div>
       
       <h2 className="text-2xl font-bold text-ocean-dark text-center mb-6">
-        Booking Confirmed!
+        {t("confirmation.title")}
       </h2>
     </>
   );
