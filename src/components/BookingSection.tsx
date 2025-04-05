@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -13,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { MapPin, Clock, Users } from "lucide-react";
 import { BookingInfo, Island, Time } from "@/types/booking";
+import PopularDestinations from "./PopularDestinations";
 
 const islands: Island[] = ['Male', 'Hulhumale', 'Maafushi', 'Baa Atoll', 'Ari Atoll'];
 const times: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
@@ -24,6 +24,14 @@ const BookingSection = () => {
     seats: 1
   });
   const navigate = useNavigate();
+
+  const handleSelectDestination = (island: Island) => {
+    setBooking({ ...booking, island });
+    toast({
+      title: "Destination selected",
+      description: `You selected ${island}`,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +52,8 @@ const BookingSection = () => {
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-md mx-auto booking-card">
         <h2 className="text-2xl font-bold text-ocean-dark mb-6">Book Your Speedboat</h2>
+        
+        <PopularDestinations onSelectDestination={handleSelectDestination} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">

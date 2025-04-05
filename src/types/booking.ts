@@ -4,7 +4,10 @@ export type Island =
   | 'Hulhumale' 
   | 'Maafushi' 
   | 'Baa Atoll'
-  | 'Ari Atoll';
+  | 'Ari Atoll'
+  | 'A.Dh Dhigurah'
+  | 'A.Dh Dhangethi'
+  | 'Aa. Mathiveri';
 
 export type Time = 
   | '8:00 AM'
