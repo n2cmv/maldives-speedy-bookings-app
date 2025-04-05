@@ -5,7 +5,6 @@ import { BookingInfo, Passenger } from "@/types/booking";
 import Header from "@/components/Header";
 import TripSummaryCard from "@/components/TripSummaryCard";
 import PassengerForm from "@/components/PassengerForm";
-import TripSummaryHeader from "@/components/TripSummaryHeader";
 
 const PassengerDetails = () => {
   const location = useLocation();
@@ -87,8 +86,14 @@ const PassengerDetails = () => {
             <div className="booking-card mb-6">
               <h2 className="text-2xl font-bold text-ocean-dark mb-6">Passenger Details</h2>
               
-              {/* Trip Summary Header is now placed here, outside the form */}
-              <TripSummaryHeader bookingInfo={bookingInfo} />
+              <div className="border-t border-gray-200 pt-2 mb-6">
+                <p className="text-sm text-gray-600">
+                  Please fill in details for all passengers
+                  <span className="block mt-1 text-xs text-gray-500">
+                    (Email and phone number only required for primary passenger)
+                  </span>
+                </p>
+              </div>
               
               <PassengerForm 
                 bookingInfo={bookingInfo}
