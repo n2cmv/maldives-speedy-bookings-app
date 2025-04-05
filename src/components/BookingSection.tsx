@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
 import PopularDestinations from "./PopularDestinations";
-import { allTimes, fallbackIslands, islandTimeRestrictions } from "./booking/constants";
+import { allTimes, fallbackIslands } from "./booking/constants";
 import BookingForm from "./booking/BookingForm";
 
 interface BookingSectionProps {
@@ -56,7 +56,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           preSelectedIsland={preSelectedIsland}
           islandNames={islandNames}
           isLoading={isLoading}
-          timeRestrictions={islandTimeRestrictions}
+          timeRestrictions={{}}
           allTimes={allTimes}
         />
       </div>

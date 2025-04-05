@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -11,6 +12,7 @@ import TripDateTimeSelector from "./TripDateTimeSelector";
 import ReturnTripSection from "./ReturnTripSection";
 import PassengerSelection from "./PassengerSelection";
 import { getAllRoutes } from "@/services/bookingService";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
@@ -34,6 +36,7 @@ const BookingForm = ({
   const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || true);
   const [fromLocations, setFromLocations] = useState<string[]>([]);
   const [toLocations, setToLocations] = useState<string[]>([]);
+  const [availableTimesMap, setAvailableTimesMap] = useState<Record<string, Record<string, Time[]>>>({});
   const [booking, setBooking] = useState<BookingInfo>({
     from: '',
     island: preSelectedIsland || '',
@@ -68,6 +71,18 @@ const BookingForm = ({
           const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
           const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
           
+          // Build a map of available times for each route
+          const timesMap: Record<string, Record<string, Time[]>> = {};
+          
+          data.forEach(route => {
+            if (!timesMap[route.from_location]) {
+              timesMap[route.from_location] = {};
+            }
+            
+            timesMap[route.from_location][route.to_location] = route.timings || [];
+          });
+          
+          setAvailableTimesMap(timesMap);
           setFromLocations(uniqueFromLocations);
           setToLocations(uniqueToLocations);
         }
@@ -81,22 +96,30 @@ const BookingForm = ({
     fetchRoutes();
   }, []);
 
-  const availableTimes = booking.island ? 
-    (timeRestrictions[booking.island] || allTimes) : 
-    allTimes;
+  // Get available times based on the selected route
+  const getRouteTimings = (from: string, to: string): Time[] => {
+    if (availableTimesMap[from] && availableTimesMap[from][to] && availableTimesMap[from][to].length > 0) {
+      return availableTimesMap[from][to];
+    }
+    return allTimes;
+  };
   
-  const returnAvailableTimes = booking.returnTripDetails?.from ? 
-    (timeRestrictions[booking.returnTripDetails.from] || allTimes) : 
-    allTimes;
+  const availableTimes = booking.from && booking.island 
+    ? getRouteTimings(booking.from, booking.island)
+    : allTimes;
+  
+  const returnAvailableTimes = booking.returnTrip && booking.returnTripDetails?.from && booking.returnTripDetails?.island
+    ? getRouteTimings(booking.returnTripDetails.from, booking.returnTripDetails.island)
+    : allTimes;
 
   useEffect(() => {
-    if (booking.island && booking.time) {
-      const availableTimesForIsland = timeRestrictions[booking.island] || allTimes;
-      if (!availableTimesForIsland.includes(booking.time as Time)) {
+    if (booking.from && booking.island && booking.time) {
+      const routeTimings = getRouteTimings(booking.from, booking.island);
+      if (!routeTimings.includes(booking.time as Time)) {
         setBooking(prev => ({ ...prev, time: '' }));
       }
     }
-  }, [booking.island, booking.time, timeRestrictions, allTimes]);
+  }, [booking.from, booking.island, booking.time]);
   
   useEffect(() => {
     if (booking.returnTrip && booking.island && booking.from) {

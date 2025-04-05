@@ -1,7 +1,7 @@
 
 import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from "@/components/ui/select";
 import { Time } from "@/types/booking";
-import { Clock, ChevronDown } from "lucide-react";
+import { Clock, ChevronDown, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface TimeSelectorProps {
@@ -40,15 +40,22 @@ const TimeSelector = ({
         >
           <SelectTrigger id={id} className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
           <SelectContent className="select-content">
-            {availableTimes.map((time) => (
-              <SelectItem 
-                key={time} 
-                value={time}
-                className="select-item"
-              >
-                {time}
-              </SelectItem>
-            ))}
+            {availableTimes.length > 0 ? (
+              availableTimes.map((time) => (
+                <SelectItem 
+                  key={time} 
+                  value={time}
+                  className="select-item"
+                >
+                  {time}
+                </SelectItem>
+              ))
+            ) : (
+              <div className="p-3 text-sm flex items-center text-amber-600">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                {t("booking.form.noTimingsAvailable", "No ferry timings available for this route")}
+              </div>
+            )}
           </SelectContent>
         </Select>
       </div>
