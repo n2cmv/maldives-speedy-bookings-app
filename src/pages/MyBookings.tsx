@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBookingsByEmail } from "@/services/bookingService";
-import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox } from "lucide-react";
+import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/components/ui/input-otp";
 
 const MyBookings = () => {
   const navigate = useNavigate();
@@ -42,18 +42,21 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      // Send OTP via Supabase
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          // Set email OTP settings
-          emailRedirectTo: window.location.origin + '/my-bookings',
-        },
+      // Send OTP via our custom edge function instead of Supabase auth
+      const response = await supabase.functions.invoke("process-booking-otp", {
+        body: { email }
       });
       
-      if (error) {
+      if (response.error) {
         toast.error("Error sending verification code", {
-          description: error.message
+          description: response.error
+        });
+        return;
+      }
+      
+      if (!response.data.success) {
+        toast.error("Error sending verification code", {
+          description: response.data.error || "Please try again later"
         });
         return;
       }
@@ -81,17 +84,28 @@ const MyBookings = () => {
     setVerifying(true);
     
     try {
-      // Verify the OTP
-      const { data, error } = await supabase.auth.verifyOtp({
-        email,
-        token: otpValue,
-        type: 'email',
-      });
+      // Verify OTP directly with our database
+      const { data: otpData, error: otpError } = await supabase
+        .from('booking_otps')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        .eq('otp_code', otpValue)
+        .single();
       
-      if (error) {
+      if (otpError || !otpData) {
         toast.error("Invalid verification code", {
           description: "Please check the code and try again"
         });
+        setVerifying(false);
+        return;
+      }
+      
+      // Check if OTP has expired
+      if (new Date(otpData.expires_at) < new Date()) {
+        toast.error("Verification code has expired", {
+          description: "Please request a new code"
+        });
+        setVerifying(false);
         return;
       }
       
@@ -104,6 +118,7 @@ const MyBookings = () => {
         toast.error("Error fetching bookings", {
           description: "Please try again later"
         });
+        setVerifying(false);
         return;
       }
       
@@ -186,6 +201,11 @@ const MyBookings = () => {
                       )}
                       Send Verification Code
                     </Button>
+                  </div>
+                  
+                  <div className="text-xs text-gray-500 flex items-center mt-2">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    <span>We'll send a 6-digit code to your email address</span>
                   </div>
                 </form>
               ) : !verified ? (

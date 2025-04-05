@@ -20,15 +20,17 @@ interface BookingEmailRequest {
   email: string;
   name: string;
   bookingDetails: {
-    from: string;
-    to: string;
-    date: string;
-    time: string;
+    from?: string;
+    to?: string;
+    date?: string;
+    time?: string;
     returnTrip?: boolean;
     returnDate?: string;
     returnTime?: string;
-    passengerCount: number;
-    paymentReference: string;
+    passengerCount?: number;
+    paymentReference?: string;
+    otpCode?: string;
+    isOtpEmail?: boolean;
   };
 }
 
@@ -70,8 +72,8 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { email, name, bookingDetails }: BookingEmailRequest = requestData;
 
-    if (!email || !name || !bookingDetails) {
-      console.error("[send-confirmation] Missing required email data:", { email, name, bookingDetails });
+    if (!email || !name) {
+      console.error("[send-confirmation] Missing required email data:", { email, name });
       return new Response(
         JSON.stringify({ error: "Missing required email data" }),
         {
@@ -93,86 +95,148 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Format trip details
-    const tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
-    
-    // Format return trip info if applicable
-    const returnInfo = bookingDetails.returnTrip && bookingDetails.returnDate && bookingDetails.returnTime
-      ? `<p><strong>Return Trip:</strong> ${bookingDetails.to} to ${bookingDetails.from} on ${bookingDetails.returnDate} at ${bookingDetails.returnTime}</p>`
-      : '';
-
-    console.log("[send-confirmation] Preparing to send email to:", email);
-    
-    try {
-      console.log("[send-confirmation] Calling Resend API with from: Island Ferry Bookings <onboarding@resend.dev>");
-      console.log("[send-confirmation] Sending to:", email);
+    // Check if this is an OTP email or a booking confirmation
+    if (bookingDetails.isOtpEmail && bookingDetails.otpCode) {
+      // This is an OTP verification email
+      console.log("[send-confirmation] Preparing to send OTP email to:", email);
       
-      // Attempt to send the email
-      const emailResponse = await resend.emails.send({
-        from: "Island Ferry Bookings <onboarding@resend.dev>",
-        to: [email],
-        subject: "Your Island Ferry Booking Confirmation",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
-            <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-              <h1 style="color: #0AB3B8;">Island Ferry Booking Confirmation</h1>
-            </div>
-            
-            <div style="padding: 20px 0;">
-              <p>Dear ${name},</p>
-              <p>Thank you for booking with Island Ferry. Your booking has been confirmed!</p>
-              
-              <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h2 style="color: #0AB3B8; margin-top: 0;">Booking Details</h2>
-                <p><strong>Booking Reference:</strong> ${bookingDetails.paymentReference}</p>
-                <p><strong>Trip:</strong> ${tripInfo}</p>
-                ${returnInfo}
-                <p><strong>Passengers:</strong> ${bookingDetails.passengerCount}</p>
+      try {
+        console.log("[send-confirmation] Sending OTP email with code:", bookingDetails.otpCode);
+        
+        const emailResponse = await resend.emails.send({
+          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          to: [email],
+          subject: "Your Island Ferry Verification Code",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+              <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                <h1 style="color: #0AB3B8;">Island Ferry Verification Code</h1>
               </div>
               
-              <p>Please arrive at the ferry terminal at least 30 minutes before your scheduled departure time.</p>
-              <p>If you need to make any changes to your booking, please contact our customer service.</p>
+              <div style="padding: 20px 0;">
+                <p>Dear ${name},</p>
+                <p>Your verification code for accessing your Island Ferry bookings is:</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
+                  <h2 style="color: #0AB3B8; margin-top: 0; font-size: 32px; letter-spacing: 5px;">${bookingDetails.otpCode}</h2>
+                </div>
+                
+                <p>This code will expire in 30 minutes.</p>
+                <p>If you did not request this code, you can safely ignore this email.</p>
+              </div>
+              
+              <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+                <p>Island Ferry Services &copy; 2025</p>
+              </div>
             </div>
-            
-            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
-              <p>Island Ferry Services &copy; 2025</p>
-            </div>
-          </div>
-        `,
-      });
+          `,
+        });
 
-      console.log("[send-confirmation] Email sent successfully. Resend response:", JSON.stringify(emailResponse));
-
-      return new Response(JSON.stringify(emailResponse), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      });
-    } catch (emailError: any) {
-      console.error("[send-confirmation] Resend API error:", emailError);
-      console.error("[send-confirmation] Error details:", JSON.stringify(emailError));
-      
-      // Extract the most relevant error message
-      let errorMessage = "Failed to send email";
-      if (emailError.message) {
-        errorMessage = emailError.message;
-      } else if (typeof emailError === 'object') {
-        errorMessage = JSON.stringify(emailError);
+        console.log("[send-confirmation] OTP email sent successfully. Resend response:", JSON.stringify(emailResponse));
+        return new Response(JSON.stringify(emailResponse), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        });
+      } catch (emailError: any) {
+        console.error("[send-confirmation] Error sending OTP email:", emailError);
+        return new Response(
+          JSON.stringify({ 
+            error: emailError.message || "Failed to send OTP email",
+            errorDetails: emailError,
+            emailAddress: email 
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
       }
+    } else {
+      // Regular booking confirmation email
+      // Format trip details
+      const tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
       
-      return new Response(
-        JSON.stringify({ 
-          error: errorMessage,
-          errorDetails: emailError,
-          emailAddress: email 
-        }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
+      // Format return trip info if applicable
+      const returnInfo = bookingDetails.returnTrip && bookingDetails.returnDate && bookingDetails.returnTime
+        ? `<p><strong>Return Trip:</strong> ${bookingDetails.to} to ${bookingDetails.from} on ${bookingDetails.returnDate} at ${bookingDetails.returnTime}</p>`
+        : '';
+
+      console.log("[send-confirmation] Preparing to send booking confirmation email to:", email);
+      
+      try {
+        console.log("[send-confirmation] Calling Resend API with from: Island Ferry Bookings <onboarding@resend.dev>");
+        console.log("[send-confirmation] Sending to:", email);
+        
+        // Attempt to send the email
+        const emailResponse = await resend.emails.send({
+          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          to: [email],
+          subject: "Your Island Ferry Booking Confirmation",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+              <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                <h1 style="color: #0AB3B8;">Island Ferry Booking Confirmation</h1>
+              </div>
+              
+              <div style="padding: 20px 0;">
+                <p>Dear ${name},</p>
+                <p>Thank you for booking with Island Ferry. Your booking has been confirmed!</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <h2 style="color: #0AB3B8; margin-top: 0;">Booking Details</h2>
+                  <p><strong>Booking Reference:</strong> ${bookingDetails.paymentReference}</p>
+                  <p><strong>Trip:</strong> ${tripInfo}</p>
+                  ${returnInfo}
+                  <p><strong>Passengers:</strong> ${bookingDetails.passengerCount}</p>
+                </div>
+                
+                <p>Please arrive at the ferry terminal at least 30 minutes before your scheduled departure time.</p>
+                <p>If you need to make any changes to your booking, please contact our customer service.</p>
+              </div>
+              
+              <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+                <p>Island Ferry Services &copy; 2025</p>
+              </div>
+            </div>
+          `,
+        });
+
+        console.log("[send-confirmation] Email sent successfully. Resend response:", JSON.stringify(emailResponse));
+
+        return new Response(JSON.stringify(emailResponse), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        });
+      } catch (emailError: any) {
+        console.error("[send-confirmation] Resend API error:", emailError);
+        console.error("[send-confirmation] Error details:", JSON.stringify(emailError));
+        
+        // Extract the most relevant error message
+        let errorMessage = "Failed to send email";
+        if (emailError.message) {
+          errorMessage = emailError.message;
+        } else if (typeof emailError === 'object') {
+          errorMessage = JSON.stringify(emailError);
         }
-      );
+        
+        return new Response(
+          JSON.stringify({ 
+            error: errorMessage,
+            errorDetails: emailError,
+            emailAddress: email 
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
     }
   } catch (error: any) {
     console.error("[send-confirmation] Uncaught error in send-confirmation function:", error);
