@@ -8,6 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Plus, Trash2, User } from "lucide-react";
 import Header from "@/components/Header";
 import TripSummaryCard from "@/components/TripSummaryCard";
+import CountryCodeSelector from "@/components/CountryCodeSelector";
 
 const MAX_PASSENGERS = 15;
 
@@ -39,6 +40,8 @@ const PassengerDetails = () => {
           name: "",
           email: "",
           phone: "",
+          countryCode: "+960", // Default to Maldives country code
+          passport: "",
           type: "adult"
         });
         id++;
@@ -51,6 +54,8 @@ const PassengerDetails = () => {
           name: "",
           email: "",
           phone: "",
+          countryCode: "+960", // Default to Maldives country code
+          passport: "",
           type: "child"
         });
         id++;
@@ -63,6 +68,8 @@ const PassengerDetails = () => {
           name: "",
           email: "",
           phone: "",
+          countryCode: "+960", // Default to Maldives country code
+          passport: "",
           type: "senior"
         });
         id++;
@@ -102,6 +109,8 @@ const PassengerDetails = () => {
         name: "",
         email: "",
         phone: "",
+        countryCode: "+960", // Default to Maldives country code
+        passport: "",
         type: "adult" // Default type
       }
     ]);
@@ -111,7 +120,7 @@ const PassengerDetails = () => {
     e.preventDefault();
     
     // Check if all required fields are filled
-    const missingInfo = passengers.some(p => !p.name || !p.email || !p.phone);
+    const missingInfo = passengers.some(p => !p.name || !p.email || !p.phone || !p.passport);
     
     if (missingInfo) {
       toast({
@@ -217,11 +226,29 @@ const PassengerDetails = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <div className="flex items-center gap-2">
+                          <CountryCodeSelector 
+                            value={passenger.countryCode}
+                            onChange={(value) => handlePassengerChange(passenger.id, "countryCode", value)}
+                          />
+                          <Input
+                            type="tel"
+                            value={passenger.phone}
+                            onChange={(e) => handlePassengerChange(passenger.id, "phone", e.target.value)}
+                            placeholder="Enter phone number"
+                            required
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Passport Number</label>
                         <Input
-                          type="tel"
-                          value={passenger.phone}
-                          onChange={(e) => handlePassengerChange(passenger.id, "phone", e.target.value)}
-                          placeholder="Enter phone number"
+                          type="text"
+                          value={passenger.passport}
+                          onChange={(e) => handlePassengerChange(passenger.id, "passport", e.target.value)}
+                          placeholder="Enter passport number"
                           required
                         />
                       </div>
