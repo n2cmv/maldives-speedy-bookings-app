@@ -84,7 +84,7 @@ const PassengerDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -99,8 +99,8 @@ const PassengerDetails = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
-              <div className="booking-card mb-6 border border-ocean/10 rounded-xl overflow-hidden">
-                <div className="bg-ocean/5 py-4 px-6 border-b border-ocean/10">
+              <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100 mb-6">
+                <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold text-ocean-dark">Passenger Details</h2>
                 </div>
                 
