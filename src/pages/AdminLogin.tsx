@@ -41,6 +41,8 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
+      console.log("Attempting login with:", { email: username, password });
+      
       // Step 1: Sign in with username as the email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: username,
@@ -48,13 +50,17 @@ const AdminLogin = () => {
       });
 
       if (authError) {
+        console.error("Auth error:", authError);
         throw authError;
       }
 
       if (!authData.user || !authData.session) {
+        console.error("No user or session returned");
         throw new Error("Authentication failed");
       }
 
+      console.log("Auth successful, checking if admin");
+      
       // Step 2: Check if the user is in the admin_users table
       const { data: adminData, error: adminError } = await supabase
         .from('admin_users')
@@ -63,18 +69,21 @@ const AdminLogin = () => {
         .single();
 
       if (adminError || !adminData) {
+        console.error("Admin check failed:", adminError || "No admin data");
         // Sign out if not an admin
         await supabase.auth.signOut();
         throw new Error("Not authorized as admin");
       }
 
       // Success - redirect to admin dashboard
+      console.log("Admin check passed, redirecting to dashboard");
       toast({
         title: "Login successful",
         description: "Welcome to the admin dashboard",
       });
       navigate("/admin");
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error.message || "Could not authenticate",
