@@ -21,6 +21,9 @@ const Header = () => {
             <Search className="h-4 w-4 mr-1" />
             {t("lookup.findBooking", "Find Booking")}
           </Link>
+          <Link to="/my-bookings" className="text-ocean-dark hover:text-ocean transition-colors">
+            {t("common.myBookings", "My Bookings")}
+          </Link>
         </nav>
       </div>
     </header>

@@ -22,7 +22,6 @@ import i18n from "./i18n/i18n";
 
 // Import language context
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { ThemeProvider } from "./components/ui/use-theme";
 
 // Import local storage service
 import { saveBookingToLocalStorage } from "./services/bookingStorage";
@@ -51,27 +50,25 @@ const App = () => {
   
   return (
     <I18nextProvider i18n={i18n}>
-      <ThemeProvider defaultTheme="light">
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster position="top-center" richColors closeButton />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/booking" element={<BookingForm />} />
-                  <Route path="/passenger-details" element={<PassengerDetails />} />
-                  <Route path="/payment" element={<PaymentGateway />} />
-                  <Route path="/confirmation" element={<Confirmation />} />
-                  <Route path="/my-bookings" element={<MyBookings />} />
-                  <Route path="/lookup" element={<BookingLookup />} /> {/* Add the new route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster position="top-center" richColors closeButton />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/booking" element={<BookingForm />} />
+                <Route path="/passenger-details" element={<PassengerDetails />} />
+                <Route path="/payment" element={<PaymentGateway />} />
+                <Route path="/confirmation" element={<Confirmation />} />
+                <Route path="/my-bookings" element={<MyBookings />} />
+                <Route path="/lookup" element={<BookingLookup />} /> {/* Add the new route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
     </I18nextProvider>
   );
 };
