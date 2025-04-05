@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Plus, Trash2, User } from "lucide-react";
 import Header from "@/components/Header";
+import TripSummaryCard from "@/components/TripSummaryCard";
 
 const MAX_PASSENGERS = 15;
 
@@ -139,116 +140,125 @@ const PassengerDetails = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
       <div className="pt-24 pb-12 px-4">
-        <div className="max-w-md mx-auto booking-card">
-          <h2 className="text-2xl font-bold text-ocean-dark mb-6">Passenger Details</h2>
-          
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <p className="text-sm text-gray-600">Trip to</p>
-                <p className="font-medium">{bookingInfo.island}</p>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <div className="booking-card mb-6">
+              <h2 className="text-2xl font-bold text-ocean-dark mb-6">Passenger Details</h2>
+              
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Trip to</p>
+                    <p className="font-medium">{bookingInfo.island}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Departure</p>
+                    <p className="font-medium">{bookingInfo.time}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Total seats</p>
+                    <p className="font-medium">{bookingInfo.seats}</p>
+                  </div>
+                </div>
+                <div className="border-t border-gray-200 pt-2">
+                  <p className="text-sm text-gray-600">Please fill in details for all passengers</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Departure</p>
-                <p className="font-medium">{bookingInfo.time}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Total seats</p>
-                <p className="font-medium">{bookingInfo.seats}</p>
-              </div>
-            </div>
-            <div className="border-t border-gray-200 pt-2">
-              <p className="text-sm text-gray-600">Please fill in details for all passengers</p>
+              
+              <form onSubmit={handleSubmit}>
+                {passengers.map((passenger, index) => (
+                  <div 
+                    key={passenger.id} 
+                    className="mb-8 border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <User className="h-5 w-5 text-ocean mr-2" />
+                        <h3 className="font-medium">
+                          Passenger {index + 1} ({passenger.type})
+                        </h3>
+                      </div>
+                      {index > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemovePassenger(passenger.id)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <Input
+                          type="text"
+                          value={passenger.name}
+                          onChange={(e) => handlePassengerChange(passenger.id, "name", e.target.value)}
+                          placeholder="Enter full name"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <Input
+                          type="email"
+                          value={passenger.email}
+                          onChange={(e) => handlePassengerChange(passenger.id, "email", e.target.value)}
+                          placeholder="Enter email address"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <Input
+                          type="tel"
+                          value={passenger.phone}
+                          onChange={(e) => handlePassengerChange(passenger.id, "phone", e.target.value)}
+                          placeholder="Enter phone number"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="mb-6">
+                  <Button 
+                    type="button" 
+                    onClick={handleAddPassenger}
+                    variant="outline"
+                    className="w-full border-dashed border-gray-300 py-3 flex items-center justify-center text-ocean hover:bg-ocean/5"
+                    disabled={passengers.length >= MAX_PASSENGERS}
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Add Another Passenger
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Maximum {MAX_PASSENGERS} passengers per booking ({passengers.length}/{MAX_PASSENGERS})
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
+                >
+                  Continue to Confirmation
+                </Button>
+              </form>
             </div>
           </div>
           
-          <form onSubmit={handleSubmit}>
-            {passengers.map((passenger, index) => (
-              <div 
-                key={passenger.id} 
-                className="mb-8 border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <User className="h-5 w-5 text-ocean mr-2" />
-                    <h3 className="font-medium">
-                      Passenger {index + 1} ({passenger.type})
-                    </h3>
-                  </div>
-                  {index > 0 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemovePassenger(passenger.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Remove
-                    </Button>
-                  )}
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <Input
-                      type="text"
-                      value={passenger.name}
-                      onChange={(e) => handlePassengerChange(passenger.id, "name", e.target.value)}
-                      placeholder="Enter full name"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                    <Input
-                      type="email"
-                      value={passenger.email}
-                      onChange={(e) => handlePassengerChange(passenger.id, "email", e.target.value)}
-                      placeholder="Enter email address"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <Input
-                      type="tel"
-                      value={passenger.phone}
-                      onChange={(e) => handlePassengerChange(passenger.id, "phone", e.target.value)}
-                      placeholder="Enter phone number"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            <div className="mb-6">
-              <Button 
-                type="button" 
-                onClick={handleAddPassenger}
-                variant="outline"
-                className="w-full border-dashed border-gray-300 py-3 flex items-center justify-center text-ocean hover:bg-ocean/5"
-                disabled={passengers.length >= MAX_PASSENGERS}
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Add Another Passenger
-              </Button>
-              <p className="text-xs text-gray-500 mt-1 text-center">
-                Maximum {MAX_PASSENGERS} passengers per booking ({passengers.length}/{MAX_PASSENGERS})
-              </p>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
-            >
-              Continue to Confirmation
-            </Button>
-          </form>
+          {/* Trip Summary Card */}
+          <div className="md:col-span-1">
+            <TripSummaryCard bookingInfo={{...bookingInfo, passengers}} />
+          </div>
         </div>
       </div>
     </div>
