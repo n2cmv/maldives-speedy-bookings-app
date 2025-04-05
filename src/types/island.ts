@@ -7,3 +7,6 @@ export interface Island {
   created_at?: string;
   updated_at?: string;
 }
+
+// For backward compatibility with existing components
+export type IslandName = string;

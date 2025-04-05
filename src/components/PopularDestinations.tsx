@@ -1,30 +1,87 @@
 
-import { Island } from "@/types/booking";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Sun, Ship, Anchor } from "lucide-react";
 
 interface PopularDestinationsProps {
-  onSelectDestination: (island: Island) => void;
+  onSelectDestination: (island: string) => void;
 }
 
 const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) => {
-  const destinations = [
+  const [popularIslands, setPopularIslands] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fallback destinations with icons in case the DB fetch fails
+  const fallbackDestinations = [
     { name: "A.Dh Dhigurah", icon: <Sun className="h-4 w-4 text-amber-500" /> },
     { name: "A.Dh Dhangethi", icon: <Ship className="h-4 w-4 text-blue-500" /> },
     { name: "Aa. Mathiveri", icon: <Anchor className="h-4 w-4 text-teal-500" /> }
   ];
+  
+  useEffect(() => {
+    const fetchPopularIslands = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch islands from Supabase
+        // In a real app, you might have a "popular" flag or sort by booking count
+        const { data, error } = await supabase
+          .from('islands')
+          .select('name')
+          .limit(3);
+        
+        if (error) {
+          console.error('Error fetching popular islands:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          setPopularIslands(data.map(island => island.name));
+        }
+      } catch (error) {
+        console.error('Error fetching popular islands:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPopularIslands();
+  }, []);
+
+  // Use DB islands or fallbacks if not available
+  const displayDestinations = popularIslands.length > 0 
+    ? popularIslands.map((name, index) => ({
+        name,
+        icon: [
+          <Sun key="sun" className="h-4 w-4 text-amber-500" />,
+          <Ship key="ship" className="h-4 w-4 text-blue-500" />,
+          <Anchor key="anchor" className="h-4 w-4 text-teal-500" />
+        ][index % 3]
+      })) 
+    : fallbackDestinations;
+
+  if (isLoading) {
+    return (
+      <div className="mb-12 flex flex-col items-center">
+        <h3 className="text-lg font-semibold text-ocean-dark mb-3">Quick Select</h3>
+        <div className="flex flex-wrap justify-center gap-2">
+          <div className="h-8 w-8 border-2 border-t-ocean border-opacity-50 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-12 flex flex-col items-center">
       <h3 className="text-lg font-semibold text-ocean-dark mb-3">Quick Select</h3>
       <div className="flex flex-wrap justify-center gap-2">
-        {destinations.map((dest) => (
+        {displayDestinations.map((dest) => (
           <Button 
             key={dest.name} 
             variant="outline" 
             size="sm"
             className="flex items-center gap-1.5 bg-white border-primary/30 hover:bg-white hover:border-primary hover:text-primary"
-            onClick={() => onSelectDestination(dest.name as Island)}
+            onClick={() => onSelectDestination(dest.name)}
           >
             {dest.icon}
             <span>{dest.name}</span>

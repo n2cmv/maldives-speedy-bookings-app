@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -11,7 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { MapPin, Clock, Navigation, ChevronDown, Calendar } from "lucide-react";
-import { BookingInfo, Island, Time, PassengerCount } from "@/types/booking";
+import { BookingInfo, Time, PassengerCount } from "@/types/booking";
+import { Island } from "@/types/island";
+import { supabase } from "@/integrations/supabase/client";
 import PopularDestinations from "./PopularDestinations";
 import SeatPicker from "./SeatPicker";
 import { Label } from "@/components/ui/label";
@@ -21,12 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
-const fromLocations: Island[] = [
-  'Male\' City',
-  'Male\' Airport'
-];
-
-const islands: Island[] = [
+const fallbackIslands = [
   'Male', 
   'Hulhumale', 
   'Maafushi', 
@@ -38,9 +34,15 @@ const islands: Island[] = [
   'A.Dh Dhangethi',
   'Aa. Mathiveri'
 ];
+
+const fromLocations: string[] = [
+  'Male\' City',
+  'Male\' Airport'
+];
+
 const allTimes: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
 
-const islandTimeRestrictions: Record<Island, Time[]> = {
+const islandTimeRestrictions: Record<string, Time[]> = {
   'A.Dh Dhigurah': ['6:30 AM', '1:10 PM'],
   'A.Dh Dhangethi': ['7:00 AM', '1:30 PM'],
   'Male': allTimes,
@@ -56,7 +58,7 @@ const islandTimeRestrictions: Record<Island, Time[]> = {
 const MAX_PASSENGERS = 15;
 
 interface BookingSectionProps {
-  preSelectedIsland?: Island;
+  preSelectedIsland?: string;
 }
 
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
@@ -76,6 +78,9 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const navigate = useNavigate();
   const islandSelectRef = useRef<HTMLButtonElement>(null);
   
+  const [islandsData, setIslandsData] = useState<Island[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
   const today = new Date();
   const [departureDate, setDepartureDate] = useState<Date | undefined>(today);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
@@ -90,6 +95,37 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     (islandTimeRestrictions[booking.returnTripDetails.from] || allTimes) : 
     allTimes;
   
+  useEffect(() => {
+    const fetchIslands = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('islands')
+          .select('*')
+          .order('name');
+        
+        if (error) {
+          console.error('Error fetching islands:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          setIslandsData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching islands:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchIslands();
+  }, []);
+  
+  const islandNames = islandsData.length > 0 
+    ? islandsData.map(island => island.name) 
+    : fallbackIslands;
+
   useEffect(() => {
     if (preSelectedIsland) {
       setBooking(prev => ({ ...prev, island: preSelectedIsland }));
@@ -119,7 +155,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     }
   }, [booking.returnTrip, booking.island, booking.from, returnDate]);
 
-  const handleSelectDestination = (island: Island) => {
+  const handleSelectDestination = (island: string) => {
     setBooking(prev => ({ ...prev, island }));
     
     if (booking.returnTrip) {
@@ -242,19 +278,23 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               </div>
               <Select
                 value={booking.from}
-                onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
+                onValueChange={(value) => setBooking({ ...booking, from: value })}
               >
                 <SelectTrigger id="from-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
                 <SelectContent className="select-content">
-                  {fromLocations.map((location) => (
-                    <SelectItem 
-                      key={location} 
-                      value={location}
-                      className="select-item"
-                    >
-                      {location}
-                    </SelectItem>
-                  ))}
+                  {isLoading ? (
+                    <SelectItem value="loading">Loading...</SelectItem>
+                  ) : (
+                    islandNames.map((islandName) => (
+                      <SelectItem 
+                        key={islandName} 
+                        value={islandName}
+                        className="select-item"
+                      >
+                        {islandName}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -274,7 +314,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               </div>
               <Select
                 value={booking.island}
-                onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
+                onValueChange={(value) => setBooking({ ...booking, island: value })}
               >
                 <SelectTrigger 
                   ref={islandSelectRef}
@@ -282,15 +322,19 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                   className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" 
                 />
                 <SelectContent className="select-content">
-                  {islands.map((island) => (
-                    <SelectItem 
-                      key={island} 
-                      value={island}
-                      className="select-item"
-                    >
-                      {island}
-                    </SelectItem>
-                  ))}
+                  {isLoading ? (
+                    <SelectItem value="loading">Loading...</SelectItem>
+                  ) : (
+                    islandNames.map((islandName) => (
+                      <SelectItem 
+                        key={islandName} 
+                        value={islandName}
+                        className="select-item"
+                      >
+                        {islandName}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
