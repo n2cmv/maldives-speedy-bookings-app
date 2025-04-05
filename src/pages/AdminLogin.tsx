@@ -17,6 +17,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [needsInitialization, setNeedsInitialization] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(false);
 
   useEffect(() => {
     // Check if already logged in as admin
@@ -39,9 +40,17 @@ const AdminLogin = () => {
   }, [navigate]);
 
   const handleInitializeAdmin = async () => {
+    setIsInitializing(true);
     setIsLoading(true);
     try {
+      toast({
+        title: "Initializing admin...",
+        description: "Please wait while we set up the admin user.",
+      });
+      
       const result = await initializeAdminUser();
+      console.log("Initialization result:", result);
+      
       if (result.success) {
         toast({
           title: "Admin initialized",
@@ -56,12 +65,14 @@ const AdminLogin = () => {
         });
       }
     } catch (error: any) {
+      console.error("Error initializing admin:", error);
       toast({
         title: "Initialization failed",
         description: error.message || "Could not initialize admin user",
         variant: "destructive",
       });
     } finally {
+      setIsInitializing(false);
       setIsLoading(false);
     }
   };
@@ -71,7 +82,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      console.log("Attempting login with:", { email: username, password });
+      console.log("Attempting login with:", { email: `${username}@example.com`, password });
       
       // Step 1: Sign in with username as the email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -151,9 +162,9 @@ const AdminLogin = () => {
               <Button 
                 onClick={handleInitializeAdmin} 
                 className="w-full" 
-                disabled={isLoading}
+                disabled={isLoading || isInitializing}
               >
-                {isLoading ? (
+                {isInitializing ? (
                   <span className="flex items-center gap-2">
                     <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
                     Initializing...
@@ -190,8 +201,11 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Retouradmin7443777!!!"
+                  placeholder="Enter your password"
                 />
+                <p className="text-xs text-gray-500">
+                  Default password: Retouradmin7443777!!!
+                </p>
               </div>
               <Button 
                 type="submit" 

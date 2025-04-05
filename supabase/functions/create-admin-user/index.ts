@@ -26,8 +26,8 @@ serve(async (req) => {
       }
     );
 
-    // Set up admin credentials
-    const adminEmail = "retouradmin";
+    // Set up admin credentials - USING A PROPER EMAIL FORMAT
+    const adminEmail = "retouradmin@example.com";
     const adminPassword = "Retouradmin7443777!!!";
 
     // Create admin user if it doesn't exist
