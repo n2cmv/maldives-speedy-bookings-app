@@ -20,9 +20,16 @@ export type Time =
   | '6:00 PM' 
   | '8:00 PM';
 
+export interface PassengerCount {
+  adults: number;
+  children: number;
+  seniors: number;
+}
+
 export interface BookingInfo {
   from: Island | '';
   island: Island | '';
   time: Time | '';
   seats: number;
+  passengerCounts?: PassengerCount;
 }

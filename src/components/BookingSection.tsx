@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -7,12 +8,12 @@ import {
   SelectTrigger,
   SelectValue 
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Clock, Users, Navigation } from "lucide-react";
-import { BookingInfo, Island, Time } from "@/types/booking";
+import { MapPin, Clock, Navigation } from "lucide-react";
+import { BookingInfo, Island, Time, PassengerCount } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
+import SeatPicker from "./SeatPicker";
 
 const fromLocations: Island[] = [
   'Male\' City',
@@ -39,7 +40,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     from: 'Male\' Airport',
     island: '',
     time: '',
-    seats: 1
+    seats: 1,
+    passengerCounts: {
+      adults: 1,
+      children: 0,
+      seniors: 0,
+    }
   });
   const navigate = useNavigate();
   
@@ -59,6 +65,15 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     toast({
       title: "Destination selected",
       description: `You selected ${island}`,
+    });
+  };
+
+  const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
+    const totalSeats = passengerCounts.adults + passengerCounts.children + passengerCounts.seniors;
+    setBooking({ 
+      ...booking, 
+      seats: totalSeats,
+      passengerCounts 
     });
   };
 
@@ -159,22 +174,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Number of Seats
+              Number of Passengers
             </label>
-            <div className="relative">
-              <Users className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                value={booking.seats}
-                onChange={(e) => setBooking({ 
-                  ...booking, 
-                  seats: parseInt(e.target.value) || 1 
-                })}
-                className="pl-10 form-input"
-              />
-            </div>
+            <SeatPicker 
+              onChange={handlePassengerCountChange}
+              initialCount={booking.passengerCounts}
+            />
             <p className="text-xs text-gray-500 mt-1">Maximum 10 seats per booking</p>
           </div>
           
