@@ -1,4 +1,3 @@
-
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,7 +12,8 @@ import PaymentGateway from "./pages/PaymentGateway";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 import MyBookings from "./pages/MyBookings";
-import BookingLookup from "./pages/BookingLookup"; // Import the new page
+import BookingLookup from "./pages/BookingLookup";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -62,7 +62,8 @@ const App = () => {
                 <Route path="/payment" element={<PaymentGateway />} />
                 <Route path="/confirmation" element={<Confirmation />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
-                <Route path="/lookup" element={<BookingLookup />} /> {/* Add the new route */}
+                <Route path="/lookup" element={<BookingLookup />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
