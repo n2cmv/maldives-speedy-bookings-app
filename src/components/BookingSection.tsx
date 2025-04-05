@@ -39,11 +39,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       if (routesData) {
         routesData.forEach(route => {
           if (!islandOrder.has(route.from_location)) {
-            islandOrder.set(route.from_location, route.display_order);
+            islandOrder.set(route.from_location, route.display_order || 0);
           }
           if (!islandOrder.has(route.to_location)) {
             // Use the same order for destination or increment it slightly
-            islandOrder.set(route.to_location, route.display_order + 0.1);
+            islandOrder.set(route.to_location, (route.display_order || 0) + 0.1);
           }
           
           uniqueIslands.add(route.from_location);
@@ -98,7 +98,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       .channel('routes-changes')
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'routes' },
+        { event: '*', schema: 'public', table: 'routes' },
         (payload) => {
           console.log('Route update detected:', payload);
           // Refresh the islands data when routes are updated

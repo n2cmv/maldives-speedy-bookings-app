@@ -41,6 +41,30 @@ const RoutesManager = () => {
 
   useEffect(() => {
     fetchRoutes();
+
+    // Set up real-time subscription for changes made by other users
+    const channel = supabase
+      .channel('admin-routes-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'routes' },
+        (payload) => {
+          console.log('Route update detected from another session:', payload);
+          // Only refresh if we're not currently saving to avoid flickering
+          if (!isSaving) {
+            fetchRoutes();
+            toast.info('Routes updated by another user', {
+              description: 'Route information has been refreshed'
+            });
+          }
+        }
+      )
+      .subscribe();
+    
+    // Clean up subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchRoutes = async () => {
@@ -106,21 +130,25 @@ const RoutesManager = () => {
       try {
         console.log("Saving route order:", routes.map(r => ({ id: r.id, order: r.display_order })));
         
-        // Update each route one by one to ensure order is saved correctly
-        for (const route of routes) {
+        // Use Promise.all to update all routes concurrently for better performance
+        const updatePromises = routes.map(route => {
           console.log(`Updating route ID ${route.id} with display_order ${route.display_order}`);
-          const { error } = await supabase
+          return supabase
             .from('routes')
             .update({ display_order: route.display_order })
             .eq('id', route.id);
-            
-          if (error) {
-            console.error(`Error updating route ${route.id}:`, error);
-            throw error;
-          }
+        });
+        
+        const results = await Promise.all(updatePromises);
+        
+        // Check if any updates failed
+        const errors = results.filter(result => result.error).map(result => result.error);
+        if (errors.length > 0) {
+          console.error("Errors updating route orders:", errors);
+          throw new Error(`Failed to update ${errors.length} routes`);
         }
         
-        // Double-check that the routes were actually saved by fetching them again
+        // Verify changes were saved by fetching them again
         const { data, error } = await supabase
           .from('routes')
           .select('id, display_order')
