@@ -119,13 +119,24 @@ const PassengerDetails = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if all required fields are filled
-    const missingInfo = passengers.some(p => !p.name || !p.email || !p.phone || !p.passport);
-    
-    if (missingInfo) {
+    // Check if first passenger has all required fields
+    const firstPassenger = passengers[0];
+    if (!firstPassenger?.name || !firstPassenger?.email || !firstPassenger?.phone || !firstPassenger?.passport) {
       toast({
         title: "Missing information",
-        description: "Please fill in all passenger details",
+        description: "Please fill in all required fields for the primary passenger",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Check if all passengers have name and passport (only these are required for all)
+    const missingRequiredInfo = passengers.some(p => !p.name || !p.passport);
+    
+    if (missingRequiredInfo) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in name and passport number for all passengers",
         variant: "destructive"
       });
       return;
@@ -170,7 +181,12 @@ const PassengerDetails = () => {
                   </div>
                 </div>
                 <div className="border-t border-gray-200 pt-2">
-                  <p className="text-sm text-gray-600">Please fill in details for all passengers</p>
+                  <p className="text-sm text-gray-600">
+                    Please fill in details for all passengers
+                    <span className="block mt-1 text-xs text-gray-500">
+                      (Email and phone number only required for primary passenger)
+                    </span>
+                  </p>
                 </div>
               </div>
               
@@ -184,7 +200,7 @@ const PassengerDetails = () => {
                       <div className="flex items-center">
                         <User className="h-5 w-5 text-ocean mr-2" />
                         <h3 className="font-medium">
-                          Passenger {index + 1} ({passenger.type})
+                          {index === 0 ? "Primary Passenger" : `Passenger ${index + 1}`} ({passenger.type})
                         </h3>
                       </div>
                       {index > 0 && (
@@ -203,7 +219,9 @@ const PassengerDetails = () => {
                     
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
                         <Input
                           type="text"
                           value={passenger.name}
@@ -214,18 +232,22 @@ const PassengerDetails = () => {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email Address {index === 0 && <span className="text-red-500">*</span>}
+                        </label>
                         <Input
                           type="email"
                           value={passenger.email}
                           onChange={(e) => handlePassengerChange(passenger.id, "email", e.target.value)}
                           placeholder="Enter email address"
-                          required
+                          required={index === 0}
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number {index === 0 && <span className="text-red-500">*</span>}
+                        </label>
                         <div className="flex items-center gap-2">
                           <CountryCodeSelector 
                             value={passenger.countryCode}
@@ -236,14 +258,16 @@ const PassengerDetails = () => {
                             value={passenger.phone}
                             onChange={(e) => handlePassengerChange(passenger.id, "phone", e.target.value)}
                             placeholder="Enter phone number"
-                            required
+                            required={index === 0}
                             className="flex-1"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Passport Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Passport Number <span className="text-red-500">*</span>
+                        </label>
                         <Input
                           type="text"
                           value={passenger.passport}
