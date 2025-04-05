@@ -6,19 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 interface AdminLoginFormProps {
-  defaultEmail?: string;
   onSubmit: (email: string, password: string) => Promise<void>;
   isLoading: boolean;
   authError: string | null;
 }
 
 const AdminLoginForm = ({
-  defaultEmail = "",
   onSubmit,
   isLoading,
   authError
 }: AdminLoginFormProps) => {
-  const [email, setEmail] = useState<string>(defaultEmail);
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {

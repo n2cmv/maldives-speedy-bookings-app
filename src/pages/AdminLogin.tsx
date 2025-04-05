@@ -22,7 +22,6 @@ const AdminLogin = () => {
         </CardHeader>
         <CardContent>
           <AdminLoginForm 
-            defaultEmail="natteynattson@gmail.com"
             onSubmit={loginAdmin}
             isLoading={isLoading}
             authError={authError}
