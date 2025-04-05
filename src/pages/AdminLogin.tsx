@@ -8,16 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { initializeAdminUser } from "@/services/adminService";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [username, setUsername] = useState<string>("retouradmin");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [needsInitialization, setNeedsInitialization] = useState<boolean>(false);
-  const [isInitializing, setIsInitializing] = useState<boolean>(false);
 
   useEffect(() => {
     // Check if already logged in as admin
@@ -39,65 +36,19 @@ const AdminLogin = () => {
     checkAdminSession();
   }, [navigate]);
 
-  const handleInitializeAdmin = async () => {
-    setIsInitializing(true);
-    setIsLoading(true);
-    try {
-      toast({
-        title: "Initializing admin...",
-        description: "Please wait while we set up the admin user.",
-      });
-      
-      const result = await initializeAdminUser();
-      console.log("Initialization result:", result);
-      
-      if (result.success) {
-        toast({
-          title: "Admin initialized",
-          description: "Admin user has been set up. You can now log in.",
-        });
-        setNeedsInitialization(false);
-      } else {
-        toast({
-          title: "Initialization failed",
-          description: result.error || "Could not initialize admin user",
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      console.error("Error initializing admin:", error);
-      toast({
-        title: "Initialization failed",
-        description: error.message || "Could not initialize admin user",
-        variant: "destructive",
-      });
-    } finally {
-      setIsInitializing(false);
-      setIsLoading(false);
-    }
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      console.log("Attempting login with:", { email: `${username}@example.com`, password });
-      
-      // Step 1: Sign in with username as the email and password
+      // Step 1: Sign in with email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: `${username}@example.com`,
+        email,
         password
       });
 
       if (authError) {
         console.error("Auth error:", authError);
-        
-        if (authError.message.includes("Invalid login credentials")) {
-          setNeedsInitialization(true);
-          throw new Error("Admin user may need to be initialized first");
-        }
-        
         throw authError;
       }
 
@@ -154,78 +105,50 @@ const AdminLogin = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {needsInitialization ? (
-            <div className="space-y-4">
-              <p className="text-amber-600 text-sm">
-                Admin user needs to be initialized first. Click the button below to set up the admin account.
-              </p>
-              <Button 
-                onClick={handleInitializeAdmin} 
-                className="w-full" 
-                disabled={isLoading || isInitializing}
-              >
-                {isInitializing ? (
-                  <span className="flex items-center gap-2">
-                    <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-                    Initializing...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    Initialize Admin User
-                  </span>
-                )}
-              </Button>
-              <p className="text-xs text-gray-500 mt-2">
-                This will create the default admin user with username: <strong>retouradmin</strong> and password: <strong>Retouradmin7443777!!!</strong>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email"
+                placeholder="Enter your email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <p className="text-xs text-gray-500">
+                Use the email address of your admin account
               </p>
             </div>
-          ) : (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input 
-                  id="username"
-                  placeholder="retouradmin"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="Enter your password"
-                />
-                <p className="text-xs text-gray-500">
-                  Default password: Retouradmin7443777!!!
-                </p>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-                    Logging in...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <LogIn className="h-4 w-4" />
-                    Login
-                  </span>
-                )}
-              </Button>
-            </form>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter your password"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                  Logging in...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </span>
+              )}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>

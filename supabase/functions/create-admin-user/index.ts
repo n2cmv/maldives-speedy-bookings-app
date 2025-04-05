@@ -26,36 +26,8 @@ serve(async (req) => {
       }
     );
 
-    // Set up admin credentials - USING A PROPER EMAIL FORMAT
-    const adminEmail = "retouradmin@example.com";
-    const adminPassword = "Retouradmin7443777!!!";
-
-    // Create admin user if it doesn't exist
-    const { data: existingUser, error: findError } = await supabaseAdmin.auth.admin.listUsers();
-    
-    let userId;
-    
-    // Find if user exists
-    const foundUser = existingUser?.users?.find(user => user.email === adminEmail);
-    
-    if (foundUser) {
-      userId = foundUser.id;
-      console.log("Admin user already exists");
-    } else {
-      // Create new admin user
-      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email: adminEmail,
-        password: adminPassword,
-        email_confirm: true,
-      });
-
-      if (createError) {
-        throw createError;
-      }
-
-      userId = newUser.user.id;
-      console.log("Created new admin user");
-    }
+    // Use the manually created user ID
+    const userId = "a8848e6f-0cf5-4e0c-a26b-b16309b07219";
 
     // Check if user already exists in admin_users table
     const { data: existingAdminUser } = await supabaseAdmin
@@ -75,6 +47,8 @@ serve(async (req) => {
       }
       
       console.log("Added user to admin_users table");
+    } else {
+      console.log("User already exists in admin_users table");
     }
 
     return new Response(

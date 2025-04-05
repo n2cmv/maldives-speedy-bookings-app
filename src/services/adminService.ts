@@ -1,10 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-// Function to initialize the admin user
+// Function to add the existing user to the admin_users table
 export const initializeAdminUser = async () => {
   try {
-    // Call the Supabase Edge Function that creates the admin user
+    // Call the Supabase Edge Function that adds the user to admin_users table
     const { data, error } = await supabase.functions.invoke(
       "create-admin-user",
       {
