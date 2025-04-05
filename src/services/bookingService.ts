@@ -102,3 +102,32 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
     return { data: [], error };
   }
 }
+
+// New function to get booking by reference number
+export async function getBookingByReference(reference: string): Promise<{ data: any; error: any }> {
+  try {
+    console.log("Looking up booking with reference:", reference);
+    
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('payment_reference', reference)
+      .maybeSingle();
+      
+    if (error) {
+      console.error("Error fetching booking by reference:", error);
+      return { data: null, error };
+    }
+    
+    if (!data) {
+      console.log("No booking found with reference:", reference);
+      return { data: null, error: "Booking not found" };
+    }
+    
+    console.log("Found booking:", data);
+    return { data, error: null };
+  } catch (error) {
+    console.error("Exception fetching booking by reference:", error);
+    return { data: null, error };
+  }
+}

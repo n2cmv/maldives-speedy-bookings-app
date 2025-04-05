@@ -13,6 +13,7 @@ import PaymentGateway from "./pages/PaymentGateway";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 import MyBookings from "./pages/MyBookings";
+import BookingLookup from "./pages/BookingLookup"; // Import the new page
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -63,6 +64,7 @@ const App = () => {
                   <Route path="/payment" element={<PaymentGateway />} />
                   <Route path="/confirmation" element={<Confirmation />} />
                   <Route path="/my-bookings" element={<MyBookings />} />
+                  <Route path="/lookup" element={<BookingLookup />} /> {/* Add the new route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
