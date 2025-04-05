@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import { Island } from "@/types/booking";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
 
 const BookingForm = () => {
   const location = useLocation();
@@ -16,7 +15,7 @@ const BookingForm = () => {
       <Header />
       
       <motion.div
-        className="max-w-4xl mx-auto pt-24 px-4"
+        className="max-w-4xl mx-auto pt-8 px-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}

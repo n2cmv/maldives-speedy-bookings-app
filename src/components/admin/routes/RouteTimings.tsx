@@ -42,6 +42,7 @@ const RouteTimings = ({ timings, onChange }: RouteTimingsProps) => {
       return timeToMinutes(a) - timeToMinutes(b);
     });
 
+    console.log("Updated route timings:", updatedTimings);
     onChange(updatedTimings);
     setNewTiming("");
     setError(null);

@@ -49,7 +49,11 @@ const TimeSelector = ({
           }}
         >
           <SelectTrigger id={id} className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
-          <SelectContent className="select-content max-h-[300px] overflow-auto">
+          <SelectContent
+            className="select-content max-h-[300px] overflow-auto bg-white z-50"
+            position="popper"
+            sideOffset={5}
+          >
             {availableTimes && availableTimes.length > 0 ? (
               availableTimes.map((time) => (
                 <SelectItem 
