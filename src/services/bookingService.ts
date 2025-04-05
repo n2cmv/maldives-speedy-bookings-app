@@ -137,11 +137,19 @@ function isValidEmail(email: string): boolean {
 
 export async function getBookingsByEmail(email: string): Promise<{ data: any[]; error: any }> {
   try {
+    console.log("Fetching bookings for email:", email);
+    
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
-      .eq('user_email', email)
+      .eq('user_email', email.toLowerCase().trim())
       .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error fetching bookings:", error);
+    } else {
+      console.log("Successfully retrieved bookings:", data?.length || 0);
+    }
 
     return { data, error };
   } catch (error) {

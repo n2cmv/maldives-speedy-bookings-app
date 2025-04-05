@@ -1,26 +1,37 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBookingsByEmail } from "@/services/bookingService";
-import { ChevronLeft, Search, Ship, Calendar, Loader2, Users } from "lucide-react";
+import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
 const MyBookings = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   const handleGoBack = () => {
     navigate("/");
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
@@ -31,29 +42,84 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      const { data, error } = await getBookingsByEmail(email);
+      // Send OTP via Supabase
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          // Set email OTP settings
+          emailRedirectTo: window.location.origin + '/my-bookings',
+        },
+      });
       
       if (error) {
+        toast.error("Error sending verification code", {
+          description: error.message
+        });
+        return;
+      }
+      
+      toast.success("Verification code sent", {
+        description: "Please check your email and enter the code below"
+      });
+      
+      setShowOTP(true);
+    } catch (err) {
+      toast.error("Error sending verification code", {
+        description: "Please try again later"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!otpValue || otpValue.length < 6) {
+      toast.error("Please enter the complete verification code");
+      return;
+    }
+    
+    setVerifying(true);
+    
+    try {
+      // Verify the OTP
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token: otpValue,
+        type: 'email',
+      });
+      
+      if (error) {
+        toast.error("Invalid verification code", {
+          description: "Please check the code and try again"
+        });
+        return;
+      }
+      
+      setVerified(true);
+      
+      // Fetch bookings
+      const { data: bookingsData, error: bookingsError } = await getBookingsByEmail(email);
+      
+      if (bookingsError) {
         toast.error("Error fetching bookings", {
           description: "Please try again later"
         });
         return;
       }
       
-      setBookings(data || []);
-      setSearched(true);
+      setBookings(bookingsData || []);
       
-      if (data && data.length === 0) {
+      if (bookingsData && bookingsData.length === 0) {
         toast.info("No bookings found", {
           description: "No bookings were found with this email address"
         });
       }
     } catch (err) {
-      toast.error("Error fetching bookings", {
+      toast.error("Error verifying code", {
         description: "Please try again later"
       });
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
   };
 
@@ -92,39 +158,102 @@ const MyBookings = () => {
             <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-ocean-dark">My Bookings</h2>
               <p className="text-sm text-gray-600 mt-1">
-                Search for your bookings by email address
+                Access your bookings with email verification
               </p>
             </div>
             
             <div className="p-6">
-              <form onSubmit={handleSearch} className="space-y-4">
-                <div className="flex flex-col md:flex-row gap-3">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="flex-1"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                  />
-                  <Button 
-                    type="submit" 
-                    className="bg-ocean hover:bg-ocean-dark text-white"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Search className="h-4 w-4 mr-2" />
-                    )}
-                    Search
-                  </Button>
+              {!showOTP ? (
+                <form onSubmit={handleSendOTP} className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      className="flex-1"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={loading}
+                    />
+                    <Button 
+                      type="submit" 
+                      className="bg-ocean hover:bg-ocean-dark text-white"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Inbox className="h-4 w-4 mr-2" />
+                      )}
+                      Send Verification Code
+                    </Button>
+                  </div>
+                </form>
+              ) : !verified ? (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-4">
+                      We've sent a verification code to <span className="font-medium">{email}</span>
+                    </p>
+                    
+                    <div className="flex justify-center mb-6">
+                      <Card className="p-4 border border-gray-200">
+                        <InputOTP 
+                          maxLength={6}
+                          value={otpValue}
+                          onChange={(value) => setOtpValue(value)}
+                          className="gap-2"
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </Card>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row justify-center gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowOTP(false)}
+                        disabled={verifying}
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        onClick={handleVerifyOTP}
+                        disabled={verifying || otpValue.length < 6}
+                        className="bg-ocean hover:bg-ocean-dark text-white"
+                      >
+                        {verifying ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Search className="h-4 w-4 mr-2" />
+                        )}
+                        Verify & Show Bookings
+                      </Button>
+                    </div>
+                    
+                    <p className="text-xs text-gray-500 mt-6">
+                      Didn't receive the code?{" "}
+                      <button 
+                        className="text-ocean hover:underline" 
+                        onClick={handleSendOTP}
+                        disabled={loading}
+                      >
+                        Resend code
+                      </button>
+                    </p>
+                  </div>
                 </div>
-              </form>
+              ) : null}
             </div>
           </div>
           
-          {searched && (
+          {verified && (
             <motion.div
               variants={containerVariants}
               initial="hidden"

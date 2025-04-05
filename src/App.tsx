@@ -13,7 +13,6 @@ import PaymentGateway from "./pages/PaymentGateway";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 import MyBookings from "./pages/MyBookings";
-import BookingLookup from "./pages/BookingLookup";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 
@@ -64,7 +63,6 @@ const App = () => {
                 <Route path="/payment" element={<PaymentGateway />} />
                 <Route path="/confirmation" element={<Confirmation />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
-                <Route path="/lookup" element={<BookingLookup />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="*" element={<NotFound />} />
