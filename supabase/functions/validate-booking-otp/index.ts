@@ -63,12 +63,16 @@ serve(async (req) => {
         .select('*')
         .eq('email', email.toLowerCase())
         .eq('otp_code', code)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error("OTP validation query error:", error);
         return new Response(
-          JSON.stringify({ valid: false, error: "Invalid verification code" }),
+          JSON.stringify({ 
+            valid: false, 
+            error: "Failed to validate code", 
+            details: error.message 
+          }),
           { 
             headers: { ...corsHeaders, "Content-Type": "application/json" }
           }
@@ -108,10 +112,15 @@ serve(async (req) => {
       );
     } catch (dbError) {
       console.error("Database error validating OTP:", dbError);
+      const errorMessage = typeof dbError === 'object' && dbError !== null ? 
+        (dbError.message || JSON.stringify(dbError)) : 
+        String(dbError);
+        
       return new Response(
         JSON.stringify({ 
           valid: false,
-          error: "Error validating code, please try again" 
+          error: "Error validating code, please try again",
+          details: errorMessage
         }),
         { 
           status: 500, 
@@ -121,13 +130,17 @@ serve(async (req) => {
     }
   } catch (error) {
     console.error("Error validating OTP:", error);
-    
+    const errorMessage = typeof error === 'object' && error !== null ? 
+      (error.message || JSON.stringify(error)) : 
+      String(error);
+      
     return new Response(
       JSON.stringify({ 
         valid: false,
-        error: "An unexpected error occurred" 
+        error: "An unexpected error occurred",
+        details: errorMessage
       }),
-      { 
+      {
         status: 500, 
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       }

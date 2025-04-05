@@ -34,10 +34,22 @@ serve(async (req) => {
     // Log the action
     console.log(`Processing OTP verification request for: ${email}`);
     
-    // Create a Supabase client with the URL and anon key from environment variables
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://fbgeiasbtjfpqfqmllde.supabase.co";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZiZ2VpYXNidGpmcHFmcW1sbGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTgyODYsImV4cCI6MjA1OTQzNDI4Nn0.tiZnJeHMWYSfQiR-jd9i9f3z31Bi4_d1XzXx9tDIXFA";
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Create a Supabase client with the service role key for admin access
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    if (!supabaseUrl || !supabaseServiceRole) {
+      console.error("Missing Supabase environment variables");
+      return new Response(
+        JSON.stringify({ success: false, error: "Server configuration error" }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceRole);
     
     // Generate an OTP code
     const otpCode = generateOTP();
@@ -47,80 +59,108 @@ serve(async (req) => {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 30); // OTP valid for 30 minutes
     
-    // Insert or update OTP record for this email
-    const { error: storeError } = await supabase
-      .from('booking_otps')
-      .upsert([
-        {
-          email: email.toLowerCase(),
-          otp_code: otpCode,
-          expires_at: expiresAt.toISOString(),
-        }
-      ], { onConflict: 'email' });
-    
-    if (storeError) {
-      console.error("Error storing OTP:", storeError);
-      return new Response(
-        JSON.stringify({ success: false, error: "Failed to generate verification code" }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        }
-      );
-    }
-    
-    // Send email with OTP using the send-confirmation function
     try {
-      const emailResponse = await supabase.functions.invoke("send-confirmation", {
-        body: {
-          email: email,
-          name: "Customer",
-          bookingDetails: {
-            otpCode: otpCode,
-            isOtpEmail: true
+      // Insert or update OTP record for this email
+      const { error: storeError } = await supabase
+        .from('booking_otps')
+        .upsert([
+          {
+            email: email.toLowerCase(),
+            otp_code: otpCode,
+            expires_at: expiresAt.toISOString(),
           }
-        }
-      });
+        ], { onConflict: 'email' });
       
-      if (emailResponse.error) {
-        console.error("Error sending OTP email:", emailResponse.error);
+      if (storeError) {
+        console.error("Error storing OTP:", storeError);
         return new Response(
-          JSON.stringify({ success: false, error: "Failed to send verification code email" }),
+          JSON.stringify({ 
+            success: false, 
+            error: "Failed to generate verification code", 
+            details: storeError.message 
+          }),
           { 
             status: 500, 
             headers: { ...corsHeaders, "Content-Type": "application/json" }
           }
         );
       }
-      
-      console.log("OTP email sent successfully");
-    } catch (emailError) {
-      console.error("Exception sending OTP email:", emailError);
+    
+      // Send email with OTP using the send-confirmation function
+      try {
+        const emailResponse = await supabase.functions.invoke("send-confirmation", {
+          body: {
+            email: email,
+            name: "Customer",
+            bookingDetails: {
+              otpCode: otpCode,
+              isOtpEmail: true
+            }
+          }
+        });
+        
+        if (emailResponse.error) {
+          console.error("Error sending OTP email:", emailResponse.error);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: "Failed to send verification code email",
+              details: typeof emailResponse.error === 'object' ? JSON.stringify(emailResponse.error) : String(emailResponse.error)
+            }),
+            { 
+              status: 500, 
+              headers: { ...corsHeaders, "Content-Type": "application/json" }
+            }
+          );
+        }
+        
+        console.log("OTP email sent successfully");
+      } catch (emailError) {
+        console.error("Exception sending OTP email:", emailError);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: "Failed to send verification code email",
+            details: typeof emailError === 'object' ? JSON.stringify(emailError) : String(emailError)
+          }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          }
+        );
+      }
+
       return new Response(
-        JSON.stringify({ success: false, error: "Failed to send verification code email" }),
+        JSON.stringify({ 
+          success: true, 
+          message: "Verification code sent to your email" 
+        }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    } catch (dbError) {
+      console.error("Database error storing OTP:", dbError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Error processing your request", 
+          details: typeof dbError === 'object' ? JSON.stringify(dbError) : String(dbError)
+        }),
         { 
           status: 500, 
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
     }
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Verification code sent to your email" 
-      }),
-      { 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      }
-    );
   } catch (error) {
     console.error("Error processing OTP request:", error);
     
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: "An unexpected error occurred",
+        details: typeof error === 'object' ? JSON.stringify(error) : String(error)
       }),
       { 
         status: 400, 

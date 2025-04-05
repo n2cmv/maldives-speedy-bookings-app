@@ -89,7 +89,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
       console.error("Error from send-confirmation edge function:", response.error);
       return { 
         success: false, 
-        error: response.error,
+        error: typeof response.error === 'object' ? JSON.stringify(response.error) : String(response.error),
         emailSentTo: primaryPassenger.email
       };
     }
@@ -112,7 +112,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     console.error("Exception sending confirmation email:", error);
     return { 
       success: false, 
-      error,
+      error: typeof error === 'object' ? JSON.stringify(error) : String(error),
       emailSentTo: booking.passengers?.[0].email
     };
   }

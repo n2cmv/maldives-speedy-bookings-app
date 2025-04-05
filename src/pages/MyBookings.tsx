@@ -53,15 +53,18 @@ const MyBookings = () => {
       
       if (response.error) {
         console.error("Error from process-booking-otp function:", response.error);
+        const errorMsg = typeof response.error === 'object' ? 
+          JSON.stringify(response.error) : String(response.error);
         toast.error("Error sending verification code", {
-          description: "Please try again later"
+          description: `API error: ${errorMsg}`
         });
         return;
       }
       
       if (!response.data?.success) {
         const errorMsg = response.data?.error || "Please try again later";
-        console.error("Error response from process-booking-otp:", errorMsg);
+        console.error("Error response from process-booking-otp:", errorMsg, 
+          response.data?.details ? `Details: ${response.data.details}` : '');
         toast.error("Error sending verification code", {
           description: errorMsg
         });
@@ -75,8 +78,9 @@ const MyBookings = () => {
       setShowOTP(true);
     } catch (err) {
       console.error("Exception sending OTP:", err);
+      const errorMsg = err instanceof Error ? err.message : String(err);
       toast.error("Error sending verification code", {
-        description: "Please try again later"
+        description: `Exception: ${errorMsg}`
       });
     } finally {
       setLoading(false);
@@ -111,9 +115,11 @@ const MyBookings = () => {
       // Handle validation errors
       if (response.error) {
         console.error("Edge function error:", response.error);
-        setErrorMessage(`Error: ${response.error.message || "Failed to verify code"}`);
+        const errorMsg = typeof response.error === 'object' ? 
+          JSON.stringify(response.error) : String(response.error);
+        setErrorMessage(`Error: ${errorMsg}`);
         toast.error("Error verifying code", {
-          description: "Please try again later"
+          description: `API error: ${errorMsg}`
         });
         setVerifying(false);
         return;
@@ -122,7 +128,8 @@ const MyBookings = () => {
       // If the OTP is invalid
       if (!response.data?.valid) {
         const errorMessage = response.data?.error || "Please check the code and try again";
-        console.error("Invalid OTP response:", response.data);
+        const details = response.data?.details ? `Details: ${response.data.details}` : '';
+        console.error("Invalid OTP response:", response.data, details);
         setErrorMessage(`Error: ${errorMessage}`);
         toast.error("Invalid verification code", {
           description: errorMessage
@@ -141,7 +148,7 @@ const MyBookings = () => {
         if (bookingsError) {
           console.error("Error fetching bookings:", bookingsError);
           toast.error("Error fetching bookings", {
-            description: "Please try again later"
+            description: bookingsError.message || "Please try again later"
           });
           setVerifying(false);
           return;
@@ -156,15 +163,17 @@ const MyBookings = () => {
         }
       } catch (bookingErr) {
         console.error("Exception fetching bookings:", bookingErr);
+        const errorMsg = bookingErr instanceof Error ? bookingErr.message : String(bookingErr);
         toast.error("Error fetching bookings", {
-          description: "Please try again later"
+          description: `Exception: ${errorMsg}`
         });
       }
     } catch (err) {
       console.error("Exception verifying code:", err);
-      setErrorMessage(`Error: ${err instanceof Error ? err.message : "Failed to verify code"}`);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      setErrorMessage(`Error: ${errorMsg}`);
       toast.error("Error verifying code", {
-        description: "Please try again later"
+        description: `Exception: ${errorMsg}`
       });
     } finally {
       setVerifying(false);
