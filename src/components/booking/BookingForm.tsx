@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -32,8 +31,8 @@ const BookingForm = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingInfo>({
-    from: 'Male\' Airport',
-    island: preSelectedIsland || 'Maafushi',
+    from: '',
+    island: preSelectedIsland || '',
     time: '',
     seats: 1,
     passengerCounts: {
@@ -181,7 +180,7 @@ const BookingForm = ({
       <TripLocationSelector
         fromLocation={booking.from}
         toLocation={booking.island}
-        islandNames={islandNames}
+        islandNames={[]} // Empty array to not display any predefined islands
         isLoading={isLoading}
         onFromChange={(value) => setBooking({ ...booking, from: value })}
         onToChange={handleSelectDestination}

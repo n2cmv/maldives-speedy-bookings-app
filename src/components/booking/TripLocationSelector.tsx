@@ -28,7 +28,7 @@ const TripLocationSelector = ({
         label={t("booking.form.from", "From")}
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={fromLocation}
-        islandNames={islandNames}
+        islandNames={[]} // Empty array to not display any predefined islands
         onIslandChange={onFromChange}
         placeholder={t("booking.form.selectDeparture", "Select departure island")}
         isLoading={isLoading}
@@ -39,7 +39,7 @@ const TripLocationSelector = ({
         label={t("booking.form.destinationIsland", "Destination Island")}
         icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={toLocation}
-        islandNames={islandNames}
+        islandNames={[]} // Empty array to not display any predefined islands
         onIslandChange={onToChange}
         isLoading={isLoading}
         id="island-select"
