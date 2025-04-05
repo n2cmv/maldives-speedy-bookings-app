@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -49,7 +48,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   });
   const navigate = useNavigate();
   
-  // Handle pre-selected island when component mounts
   useEffect(() => {
     if (preSelectedIsland) {
       setBooking(prev => ({ ...prev, island: preSelectedIsland }));
@@ -110,12 +108,16 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                 value={booking.from}
                 onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
               >
-                <SelectTrigger className="pl-10 form-input">
+                <SelectTrigger className="pl-10 form-input border-gray-300 focus:ring-primary focus:border-primary">
                   <SelectValue placeholder="Select departure island" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-sm">
                   {fromLocations.map((location) => (
-                    <SelectItem key={location} value={location}>
+                    <SelectItem 
+                      key={location} 
+                      value={location}
+                      className="hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    >
                       {location}
                     </SelectItem>
                   ))}
@@ -134,12 +136,16 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                 value={booking.island}
                 onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
               >
-                <SelectTrigger className="pl-10 form-input">
+                <SelectTrigger className="pl-10 form-input border-gray-300 focus:ring-primary focus:border-primary">
                   <SelectValue placeholder="Select an island" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-sm">
                   {islands.map((island) => (
-                    <SelectItem key={island} value={island}>
+                    <SelectItem 
+                      key={island} 
+                      value={island}
+                      className="hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    >
                       {island}
                     </SelectItem>
                   ))}
@@ -158,12 +164,16 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                 value={booking.time}
                 onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
               >
-                <SelectTrigger className="pl-10 form-input">
+                <SelectTrigger className="pl-10 form-input border-gray-300 focus:ring-primary focus:border-primary">
                   <SelectValue placeholder="Select a time" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-sm">
                   {times.map((time) => (
-                    <SelectItem key={time} value={time}>
+                    <SelectItem 
+                      key={time} 
+                      value={time}
+                      className="hover:bg-primary/10 hover:text-primary cursor-pointer"
+                    >
                       {time}
                     </SelectItem>
                   ))}
