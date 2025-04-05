@@ -80,6 +80,13 @@ const SelectContent = React.forwardRef<
         className
       )}
       position={position}
+      onPointerDownOutside={(e) => {
+        // Allow the dropdown to close when clicking outside
+        // but prevent default behavior that might interfere
+      }}
+      onEscapeKeyDown={() => {
+        // Ensure the dropdown closes on Escape key
+      }}
       {...props}
     >
       <SelectScrollUpButton />

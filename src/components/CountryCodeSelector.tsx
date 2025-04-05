@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -81,9 +81,27 @@ const countryCodes: CountryCode[] = [
 
 const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
   const [open, setOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
   
   // Find the selected country by dial code
   const selectedCountry = countryCodes.find(country => country.dial_code === value);
+  
+  // Handle clicks outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
   
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -106,7 +124,7 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
+      <PopoverContent className="w-[250px] p-0" ref={popoverRef}>
         <Command>
           <div className="flex items-center border-b px-3">
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />

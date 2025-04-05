@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Minus, Plus, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -23,12 +23,31 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
     children: initialCount?.children || 0,
     seniors: initialCount?.seniors || 0,
   });
-
+  
+  const seatPickerRef = useRef<HTMLDivElement>(null);
+  
   const totalPassengers = counts.adults + counts.children + counts.seniors;
 
   useEffect(() => {
     onChange(counts);
   }, [counts, onChange]);
+  
+  // Handle clicks outside the component
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (seatPickerRef.current && !seatPickerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const updateCount = (type: keyof PassengerCount, delta: number, e: React.MouseEvent) => {
     // Prevent event propagation to stop form submission
@@ -51,7 +70,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
   };
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2" ref={seatPickerRef}>
       <div
         onClick={() => setIsOpen(!isOpen)}
         className="passenger-picker"
