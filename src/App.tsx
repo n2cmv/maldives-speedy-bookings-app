@@ -1,3 +1,4 @@
+
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ import i18n from "./i18n/i18n";
 
 // Import language context
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { ThemeProvider } from "./components/ui/use-theme";
 
 // Import local storage service
 import { saveBookingToLocalStorage } from "./services/bookingStorage";
@@ -48,24 +50,26 @@ const App = () => {
   
   return (
     <I18nextProvider i18n={i18n}>
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster position="top-center" richColors closeButton />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/booking" element={<BookingForm />} />
-                <Route path="/passenger-details" element={<PassengerDetails />} />
-                <Route path="/payment" element={<PaymentGateway />} />
-                <Route path="/confirmation" element={<Confirmation />} />
-                <Route path="/my-bookings" element={<MyBookings />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </LanguageProvider>
+      <ThemeProvider defaultTheme="light">
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster position="top-center" richColors closeButton />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/booking" element={<BookingForm />} />
+                  <Route path="/passenger-details" element={<PassengerDetails />} />
+                  <Route path="/payment" element={<PaymentGateway />} />
+                  <Route path="/confirmation" element={<Confirmation />} />
+                  <Route path="/my-bookings" element={<MyBookings />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </I18nextProvider>
   );
 };

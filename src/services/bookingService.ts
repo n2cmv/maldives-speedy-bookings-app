@@ -10,12 +10,14 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       from_location: booking.from,
       to_location: booking.island,
       departure_time: booking.time,
-      departure_date: booking.date,
+      departure_date: booking.date ? booking.date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       return_trip: booking.returnTrip || false,
       return_from_location: booking.returnTripDetails?.from || null,
       return_to_location: booking.returnTripDetails?.island || null,
       return_time: booking.returnTripDetails?.time || null,
-      return_date: booking.returnTripDetails?.date || null,
+      return_date: booking.returnTripDetails?.date 
+        ? booking.returnTripDetails.date.toISOString().split('T')[0] 
+        : null,
       passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
@@ -47,7 +49,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     }
 
     const primaryPassenger = booking.passengers[0];
-    const { data, error } = await supabase.functions.invoke("send-confirmation", {
+    const { error } = await supabase.functions.invoke("send-confirmation", {
       body: {
         email: primaryPassenger.email,
         name: primaryPassenger.name,
@@ -70,7 +72,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
       return { success: false, error };
     }
 
-    return { success: true, data };
+    return { success: true };
   } catch (error) {
     console.error("Exception sending confirmation email:", error);
     return { success: false, error };
