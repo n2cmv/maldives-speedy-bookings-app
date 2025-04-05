@@ -37,6 +37,7 @@ const RoutesManager = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
     fetchRoutes();
@@ -100,7 +101,10 @@ const RoutesManager = () => {
   const handleDragEnd = async () => {
     // Save the new order to the database
     if (draggedItemIndex !== null) {
+      setIsSaving(true);
       try {
+        console.log("Saving route order:", routes.map(r => ({ id: r.id, order: r.display_order })));
+        
         // Prepare updates for batch operation
         const updates = routes.map(route => ({
           id: route.id,
@@ -123,8 +127,10 @@ const RoutesManager = () => {
         toast.error("Failed to update route order");
         // Fetch routes again to restore from server state
         fetchRoutes();
+      } finally {
+        setIsSaving(false);
+        setDraggedItemIndex(null);
       }
-      setDraggedItemIndex(null);
     }
   };
 
@@ -265,6 +271,15 @@ const RoutesManager = () => {
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
         />
+      )}
+
+      {isSaving && (
+        <div className="fixed inset-0 z-50 bg-black/20 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-4">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+            <p>Saving route order...</p>
+          </div>
+        </div>
       )}
 
       <Dialog open={isRouteFormOpen} onOpenChange={setIsRouteFormOpen}>

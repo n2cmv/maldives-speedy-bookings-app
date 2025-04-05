@@ -81,9 +81,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'routes' },
-        () => {
+        (payload) => {
+          console.log('Route updated detected:', payload);
           // Refresh the islands data when routes are updated
           fetchIslands();
+          toast.info('Routes have been updated', {
+            description: 'Route information has been refreshed'
+          });
         }
       )
       .subscribe();
