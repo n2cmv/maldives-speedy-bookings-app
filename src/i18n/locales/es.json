@@ -1,0 +1,75 @@
+
+{
+  "app": {
+    "name": "Retour Maldivas"
+  },
+  "common": {
+    "bookNow": "Reservar Ahora",
+    "continue": "Continuar",
+    "backToHome": "Volver al Inicio",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "booking": "Reservas",
+    "about": "Acerca de",
+    "contact": "Contacto"
+  },
+  "booking": {
+    "steps": {
+      "selectIsland": "Seleccionar Isla",
+      "passengerDetails": "Detalles del Pasajero",
+      "payment": "Pago",
+      "confirmation": "Confirmación"
+    },
+    "form": {
+      "from": "Desde",
+      "to": "Hacia",
+      "departureDate": "Fecha de Salida",
+      "departureTime": "Hora de Salida",
+      "returnDate": "Fecha de Regreso",
+      "returnTime": "Hora de Regreso",
+      "passengers": "Número de Pasajeros",
+      "returnTrip": "Viaje de Regreso",
+      "selectDate": "Seleccionar fecha",
+      "selectTime": "Seleccionar hora"
+    },
+    "summary": {
+      "title": "Resumen de Reserva",
+      "outboundJourney": "Viaje de Ida",
+      "returnJourney": "Viaje de Regreso",
+      "from": "Desde",
+      "to": "Hacia",
+      "date": "Fecha",
+      "time": "Hora",
+      "passengers": "Pasajeros",
+      "totalPrice": "Precio Total"
+    },
+    "passenger": {
+      "details": "Detalles del Pasajero",
+      "primary": "Pasajero Principal",
+      "name": "Nombre Completo",
+      "email": "Correo Electrónico",
+      "phone": "Número de Teléfono",
+      "passport": "Número de Pasaporte",
+      "countryCode": "Código de País"
+    }
+  },
+  "confirmation": {
+    "title": "¡Reserva Confirmada!",
+    "message": "Su reserva ha sido confirmada. Le hemos enviado un correo electrónico con los detalles de su reserva.",
+    "reference": "Referencia de Reserva",
+    "yourTrip": "Tu Viaje",
+    "returnTrip": "Viaje de Regreso"
+  },
+  "islands": {
+    "featured": "Destinos Destacados",
+    "popular": "Destinos Populares",
+    "travelTime": "Tiempo de Viaje",
+    "bestFor": "Mejor para"
+  }
+}

@@ -1,10 +1,11 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// Import pages
 import Index from "./pages/Index";
 import BookingForm from "./pages/BookingForm";
 import PassengerDetails from "./pages/PassengerDetails";
@@ -12,16 +13,38 @@ import PaymentGateway from "./pages/PaymentGateway";
 import Confirmation from "./pages/Confirmation";
 import NotFound from "./pages/NotFound";
 
+// Import i18n configuration
+import "./i18n/i18n";
+
+// Import local storage service
+import { saveBookingToLocalStorage } from "./services/bookingStorage";
+import { BookingInfo } from "./types/booking";
+
 const App = () => {
   // Create a client instance inside the component to avoid React hook issues
-  // This ensures the QueryClient is created within the React lifecycle
   const [queryClient] = useState(() => new QueryClient());
+  
+  // Set up listener to save booking info to local storage when navigation happens
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const bookingInfoString = sessionStorage.getItem("currentBooking");
+      if (bookingInfoString) {
+        const booking = JSON.parse(bookingInfoString) as BookingInfo;
+        saveBookingToLocalStorage(booking);
+      }
+    };
+    
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
   
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
+        <Toaster position="top-center" richColors closeButton />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

@@ -1,0 +1,75 @@
+
+{
+  "app": {
+    "name": "Retour Maldives"
+  },
+  "common": {
+    "bookNow": "Book Now",
+    "continue": "Continue",
+    "backToHome": "Back to Home",
+    "next": "Next",
+    "previous": "Previous",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "booking": "Booking",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "booking": {
+    "steps": {
+      "selectIsland": "Select Island",
+      "passengerDetails": "Passenger Details",
+      "payment": "Payment",
+      "confirmation": "Confirmation"
+    },
+    "form": {
+      "from": "From",
+      "to": "To",
+      "departureDate": "Departure Date",
+      "departureTime": "Departure Time",
+      "returnDate": "Return Date",
+      "returnTime": "Return Time",
+      "passengers": "Number of Passengers",
+      "returnTrip": "Return Trip",
+      "selectDate": "Select date",
+      "selectTime": "Select a time"
+    },
+    "summary": {
+      "title": "Booking Summary",
+      "outboundJourney": "Outbound Journey",
+      "returnJourney": "Return Journey",
+      "from": "From",
+      "to": "To",
+      "date": "Date",
+      "time": "Time",
+      "passengers": "Passengers",
+      "totalPrice": "Total Price"
+    },
+    "passenger": {
+      "details": "Passenger Details",
+      "primary": "Primary Passenger",
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "passport": "Passport Number",
+      "countryCode": "Country Code"
+    }
+  },
+  "confirmation": {
+    "title": "Booking Confirmed!",
+    "message": "Your booking has been confirmed. We have sent you an email with your booking details.",
+    "reference": "Booking Reference",
+    "yourTrip": "Your Trip",
+    "returnTrip": "Return Trip"
+  },
+  "islands": {
+    "featured": "Featured Destinations",
+    "popular": "Popular Destinations",
+    "travelTime": "Travel Time",
+    "bestFor": "Best for"
+  }
+}

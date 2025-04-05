@@ -3,14 +3,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
 import PaymentInfo from "@/components/confirmation/PaymentInfo";
 import TripDetails from "@/components/confirmation/TripDetails";
 import PassengerInfo from "@/components/confirmation/PassengerInfo";
 import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
+import StepIndicator from "@/components/StepIndicator";
+import { saveBookingToLocalStorage } from "@/services/bookingStorage";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { motion } from "framer-motion";
 
 const Confirmation = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const booking = location.state as BookingInfo & { paymentComplete?: boolean; paymentReference?: string };
@@ -28,11 +34,14 @@ const Confirmation = () => {
       return;
     }
     
+    // Save booking to local storage for future reference
+    if (booking.paymentComplete && booking.paymentReference) {
+      saveBookingToLocalStorage(booking);
+    }
+    
     // Show success toast when page loads
-    toast({
-      title: "Payment Successful!",
-      description: "Your booking has been confirmed.",
-      variant: "default",
+    toast.success("Payment Successful!", {
+      description: "Your booking has been confirmed."
     });
   }, [booking, navigate]);
   
@@ -41,6 +50,22 @@ const Confirmation = () => {
   }
   
   const isReturnTrip = Boolean(booking.returnTrip && booking.returnTripDetails);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 overflow-hidden relative">
@@ -52,49 +77,74 @@ const Confirmation = () => {
       />
       
       <div className="relative z-10">
+        <div className="absolute top-4 right-4 z-20">
+          <LanguageSwitcher />
+        </div>
+        
         <Header />
-        <main className="pt-24 pb-12 px-4">
-          <div className="max-w-md mx-auto booking-card">
-            <ConfirmationHeader />
+        <main className="pt-20 pb-12 px-4">
+          <div className="max-w-4xl mx-auto">
+            <StepIndicator />
+          </div>
+          
+          <motion.div 
+            className="max-w-md mx-auto booking-card"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={itemVariants}>
+              <ConfirmationHeader />
+            </motion.div>
             
             <div className="space-y-6 mb-8">
               {/* Payment Information */}
-              <PaymentInfo paymentReference={booking.paymentReference} />
-            
+              <motion.div variants={itemVariants}>
+                <PaymentInfo paymentReference={booking.paymentReference} />
+              </motion.div>
+              
               {/* Outbound Journey - Changed to Your Trip */}
-              <TripDetails
-                title="Your Trip"
-                from={booking.from}
-                to={booking.island}
-                time={booking.time}
-                date={booking.date}
-                isOutbound={isReturnTrip}
-              />
+              <motion.div variants={itemVariants}>
+                <TripDetails
+                  title={t("confirmation.yourTrip")}
+                  from={booking.from}
+                  to={booking.island}
+                  time={booking.time}
+                  date={booking.date}
+                  isOutbound={isReturnTrip}
+                />
+              </motion.div>
               
               {/* Return Journey (if applicable) */}
               {isReturnTrip && booking.returnTripDetails && (
-                <TripDetails
-                  title="Return Journey"
-                  from={booking.returnTripDetails.from}
-                  to={booking.returnTripDetails.island}
-                  time={booking.returnTripDetails.time}
-                  date={booking.returnTripDetails.date}
-                  isReturn
-                />
+                <motion.div variants={itemVariants}>
+                  <TripDetails
+                    title={t("confirmation.returnTrip")}
+                    from={booking.returnTripDetails.from}
+                    to={booking.returnTripDetails.island}
+                    time={booking.returnTripDetails.time}
+                    date={booking.returnTripDetails.date}
+                    isReturn
+                  />
+                </motion.div>
               )}
               
               {/* Passenger Information */}
-              <PassengerInfo 
-                seats={booking.seats}
-                passengers={booking.passengers}
-              />
+              <motion.div variants={itemVariants}>
+                <PassengerInfo 
+                  seats={booking.seats}
+                  passengers={booking.passengers}
+                />
+              </motion.div>
             </div>
             
-            <ConfirmationFooter 
-              island={booking.island}
-              isReturnTrip={!!isReturnTrip}
-            />
-          </div>
+            <motion.div variants={itemVariants}>
+              <ConfirmationFooter 
+                island={booking.island}
+                isReturnTrip={!!isReturnTrip}
+              />
+            </motion.div>
+          </motion.div>
         </main>
       </div>
     </div>

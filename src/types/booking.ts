@@ -60,4 +60,9 @@ export interface BookingInfo {
   returnTripDetails?: TripDetails;
   paymentComplete?: boolean;
   paymentReference?: string;
+  id?: string; // For saved bookings
+}
+
+export interface SavedBooking extends BookingInfo {
+  id: string;
 }
