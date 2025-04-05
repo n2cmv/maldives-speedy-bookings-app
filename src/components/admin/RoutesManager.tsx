@@ -61,7 +61,8 @@ const RoutesManager = () => {
         timings: route.timings || [],
         display_order: route.display_order || index + 1
       }));
-
+      
+      console.log("Fetched routes:", routesWithTimings);
       setRoutes(routesWithTimings);
     } catch (error) {
       console.error("Error fetching routes:", error);
@@ -105,20 +106,30 @@ const RoutesManager = () => {
       try {
         console.log("Saving route order:", routes.map(r => ({ id: r.id, order: r.display_order })));
         
-        // Prepare updates for batch operation
-        const updates = routes.map(route => ({
-          id: route.id,
-          display_order: route.display_order
-        }));
-        
-        for (const update of updates) {
-          // Execute update for each route
+        // Update each route one by one to ensure order is saved correctly
+        for (const route of routes) {
+          console.log(`Updating route ID ${route.id} with display_order ${route.display_order}`);
           const { error } = await supabase
             .from('routes')
-            .update({ display_order: update.display_order })
-            .eq('id', update.id) as any;
+            .update({ display_order: route.display_order })
+            .eq('id', route.id);
             
-          if (error) throw error;
+          if (error) {
+            console.error(`Error updating route ${route.id}:`, error);
+            throw error;
+          }
+        }
+        
+        // Double-check that the routes were actually saved by fetching them again
+        const { data, error } = await supabase
+          .from('routes')
+          .select('id, display_order')
+          .order('display_order');
+          
+        if (error) {
+          console.error("Error verifying routes:", error);
+        } else {
+          console.log("Routes after saving:", data);
         }
         
         toast.success("Route order updated successfully");

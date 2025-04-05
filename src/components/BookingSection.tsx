@@ -16,65 +16,83 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [islandsData, setIslandsData] = useState<Island[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   
-  useEffect(() => {
-    const fetchIslands = async () => {
-      setIsLoading(true);
-      try {
-        // First get routes in the correct display order
-        const { data: routesData, error: routesError } = await supabase
-          .from('routes')
-          .select('from_location, to_location')
-          .order('display_order', { ascending: true });
-          
-        if (routesError) {
-          console.error('Error fetching routes:', routesError);
-          throw routesError;
-        }
+  const fetchIslands = async () => {
+    setIsLoading(true);
+    try {
+      // First get routes in the correct display order
+      const { data: routesData, error: routesError } = await supabase
+        .from('routes')
+        .select('from_location, to_location, display_order')
+        .order('display_order', { ascending: true });
         
-        // Extract unique islands from routes
-        const uniqueIslands = new Set<string>();
-        if (routesData) {
-          routesData.forEach(route => {
-            uniqueIslands.add(route.from_location);
-            uniqueIslands.add(route.to_location);
+      if (routesError) {
+        console.error('Error fetching routes:', routesError);
+        throw routesError;
+      }
+      
+      console.log('Routes data with display order:', routesData);
+      
+      // Extract unique islands from routes
+      const uniqueIslands = new Set<string>();
+      const islandOrder = new Map<string, number>();
+      
+      if (routesData) {
+        routesData.forEach(route => {
+          if (!islandOrder.has(route.from_location)) {
+            islandOrder.set(route.from_location, route.display_order);
+          }
+          if (!islandOrder.has(route.to_location)) {
+            // Use the same order for destination or increment it slightly
+            islandOrder.set(route.to_location, route.display_order + 0.1);
+          }
+          
+          uniqueIslands.add(route.from_location);
+          uniqueIslands.add(route.to_location);
+        });
+      }
+      
+      console.log('Unique islands with order:', Array.from(islandOrder.entries()));
+      
+      // Then get island details from islands table
+      const { data, error } = await supabase
+        .from('islands')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching islands:', error);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        // Sort islands according to route display order if possible
+        const sortedIslands = [...data];
+        if (uniqueIslands.size > 0) {
+          sortedIslands.sort((a, b) => {
+            // If island is in routes, sort by route order
+            const aOrder = islandOrder.get(a.name);
+            const bOrder = islandOrder.get(b.name);
+            
+            if (aOrder !== undefined && bOrder !== undefined) {
+              return aOrder - bOrder;
+            }
+            if (aOrder !== undefined) return -1;
+            if (bOrder !== undefined) return 1;
+            return a.name.localeCompare(b.name);
           });
         }
         
-        // Then get island details from islands table
-        const { data, error } = await supabase
-          .from('islands')
-          .select('*')
-          .order('name');
-        
-        if (error) {
-          console.error('Error fetching islands:', error);
-          return;
-        }
-        
-        if (data && data.length > 0) {
-          // Sort islands according to route display order if possible
-          const sortedIslands = [...data];
-          if (uniqueIslands.size > 0) {
-            sortedIslands.sort((a, b) => {
-              // If island is in routes, sort by route order
-              const aIndex = Array.from(uniqueIslands).indexOf(a.name);
-              const bIndex = Array.from(uniqueIslands).indexOf(b.name);
-              if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
-              if (aIndex >= 0) return -1;
-              if (bIndex >= 0) return 1;
-              return a.name.localeCompare(b.name);
-            });
-          }
-          
-          setIslandsData(sortedIslands);
-        }
-      } catch (error) {
-        console.error('Error fetching islands:', error);
-      } finally {
-        setIsLoading(false);
+        console.log('Sorted islands:', sortedIslands.map(i => i.name));
+        setIslandsData(sortedIslands);
       }
-    };
-    
+    } catch (error) {
+      console.error('Error fetching islands:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     // Set up real-time subscription to listen for route changes
     const channel = supabase
       .channel('routes-changes')
@@ -82,7 +100,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'routes' },
         (payload) => {
-          console.log('Route updated detected:', payload);
+          console.log('Route update detected:', payload);
           // Refresh the islands data when routes are updated
           fetchIslands();
           toast.info('Routes have been updated', {
