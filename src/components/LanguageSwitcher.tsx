@@ -17,9 +17,9 @@ const languages = [
 ];
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   
   // Force re-render when language changes to ensure UI updates
   useEffect(() => {
@@ -27,8 +27,11 @@ const LanguageSwitcher = () => {
   }, [i18n.language]);
   
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setCurrentLanguage(lng);
+    i18n.changeLanguage(lng).then(() => {
+      setCurrentLanguage(lng);
+      // Force a re-render of the entire app
+      window.location.reload();
+    });
     setIsOpen(false);
   };
 
