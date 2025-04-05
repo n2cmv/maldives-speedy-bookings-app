@@ -27,10 +27,19 @@ export interface PassengerCount {
   seniors: number;
 }
 
+export interface Passenger {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  type: 'adult' | 'child' | 'senior';
+}
+
 export interface BookingInfo {
   from: Island | '';
   island: Island | '';
   time: Time | '';
   seats: number;
   passengerCounts?: PassengerCount;
+  passengers?: Passenger[];
 }

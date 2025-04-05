@@ -11,7 +11,7 @@ const Confirmation = () => {
   const booking = location.state as BookingInfo;
   
   // Redirect if no booking data
-  if (!booking?.island) {
+  if (!booking?.island || !booking?.passengers) {
     navigate("/booking");
     return null;
   }
@@ -62,6 +62,17 @@ const Confirmation = () => {
                   <p className="text-sm text-gray-500">Number of Seats</p>
                   <p className="font-medium text-gray-900">{booking.seats}</p>
                 </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <h3 className="font-medium mb-4">Passenger Information</h3>
+                {booking.passengers && booking.passengers.map((passenger, index) => (
+                  <div key={passenger.id} className="mb-3 border-b border-gray-100 pb-3 last:border-0">
+                    <p className="font-medium">{passenger.name} <span className="text-xs text-gray-500">({passenger.type})</span></p>
+                    <p className="text-sm text-gray-600">{passenger.email}</p>
+                    <p className="text-sm text-gray-600">{passenger.phone}</p>
+                  </div>
+                ))}
               </div>
             </div>
             

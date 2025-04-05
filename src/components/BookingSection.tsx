@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -115,7 +114,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       return;
     }
     
-    navigate("/confirmation", { state: booking });
+    navigate("/passenger-details", { state: booking });
   };
 
   return (
