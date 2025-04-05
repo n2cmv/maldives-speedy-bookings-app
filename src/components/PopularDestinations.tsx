@@ -63,7 +63,7 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
   if (isLoading) {
     return (
       <div className="mb-12 flex flex-col items-center">
-        <h3 className="text-lg font-semibold text-ocean-dark mb-3">Quick Select</h3>
+        <h3 className="text-lg font-semibold text-ocean-dark mb-3">Popular Islands</h3>
         <div className="flex flex-wrap justify-center gap-2">
           <div className="h-8 w-8 border-2 border-t-ocean border-opacity-50 rounded-full animate-spin"></div>
         </div>
@@ -73,7 +73,7 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
 
   return (
     <div className="mb-12 flex flex-col items-center">
-      <h3 className="text-lg font-semibold text-ocean-dark mb-3">Quick Select</h3>
+      <h3 className="text-lg font-semibold text-ocean-dark mb-3">Popular Islands</h3>
       <div className="flex flex-wrap justify-center gap-2">
         {displayDestinations.map((dest) => (
           <Button 
