@@ -91,17 +91,23 @@ const BookingForm = ({
               return Object.values<string>(Time).includes(time);
             });
             
-            // Log route timings for debugging
-            console.log(`Route timings for ${route.from_location} to ${route.to_location}:`, 
+            // Enhanced debugging for route timings
+            console.log(`BookingForm - Route timings for ${route.from_location} to ${route.to_location}:`, 
               route.timings, "Valid timings:", validTimings);
             
-            timesMap[route.from_location][route.to_location] = validTimings.length > 0 ? validTimings : allTimes;
+            timesMap[route.from_location][route.to_location] = validTimings.length > 0 ? validTimings : [];
           });
           
-          console.log("Available times map:", timesMap);
+          console.log("BookingForm - Complete available times map:", timesMap);
           setAvailableTimesMap(timesMap);
           setFromLocations(uniqueFromLocations);
           setToLocations(uniqueToLocations);
+
+          // Check if current selection has timings and update if necessary
+          if (booking.from && booking.island) {
+            const routeTimings = timesMap[booking.from]?.[booking.island];
+            console.log(`BookingForm - Checking timings for current selection: ${booking.from} to ${booking.island}:`, routeTimings);
+          }
         }
       } catch (error) {
         console.error("Exception fetching routes:", error);
@@ -143,13 +149,17 @@ const BookingForm = ({
 
   const getRouteTimings = (from: string, to: string): Time[] => {
     // Check both directional routes if data exists (in case route is defined in reverse)
-    if (availableTimesMap[from] && availableTimesMap[from][to] && availableTimesMap[from][to].length > 0) {
-      console.log(`Found timings for ${from} to ${to}:`, availableTimesMap[from][to]);
-      return availableTimesMap[from][to];
+    if (availableTimesMap[from] && availableTimesMap[from][to]) {
+      const timings = availableTimesMap[from][to];
+      console.log(`BookingForm - Found timings for ${from} to ${to}:`, timings);
+      
+      if (timings && timings.length > 0) {
+        return timings;
+      }
     }
     
     // Log that we're falling back to default times
-    console.log(`No specific timings found for ${from} to ${to}, using default times`);
+    console.log(`BookingForm - No specific timings found for ${from} to ${to}, using default times`);
     return allTimes;
   };
   
@@ -289,7 +299,15 @@ const BookingForm = ({
         fromLocations={fromLocations}
         toLocations={toLocations}
         isLoading={isLoading}
-        onFromChange={(value) => setBooking({ ...booking, from: value })}
+        onFromChange={(value) => {
+          // Clear destination if it's the same as the selected origin
+          setBooking({ 
+            ...booking, 
+            from: value,
+            island: value === booking.island ? '' : booking.island,
+            time: '' // Reset time as available times may change
+          });
+        }}
         onToChange={handleSelectDestination}
       />
       

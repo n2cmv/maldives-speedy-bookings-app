@@ -30,7 +30,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         throw routesError;
       }
       
-      console.log('Routes data with display order and timings:', routesData);
+      console.log('BookingSection - Routes data with display order and timings:', routesData);
       
       // Extract unique islands from routes
       const uniqueIslands = new Set<string>();
@@ -49,12 +49,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           uniqueIslands.add(route.from_location);
           uniqueIslands.add(route.to_location);
           
-          // Log route timings for debugging
-          console.log(`Route ${route.from_location} to ${route.to_location} timings:`, route.timings);
+          // Enhanced logging for route timings
+          console.log(`BookingSection - Route ${route.from_location} to ${route.to_location} timings:`, route.timings);
         });
       }
       
-      console.log('Unique islands with order:', Array.from(islandOrder.entries()));
+      console.log('BookingSection - Unique islands with order:', Array.from(islandOrder.entries()));
       
       // Then get island details from islands table
       const { data, error } = await supabase
@@ -85,7 +85,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           });
         }
         
-        console.log('Sorted islands:', sortedIslands.map(i => i.name));
+        console.log('BookingSection - Sorted islands:', sortedIslands.map(i => i.name));
         setIslandsData(sortedIslands);
       }
     } catch (error) {

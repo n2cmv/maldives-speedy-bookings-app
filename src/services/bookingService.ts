@@ -186,10 +186,17 @@ export async function getAllRoutes(): Promise<{ data: RouteData[]; error: any }>
       .order('display_order', { ascending: true }) as unknown as { data: RouteData[], error: any };
     
     if (data) {
-      console.log("Retrieved routes data:", data.length, "routes");
-      // Log the first few routes for debugging
-      data.slice(0, 3).forEach(route => {
-        console.log(`Route from ${route.from_location} to ${route.to_location}:`, 
+      console.log("BookingService - Retrieved routes data:", data.length, "routes");
+      
+      // Verify that each route has the required fields
+      data.forEach(route => {
+        if (!route.timings) {
+          console.warn(`BookingService - Route from ${route.from_location} to ${route.to_location} has no timings array`);
+          route.timings = []; // Ensure timings is at least an empty array
+        }
+        
+        // Log each route's timings for debugging
+        console.log(`BookingService - Route from ${route.from_location} to ${route.to_location}:`, 
           "Timings:", route.timings, 
           "Display order:", route.display_order);
       });
@@ -204,7 +211,7 @@ export async function getAllRoutes(): Promise<{ data: RouteData[]; error: any }>
 
 export async function getRouteDetails(fromLocation: string, toLocation: string): Promise<{ data: RouteData | null; error: any }> {
   try {
-    console.log(`Fetching route details for ${fromLocation} to ${toLocation}`);
+    console.log(`BookingService - Fetching route details for ${fromLocation} to ${toLocation}`);
     
     const { data, error } = await supabase
       .from('routes')
@@ -214,7 +221,15 @@ export async function getRouteDetails(fromLocation: string, toLocation: string):
       .maybeSingle() as unknown as { data: RouteData | null, error: any };
     
     if (data) {
-      console.log("Retrieved route details:", data);
+      console.log("BookingService - Retrieved route details:", data);
+      
+      // Ensure timings is at least an empty array
+      if (!data.timings) {
+        console.warn(`BookingService - Route from ${fromLocation} to ${toLocation} has no timings array`);
+        data.timings = [];
+      }
+    } else {
+      console.log(`BookingService - No route found for ${fromLocation} to ${toLocation}`);
     }
       
     return { data, error };

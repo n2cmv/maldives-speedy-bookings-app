@@ -22,10 +22,11 @@ const TimeSelector = ({
 }: TimeSelectorProps) => {
   const { t } = useTranslation();
   
-  // Log available times when they change for debugging
+  // Enhanced logging for debugging timing issues
   useEffect(() => {
     console.log(`TimeSelector - Available times for ${label}:`, availableTimes);
-  }, [availableTimes, label]);
+    console.log(`TimeSelector - Currently selected time: ${selectedTime}`);
+  }, [availableTimes, label, selectedTime]);
   
   return (
     <div className="space-y-2">
@@ -42,10 +43,13 @@ const TimeSelector = ({
         </div>
         <Select
           value={selectedTime}
-          onValueChange={(value) => onTimeChange(value as Time)}
+          onValueChange={(value) => {
+            console.log(`TimeSelector - Time selected: ${value}`);
+            onTimeChange(value as Time);
+          }}
         >
           <SelectTrigger id={id} className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
-          <SelectContent className="select-content">
+          <SelectContent className="select-content max-h-[300px] overflow-auto">
             {availableTimes && availableTimes.length > 0 ? (
               availableTimes.map((time) => (
                 <SelectItem 
