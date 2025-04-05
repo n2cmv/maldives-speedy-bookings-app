@@ -17,21 +17,30 @@ const AdminLogin = () => {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitializing, setIsInitializing] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   
   useEffect(() => {
     // Check if already logged in as admin
     const checkAdminSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        try {
-          // Use service role function to check admin status to avoid RLS issues
-          const { success } = await initializeAdminUser();
-          if (success) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // Try to initialize admin user
+          await initializeAdminUser();
+          
+          // Check if user is in admin_users table
+          const { data } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+            
+          if (data) {
             navigate("/admin");
           }
-        } catch (error) {
-          console.error("Error checking admin status:", error);
         }
+      } catch (error) {
+        console.error("Error checking admin session:", error);
       }
     };
     
@@ -41,6 +50,7 @@ const AdminLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError(null);
 
     try {
       // Step 1: Sign in with email and password
@@ -51,12 +61,15 @@ const AdminLogin = () => {
 
       if (authError) {
         console.error("Auth error:", authError);
+        setAuthError(authError.message);
         throw authError;
       }
 
       if (!authData.user || !authData.session) {
-        console.error("No user or session returned");
-        throw new Error("Authentication failed");
+        const errorMsg = "No user or session returned";
+        console.error(errorMsg);
+        setAuthError(errorMsg);
+        throw new Error(errorMsg);
       }
 
       console.log("Auth successful, checking if admin");
@@ -66,6 +79,7 @@ const AdminLogin = () => {
       
       if (!success) {
         console.error("Admin initialization failed:", error);
+        setAuthError(error || "Not authorized as admin");
         // Sign out if admin initialization fails
         await supabase.auth.signOut();
         throw new Error(error || "Not authorized as admin");
@@ -92,14 +106,16 @@ const AdminLogin = () => {
 
   const handleInitializeAdmin = async () => {
     setIsInitializing(true);
+    setAuthError(null);
     try {
       const { success, error } = await initializeAdminUser();
       if (success) {
         toast({
           title: "Admin initialized",
-          description: "Admin user has been set up successfully"
+          description: "Admin user has been set up successfully. You can now login."
         });
       } else {
+        setAuthError(error || "Initialization failed");
         toast({
           title: "Initialization failed",
           description: error || "Could not initialize admin user",
@@ -107,6 +123,7 @@ const AdminLogin = () => {
         });
       }
     } catch (error: any) {
+      setAuthError(error.message || "An unexpected error occurred");
       toast({
         title: "Initialization error",
         description: error.message || "An unexpected error occurred",
@@ -130,6 +147,12 @@ const AdminLogin = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {authError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+              {authError}
+            </div>
+          )}
+          
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

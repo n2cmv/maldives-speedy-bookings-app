@@ -29,18 +29,17 @@ serve(async (req) => {
     // Use the manually created user ID
     const userId = "a8848e6f-0cf5-4e0c-a26b-b16309b07219";
 
-    // First let's create the admin_users table if it doesn't exist
-    // and disable RLS to avoid the recursion issue
-    await supabaseAdmin.rpc('disable_rls_for_admin_users_if_needed');
+    // First, disable RLS on the admin_users table
+    await supabaseAdmin.rpc('disable_rls_for_admin_users');
     
     // Check if user already exists in admin_users table
     const { data: existingAdminUser, error: queryError } = await supabaseAdmin
       .from("admin_users")
       .select("*")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
       
-    if (queryError && queryError.code !== 'PGRST116') {
+    if (queryError) {
       console.error("Error checking admin user:", queryError);
       throw queryError;
     }
