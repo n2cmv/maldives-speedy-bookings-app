@@ -24,7 +24,7 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
             key={dest.name} 
             variant="outline" 
             size="sm"
-            className="flex items-center gap-1.5 bg-white border-ocean/30 hover:bg-ocean/10 hover:border-ocean"
+            className="flex items-center gap-1.5 bg-white border-primary/30 hover:bg-primary/10 hover:border-primary hover:text-primary"
             onClick={() => onSelectDestination(dest.name as Island)}
           >
             {dest.icon}

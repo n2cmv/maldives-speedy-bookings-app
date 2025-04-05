@@ -104,23 +104,21 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               From
             </label>
             <div className="relative">
-              <Navigation className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Navigation className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
               <div className="w-full">
                 <Select
                   value={booking.from}
                   onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
                 >
-                  <SelectTrigger 
-                    className="pl-10 h-12 w-full border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
-                  >
+                  <SelectTrigger className="booking-select-trigger">
                     <SelectValue placeholder="Select departure island" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-md p-1 z-50">
+                  <SelectContent className="select-content">
                     {fromLocations.map((location) => (
                       <SelectItem 
                         key={location} 
                         value={location}
-                        className="py-2.5 px-3 rounded-md cursor-pointer hover:bg-primary/10 hover:text-primary text-sm"
+                        className="select-item"
                       >
                         {location}
                       </SelectItem>
@@ -136,23 +134,21 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Destination Island
             </label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
               <div className="w-full">
                 <Select
                   value={booking.island}
                   onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
                 >
-                  <SelectTrigger 
-                    className="pl-10 h-12 w-full border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
-                  >
+                  <SelectTrigger className="booking-select-trigger">
                     <SelectValue placeholder="Select an island" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-md p-1 z-50">
+                  <SelectContent className="select-content">
                     {islands.map((island) => (
                       <SelectItem 
                         key={island} 
                         value={island}
-                        className="py-2.5 px-3 rounded-md cursor-pointer hover:bg-primary/10 hover:text-primary text-sm"
+                        className="select-item"
                       >
                         {island}
                       </SelectItem>
@@ -168,23 +164,21 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Departure Time
             </label>
             <div className="relative">
-              <Clock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Clock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
               <div className="w-full">
                 <Select
                   value={booking.time}
                   onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
                 >
-                  <SelectTrigger 
-                    className="pl-10 h-12 w-full border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
-                  >
+                  <SelectTrigger className="booking-select-trigger">
                     <SelectValue placeholder="Select a time" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-md p-1 z-50">
+                  <SelectContent className="select-content">
                     {times.map((time) => (
                       <SelectItem 
                         key={time} 
                         value={time}
-                        className="py-2.5 px-3 rounded-md cursor-pointer hover:bg-primary/10 hover:text-primary text-sm"
+                        className="select-item"
                       >
                         {time}
                       </SelectItem>
