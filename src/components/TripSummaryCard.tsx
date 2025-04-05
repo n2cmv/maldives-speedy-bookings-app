@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookingInfo } from '@/types/booking';
-import { Scissors, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface TripSummaryCardProps {
@@ -85,11 +85,6 @@ const TripSummaryCard = ({ bookingInfo }: TripSummaryCardProps) => {
                 </div>
               </>
             )}
-            
-            {/* Dashed line decoration */}
-            <div className="absolute -right-6 top-1/2 transform -rotate-90 text-ocean-light opacity-30">
-              <p className="tracking-[0.5em] text-xs font-light whitespace-nowrap">TEAR HERE</p>
-            </div>
             
             <div className="border-t border-dashed border-ocean-light/30 my-4"></div>
             
