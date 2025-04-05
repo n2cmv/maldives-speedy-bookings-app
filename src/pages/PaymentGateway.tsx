@@ -87,6 +87,11 @@ const PaymentGateway = () => {
       <div className="min-h-screen flex items-center justify-center bg-white p-4">
         <div className="text-center">
           <div className="flex flex-col items-center justify-center space-y-4">
+            <img 
+              src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
+              alt="Bank of Maldives Payment Gateway" 
+              className="h-16 mb-4"
+            />
             <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
             <h2 className="text-2xl font-bold text-gray-800">Processing Payment</h2>
             <p className="text-gray-600">
@@ -143,6 +148,14 @@ const PaymentGateway = () => {
             </div>
             
             <div className="p-6 space-y-6">
+              <div className="flex justify-center mb-6">
+                <img 
+                  src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
+                  alt="Bank of Maldives Payment Gateway" 
+                  className="h-12 md:h-14"
+                />
+              </div>
+              
               <div className="border-b border-gray-200 pb-4">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-gray-700">Booking Reference:</span>
@@ -179,10 +192,12 @@ const PaymentGateway = () => {
                 )}
               </Button>
               
-              <div className="flex items-center justify-center space-x-4 mt-6">
-                <img src="https://placehold.co/80x40/eee/999?text=VISA" alt="Visa" className="h-8" />
-                <img src="https://placehold.co/80x40/eee/999?text=MASTER" alt="Mastercard" className="h-8" />
-                <img src="https://placehold.co/80x40/eee/999?text=AMEX" alt="American Express" className="h-8" />
+              <div className="flex items-center justify-center mt-6">
+                <img 
+                  src="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" 
+                  alt="Payment Methods" 
+                  className="h-8 md:h-10 w-auto"
+                />
               </div>
               
               <p className="text-xs text-gray-500 text-center mt-4">
