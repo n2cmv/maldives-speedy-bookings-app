@@ -1,5 +1,4 @@
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -77,7 +76,10 @@
   }
   
   .select-item {
-    @apply py-2.5 px-3 rounded-md cursor-pointer hover:bg-primary/10 hover:text-primary text-sm;
+    @apply py-3 px-4 rounded-md cursor-pointer text-base flex items-center;
+    @apply hover:bg-primary/10 hover:text-primary transition-colors;
+    @apply data-[highlighted]:bg-primary/10 data-[highlighted]:text-primary;
+    @apply focus:bg-primary/10 focus:text-primary outline-none;
   }
   
   .booking-select-trigger {
@@ -99,7 +101,7 @@
   }
   
   .custom-dropdown {
-    @apply mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2 z-[100];
+    @apply mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-[100];
   }
   
   .passenger-picker {
@@ -108,4 +110,3 @@
     @apply focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary;
   }
 }
-
