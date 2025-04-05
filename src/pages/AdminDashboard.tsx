@@ -8,37 +8,63 @@ import IslandsManager from "@/components/admin/IslandsManager";
 import { Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("bookings");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkAdminAccess = async () => {
       setIsLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.log("No session found, redirecting to login");
+          toast({
+            title: "Authentication required",
+            description: "Please log in to access the admin dashboard",
+            variant: "destructive",
+          });
+          navigate("/admin/login");
+          return;
+        }
+        
+        // Check if the authenticated user is in admin_users table
+        const { data, error } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (error || !data) {
+          console.error("Admin check failed:", error);
+          toast({
+            title: "Access denied",
+            description: "You don't have admin privileges",
+            variant: "destructive",
+          });
+          navigate("/admin/login");
+          return;
+        }
+        
+        console.log("Admin access verified");
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error checking admin access:", error);
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
         navigate("/admin/login");
-        return;
       }
-      
-      // Check if the authenticated user is in admin_users table
-      const { data } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .single();
-      
-      if (!data) {
-        navigate("/admin/login");
-        return;
-      }
-      setIsLoading(false);
     };
     
     checkAdminAccess();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   if (isLoading) {
     return (
