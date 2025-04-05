@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
 import {
@@ -19,9 +19,16 @@ const languages = [
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  
+  // Force re-render when language changes to ensure UI updates
+  useEffect(() => {
+    setCurrentLanguage(i18n.language);
+  }, [i18n.language]);
   
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
+    setCurrentLanguage(lng);
     setIsOpen(false);
   };
 
@@ -43,7 +50,7 @@ const LanguageSwitcher = () => {
               key={language.code}
               onClick={() => changeLanguage(language.code)}
               className={`cursor-pointer ${
-                i18n.language === language.code ? "bg-ocean/10 text-ocean-dark" : ""
+                currentLanguage === language.code ? "bg-ocean/10 text-ocean-dark" : ""
               }`}
             >
               {language.name}
