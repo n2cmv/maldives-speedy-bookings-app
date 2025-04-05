@@ -2,16 +2,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
-import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 import ReturnTripSwitch from "./ReturnTripSwitch";
-import TripLocationSelector from "./TripLocationSelector";
-import TripDateTimeSelector from "./TripDateTimeSelector";
-import ReturnTripSection from "./ReturnTripSection";
 import PassengerSelection from "./PassengerSelection";
-import { getAllRoutes } from "@/services/bookingService";
-import { supabase } from "@/integrations/supabase/client";
+import { useRouteTimesMap } from "./hooks/useRouteTimesMap";
+import { useAvailableTimes } from "./hooks/useAvailableTimes";
+import RouteSelectionForm from "./forms/RouteSelectionForm";
+import TripDatesForm from "./forms/TripDatesForm";
+import BookingFormFooter from "./forms/BookingFormFooter";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
@@ -32,10 +31,16 @@ const BookingForm = ({
 }: BookingFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || true);
-  const [fromLocations, setFromLocations] = useState<string[]>([]);
-  const [toLocations, setToLocations] = useState<string[]>([]);
-  const [availableTimesMap, setAvailableTimesMap] = useState<Record<string, Record<string, Time[]>>>({});
+  
+  // Route data state
+  const { 
+    fromLocations, 
+    toLocations, 
+    availableTimesMap, 
+    isLoading: routesLoading 
+  } = useRouteTimesMap();
+  
+  const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || routesLoading);
   const [booking, setBooking] = useState<BookingInfo>({
     from: '',
     island: preSelectedIsland || '',
@@ -49,137 +54,21 @@ const BookingForm = ({
     returnTrip: false
   });
   
+  // Date state
   const today = new Date();
   const [departureDate, setDepartureDate] = useState<Date | undefined>(today);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
   const [departureDateOpen, setDepartureDateOpen] = useState(false);
   const [returnDateOpen, setReturnDateOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchRoutes = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await getAllRoutes();
-        
-        if (error) {
-          console.error("Error fetching routes:", error);
-          toast({
-            title: t("booking.error", "Error"),
-            description: t("booking.form.errorFetchingRoutes", "Failed to fetch available routes"),
-            variant: "destructive"
-          });
-          return;
-        }
+  // Get available times based on selected route
+  const { availableTimes, returnAvailableTimes } = useAvailableTimes(
+    booking,
+    availableTimesMap,
+    allTimes
+  );
 
-        if (data) {
-          console.log("Routes data received:", data);
-          
-          const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
-          const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
-          
-          // Build a map of available times for each route
-          const timesMap: Record<string, Record<string, Time[]>> = {};
-          
-          data.forEach(route => {
-            if (!timesMap[route.from_location]) {
-              timesMap[route.from_location] = {};
-            }
-            
-            // Convert string[] to Time[] with type checking
-            const validTimings: Time[] = (route.timings || []).filter((time): time is Time => {
-              // Verify each timing string is a valid Time enum value
-              return Object.values<string>(Time).includes(time);
-            });
-            
-            // Enhanced debugging for route timings
-            console.log(`BookingForm - Route timings for ${route.from_location} to ${route.to_location}:`, 
-              route.timings, "Valid timings:", validTimings);
-            
-            timesMap[route.from_location][route.to_location] = validTimings.length > 0 ? validTimings : [];
-          });
-          
-          console.log("BookingForm - Complete available times map:", timesMap);
-          setAvailableTimesMap(timesMap);
-          setFromLocations(uniqueFromLocations);
-          setToLocations(uniqueToLocations);
-
-          // Check if current selection has timings and update if necessary
-          if (booking.from && booking.island) {
-            const routeTimings = timesMap[booking.from]?.[booking.island];
-            console.log(`BookingForm - Checking timings for current selection: ${booking.from} to ${booking.island}:`, routeTimings);
-          }
-        }
-      } catch (error) {
-        console.error("Exception fetching routes:", error);
-        toast({
-          title: t("booking.error", "Error"),
-          description: t("booking.form.exceptionFetchingRoutes", "An error occurred while fetching routes"),
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRoutes();
-    
-    // Set up real-time subscription to listen for route changes
-    const channel = supabase
-      .channel('booking-routes-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'routes' },
-        (payload) => {
-          console.log('Route update detected in booking form:', payload);
-          // Refresh routes data when changes are detected
-          fetchRoutes();
-          toast({
-            title: t("booking.routesUpdated", "Routes Updated"),
-            description: t("booking.routesRefreshed", "Available routes have been refreshed")
-          });
-        }
-      )
-      .subscribe();
-    
-    // Clean up subscription on unmount
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [allTimes, t]);
-
-  const getRouteTimings = (from: string, to: string): Time[] => {
-    // Check both directional routes if data exists (in case route is defined in reverse)
-    if (availableTimesMap[from] && availableTimesMap[from][to]) {
-      const timings = availableTimesMap[from][to];
-      console.log(`BookingForm - Found timings for ${from} to ${to}:`, timings);
-      
-      if (timings && timings.length > 0) {
-        return timings;
-      }
-    }
-    
-    // Log that we're falling back to default times
-    console.log(`BookingForm - No specific timings found for ${from} to ${to}, using default times`);
-    return allTimes;
-  };
-  
-  const availableTimes = booking.from && booking.island 
-    ? getRouteTimings(booking.from, booking.island)
-    : allTimes;
-  
-  const returnAvailableTimes = booking.returnTrip && booking.returnTripDetails?.from && booking.returnTripDetails?.island
-    ? getRouteTimings(booking.returnTripDetails.from, booking.returnTripDetails.island)
-    : allTimes;
-
-  useEffect(() => {
-    if (booking.from && booking.island && booking.time) {
-      const routeTimings = getRouteTimings(booking.from, booking.island);
-      if (!routeTimings.includes(booking.time as Time)) {
-        setBooking(prev => ({ ...prev, time: '' }));
-      }
-    }
-  }, [booking.from, booking.island, booking.time]);
-  
+  // Update return trip details when route changes
   useEffect(() => {
     if (booking.returnTrip && booking.island && booking.from) {
       setBooking(prev => ({
@@ -194,24 +83,7 @@ const BookingForm = ({
     }
   }, [booking.returnTrip, booking.island, booking.from, returnDate]);
 
-  const handleSelectDestination = (island: string) => {
-    if (island !== booking.from) {
-      setBooking(prev => ({ ...prev, island }));
-      
-      if (booking.returnTrip) {
-        setBooking(prev => ({
-          ...prev,
-          island,
-          returnTripDetails: {
-            ...prev.returnTripDetails!,
-            island: prev.from,
-            from: island
-          }
-        }));
-      }
-    }
-  };
-
+  // Passengers handling
   const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
     const totalSeats = passengerCounts.adults + passengerCounts.children + passengerCounts.seniors;
     setBooking({ 
@@ -221,6 +93,7 @@ const BookingForm = ({
     });
   };
   
+  // Return trip toggle
   const handleReturnToggle = (isChecked: boolean) => {
     setBooking(prev => ({ 
       ...prev, 
@@ -234,16 +107,7 @@ const BookingForm = ({
     }));
   };
 
-  const handleDepartureDateSelect = (date: Date | undefined) => {
-    setDepartureDate(date);
-    setDepartureDateOpen(false);
-  };
-
-  const handleReturnDateSelect = (date: Date | undefined) => {
-    setReturnDate(date);
-    setReturnDateOpen(false);
-  };
-
+  // Form validation and submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -286,6 +150,11 @@ const BookingForm = ({
     navigate("/passenger-details", { state: bookingWithDates });
   };
 
+  // Update loading state when external loading changes
+  useEffect(() => {
+    setIsLoading(externalIsLoading || routesLoading);
+  }, [externalIsLoading, routesLoading]);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <ReturnTripSwitch
@@ -293,53 +162,30 @@ const BookingForm = ({
         onReturnTripChange={handleReturnToggle}
       />
 
-      <TripLocationSelector
-        fromLocation={booking.from}
-        toLocation={booking.island}
+      <RouteSelectionForm
         fromLocations={fromLocations}
         toLocations={toLocations}
         isLoading={isLoading}
-        onFromChange={(value) => {
-          // Clear destination if it's the same as the selected origin
-          setBooking({ 
-            ...booking, 
-            from: value,
-            island: value === booking.island ? '' : booking.island,
-            time: '' // Reset time as available times may change
-          });
-        }}
-        onToChange={handleSelectDestination}
+        booking={booking}
+        onBookingChange={setBooking}
+        availableTimesMap={availableTimesMap}
       />
       
-      <TripDateTimeSelector
-        date={departureDate}
-        time={booking.time}
+      <TripDatesForm
+        booking={booking}
+        onBookingChange={setBooking}
+        departureDate={departureDate}
+        setDepartureDate={setDepartureDate}
+        departureDateOpen={departureDateOpen}
+        setDepartureDateOpen={setDepartureDateOpen}
+        returnDate={returnDate}
+        setReturnDate={setReturnDate}
+        returnDateOpen={returnDateOpen}
+        setReturnDateOpen={setReturnDateOpen}
         availableTimes={availableTimes}
-        minDate={today}
-        isDateOpen={departureDateOpen}
-        setIsDateOpen={setDepartureDateOpen}
-        onDateSelect={handleDepartureDateSelect}
-        onTimeChange={(value) => setBooking({ ...booking, time: value })}
+        returnAvailableTimes={returnAvailableTimes}
+        today={today}
       />
-      
-      {booking.returnTrip && (
-        <ReturnTripSection
-          returnTime={booking.returnTripDetails?.time || ''}
-          availableTimes={returnAvailableTimes}
-          returnDate={returnDate}
-          minDate={departureDate}
-          returnDateOpen={returnDateOpen}
-          setReturnDateOpen={setReturnDateOpen}
-          onReturnDateSelect={handleReturnDateSelect}
-          onReturnTimeChange={(value) => setBooking({ 
-            ...booking, 
-            returnTripDetails: { 
-              ...booking.returnTripDetails!, 
-              time: value 
-            } 
-          })}
-        />
-      )}
       
       <PassengerSelection 
         onChange={handlePassengerCountChange}
@@ -347,12 +193,7 @@ const BookingForm = ({
         maxPassengers={MAX_PASSENGERS}
       />
       
-      <Button 
-        type="submit" 
-        className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
-      >
-        {t("common.bookNow", "Book Now")}
-      </Button>
+      <BookingFormFooter onSubmit={handleSubmit} />
     </form>
   );
 };
