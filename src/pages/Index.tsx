@@ -15,12 +15,12 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main>
+        <main className="pt-20">
           <WelcomeSection />
         </main>
       </div>
 
-      <div className="absolute bottom-0 left-0 w-full flex justify-center pb-8 text-sm text-gray-500">
+      <div className="relative z-10 w-full flex justify-center pb-8 pt-16 text-sm text-gray-500">
         © 2025 Retour Maldives
       </div>
     </div>
