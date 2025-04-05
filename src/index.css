@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,9 +77,10 @@
   
   .select-item {
     @apply py-3 px-4 rounded-md cursor-pointer text-base flex items-center;
-    @apply hover:bg-ocean/10 hover:text-ocean transition-colors;
-    @apply data-[highlighted]:bg-ocean/15 data-[highlighted]:text-ocean-dark;
-    @apply focus:bg-ocean/10 focus:text-ocean outline-none;
+    @apply hover:bg-ocean/20 hover:text-ocean-dark transition-colors;
+    @apply data-[highlighted]:bg-ocean/30 data-[highlighted]:text-ocean-dark;
+    @apply focus:bg-ocean/20 focus:text-ocean-dark outline-none;
+    @apply data-[state=checked]:bg-ocean/30 data-[state=checked]:text-ocean-dark;
   }
   
   .booking-select-trigger {
