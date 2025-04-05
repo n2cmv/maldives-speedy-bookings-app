@@ -9,7 +9,6 @@ import PaymentInfo from "@/components/confirmation/PaymentInfo";
 import TripDetails from "@/components/confirmation/TripDetails";
 import PassengerInfo from "@/components/confirmation/PassengerInfo";
 import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
-import StepIndicator from "@/components/StepIndicator";
 import { saveBookingToLocalStorage } from "@/services/bookingStorage";
 import { useTranslation } from "react-i18next";
 import HeaderExtras from "@/components/HeaderExtras";
@@ -83,14 +82,7 @@ const Confirmation = () => {
         
         <Header />
         <main className="pt-20 pb-12 px-4">
-          <motion.div
-            className="max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <StepIndicator />
-          </motion.div>
+          {/* StepIndicator component removed */}
           
           <motion.div 
             className="max-w-md mx-auto booking-card mt-8"
