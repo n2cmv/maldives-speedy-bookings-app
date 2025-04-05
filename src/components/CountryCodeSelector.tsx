@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,6 +80,7 @@ const countryCodes: CountryCode[] = [
 
 const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
   
   // Find the selected country by dial code
@@ -102,6 +102,11 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open]);
+
+  // Set mounted state after component mount to avoid hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -125,20 +130,25 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0" ref={popoverRef}>
-        {open && (
-          <Command>
+        {mounted && open ? (
+          <div className="relative">
             <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-              <CommandInput placeholder="Search country..." />
+              <input
+                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Search country..."
+              />
             </div>
-            <CommandEmpty>No country found.</CommandEmpty>
             <ScrollArea className="h-[300px]">
-              <CommandGroup>
+              <div className="p-1">
                 {countryCodes.map((country) => (
-                  <CommandItem
+                  <div
                     key={country.code}
-                    value={`${country.name}${country.dial_code}`}
-                    onSelect={() => {
+                    className={cn(
+                      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected='true']:bg-accent data-[selected='true']:text-accent-foreground data-[disabled=true]:opacity-50",
+                      value === country.dial_code ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+                    )}
+                    onClick={() => {
                       onChange(country.dial_code);
                       setOpen(false);
                     }}
@@ -146,18 +156,15 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
                     <span className="mr-2">{country.flag}</span>
                     <span>{country.name}</span>
                     <span className="ml-2 text-gray-500">{country.dial_code}</span>
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        value === country.dial_code ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
+                    {value === country.dial_code && (
+                      <Check className="ml-auto h-4 w-4 opacity-100" />
+                    )}
+                  </div>
                 ))}
-              </CommandGroup>
+              </div>
             </ScrollArea>
-          </Command>
-        )}
+          </div>
+        ) : null}
       </PopoverContent>
     </Popover>
   );
