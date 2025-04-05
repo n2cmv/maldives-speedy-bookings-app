@@ -2,7 +2,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
 import PaymentInfo from "@/components/confirmation/PaymentInfo";
@@ -13,12 +13,15 @@ import { saveBookingToLocalStorage } from "@/services/bookingStorage";
 import { useTranslation } from "react-i18next";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
+import { saveBookingToDatabase, sendBookingConfirmationEmail } from "@/services/bookingService";
 
 const Confirmation = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const booking = location.state as BookingInfo & { paymentComplete?: boolean; paymentReference?: string };
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   
   // Redirect if no booking data or if payment not complete
   useEffect(() => {
@@ -34,18 +37,54 @@ const Confirmation = () => {
     }
     
     // Save booking to local storage for future reference
-    if (booking.paymentComplete && booking.paymentReference) {
+    if (booking.paymentComplete && booking.paymentReference && !isSaved) {
+      setIsProcessing(true);
       saveBookingToLocalStorage(booking);
+      
+      // Save to database
+      saveBookingToDatabase(booking).then(({ error }) => {
+        if (error) {
+          console.error("Error saving booking to database:", error);
+          toast.error(t("error.savingBooking", "Error saving booking"), {
+            description: t("error.tryAgainLater", "Please try again later")
+          });
+        } else {
+          // Send confirmation email
+          sendBookingConfirmationEmail(booking).then(({ success, error }) => {
+            if (!success) {
+              console.error("Error sending confirmation email:", error);
+              toast.error(t("error.emailSending", "Error sending confirmation email"), {
+                description: t("error.tryAgainLater", "Please try again later")
+              });
+            }
+            
+            setIsProcessing(false);
+            setIsSaved(true);
+            
+            // Show success toast when page loads and data is saved
+            toast.success(t("payment.success", "Payment Successful!"), {
+              description: t("payment.description", "Your booking has been confirmed.")
+            });
+          });
+        }
+      });
     }
-    
-    // Show success toast when page loads
-    toast.success(t("payment.success", "Payment Successful!"), {
-      description: t("payment.description", "Your booking has been confirmed.")
-    });
-  }, [booking, navigate, t]);
+  }, [booking, navigate, t, isSaved]);
   
-  if (!booking?.paymentComplete) {
-    return null;
+  if (!booking?.paymentComplete || isProcessing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white p-4">
+        <div className="text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
+            <h2 className="text-2xl font-bold text-gray-800">{t("confirmation.processing", "Processing Your Booking")}</h2>
+            <p className="text-gray-600">
+              {t("confirmation.wait", "Please wait while we confirm your booking...")}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   const isReturnTrip = Boolean(booking.returnTrip && booking.returnTripDetails);

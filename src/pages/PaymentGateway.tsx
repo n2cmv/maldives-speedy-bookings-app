@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, CreditCard } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
@@ -34,9 +34,8 @@ const PaymentGateway = () => {
   const handlePayment = () => {
     setIsProcessing(true);
     
-    toast({
-      title: "Redirecting to payment gateway",
-      description: "You will be redirected to the Bank of Maldives payment page",
+    toast.info("Redirecting to payment gateway", {
+      description: "You will be redirected to the Bank of Maldives payment page"
     });
     
     setTimeout(() => {
@@ -55,19 +54,20 @@ const PaymentGateway = () => {
 
   const handlePaymentCompletion = (success: boolean) => {
     if (success && bookingInfo) {
+      // Create a unique payment reference
+      const paymentRef = `BML-${Math.floor(Math.random() * 1000000)}`;
+      
       navigate("/confirmation", { 
         state: {
           ...bookingInfo,
           paymentComplete: true,
-          paymentReference: `BML-${Math.floor(Math.random() * 1000000)}`
+          paymentReference: paymentRef
         }
       });
     } else {
       setIsRedirecting(false);
-      toast({
-        title: "Payment failed",
-        description: "Your payment was not processed. Please try again.",
-        variant: "destructive",
+      toast.error("Payment failed", {
+        description: "Your payment was not processed. Please try again."
       });
     }
   };
