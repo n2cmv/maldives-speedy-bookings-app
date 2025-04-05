@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -31,7 +32,22 @@ const islands: Island[] = [
   'A.Dh Dhangethi',
   'Aa. Mathiveri'
 ];
-const times: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
+const allTimes: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
+
+// Island-specific time restrictions
+const islandTimeRestrictions: Record<Island, Time[]> = {
+  'A.Dh Dhigurah': ['11:00 AM', '4:00 PM'],
+  'A.Dh Dhangethi': ['11:00 AM', '4:00 PM'],
+  // Add default times for all other islands
+  'Male': allTimes,
+  'Hulhumale': allTimes,
+  'Maafushi': allTimes,
+  'Baa Atoll': allTimes,
+  'Ari Atoll': allTimes,
+  'Male\' City': allTimes,
+  'Male\' Airport': allTimes,
+  'Aa. Mathiveri': allTimes
+};
 
 interface BookingSectionProps {
   preSelectedIsland?: Island;
@@ -52,12 +68,27 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const navigate = useNavigate();
   // Reference to island select trigger for programmatic clicking
   const islandSelectRef = useRef<HTMLButtonElement>(null);
+
+  // Available times based on selected island
+  const availableTimes = booking.island ? 
+    (islandTimeRestrictions[booking.island] || allTimes) : 
+    allTimes;
   
   useEffect(() => {
     if (preSelectedIsland) {
       setBooking(prev => ({ ...prev, island: preSelectedIsland }));
     }
   }, [preSelectedIsland]);
+
+  // Reset time when island changes if the current time is not available for the new island
+  useEffect(() => {
+    if (booking.island && booking.time) {
+      const availableTimesForIsland = islandTimeRestrictions[booking.island] || allTimes;
+      if (!availableTimesForIsland.includes(booking.time as Time)) {
+        setBooking(prev => ({ ...prev, time: '' }));
+      }
+    }
+  }, [booking.island]);
 
   const handleSelectDestination = (island: Island) => {
     setBooking(prev => ({ ...prev, island }));
@@ -181,7 +212,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               >
                 <SelectTrigger id="time-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
                 <SelectContent className="select-content">
-                  {times.map((time) => (
+                  {availableTimes.map((time) => (
                     <SelectItem 
                       key={time} 
                       value={time}
