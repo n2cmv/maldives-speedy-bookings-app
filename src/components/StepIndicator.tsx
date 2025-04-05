@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Check, ChevronRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
