@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -32,7 +31,7 @@ const BookingForm = ({
 }: BookingFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(externalIsLoading || true);
+  const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || true);
   const [fromLocations, setFromLocations] = useState<string[]>([]);
   const [toLocations, setToLocations] = useState<string[]>([]);
   const [booking, setBooking] = useState<BookingInfo>({
@@ -54,7 +53,6 @@ const BookingForm = ({
   const [departureDateOpen, setDepartureDateOpen] = useState(false);
   const [returnDateOpen, setReturnDateOpen] = useState(false);
 
-  // Fetch routes from the database
   useEffect(() => {
     const fetchRoutes = async () => {
       setIsLoading(true);
@@ -67,7 +65,6 @@ const BookingForm = ({
         }
 
         if (data) {
-          // Extract unique from_locations and to_locations
           const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
           const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
           
