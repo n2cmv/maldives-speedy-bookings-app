@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import { Island } from "@/types/booking";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
 
 const BookingForm = () => {
   const location = useLocation();

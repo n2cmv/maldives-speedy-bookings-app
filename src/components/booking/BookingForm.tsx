@@ -4,11 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Navigation } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SeatPicker from "../SeatPicker";
 import PopularDestinations from "../PopularDestinations";
-import IslandSelector from "./IslandSelector";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
 import ReturnTripSwitch from "./ReturnTripSwitch";
@@ -34,7 +32,7 @@ const BookingForm = ({
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingInfo>({
     from: 'Male\' Airport',
-    island: preSelectedIsland || '',
+    island: preSelectedIsland || 'Maafushi',
     time: '',
     seats: 1,
     passengerCounts: {
@@ -81,22 +79,6 @@ const BookingForm = ({
       }));
     }
   }, [booking.returnTrip, booking.island, booking.from, returnDate]);
-
-  const handleSelectDestination = (island: string) => {
-    setBooking(prev => ({ ...prev, island }));
-    
-    if (booking.returnTrip) {
-      setBooking(prev => ({
-        ...prev,
-        island,
-        returnTripDetails: {
-          ...prev.returnTripDetails!,
-          island: prev.from,
-          from: island
-        }
-      }));
-    }
-  };
 
   const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
     const totalSeats = passengerCounts.adults + passengerCounts.children + passengerCounts.seniors;
@@ -177,27 +159,6 @@ const BookingForm = ({
       <ReturnTripSwitch
         isReturnTrip={booking.returnTrip}
         onReturnTripChange={handleReturnToggle}
-      />
-
-      <IslandSelector
-        label={t("booking.form.from", "From")}
-        icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
-        selectedIsland={booking.from}
-        islandNames={islandNames}
-        onIslandChange={(value) => setBooking({ ...booking, from: value })}
-        placeholder={t("booking.form.selectDeparture", "Select departure island")}
-        isLoading={isLoading}
-        id="from-select"
-      />
-      
-      <IslandSelector
-        label={t("booking.form.destinationIsland", "Destination Island")}
-        icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
-        selectedIsland={booking.island}
-        islandNames={islandNames}
-        onIslandChange={(value) => setBooking({ ...booking, island: value })}
-        isLoading={isLoading}
-        id="island-select"
       />
       
       <DateSelector
