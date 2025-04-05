@@ -41,8 +41,8 @@ interface Passenger {
 }
 
 const availableTimes: Time[] = [
-  '6:30 AM', '7:00 AM', '8:00 AM', '10:00 AM', '11:00 AM',
-  '12:00 PM', '1:10 PM', '1:30 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'
+  Time.AM_630, Time.AM_700, Time.AM_800, Time.AM_1000, Time.AM_1100,
+  Time.PM_1200, Time.PM_110, Time.PM_130, Time.PM_200, Time.PM_400, Time.PM_600, Time.PM_800
 ];
 
 const availableIslands: Island[] = [
