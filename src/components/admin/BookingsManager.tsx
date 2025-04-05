@@ -44,7 +44,7 @@ const BookingsManager = () => {
   const [currentBooking, setCurrentBooking] = useState<any | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [bookingToDelete, setBookingToDelete] = useState<string | null>(null);
-  const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+  const [isSendingEmail, setIsSendingEmail] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBookings();
@@ -112,8 +112,13 @@ const BookingsManager = () => {
   };
 
   const handleResendEmail = async (booking: any) => {
-    setIsSendingEmail(true);
+    setIsSendingEmail(booking.id);
     try {
+      // Check if passenger info contains valid email
+      if (!booking.passenger_info || booking.passenger_info.length === 0 || !booking.passenger_info[0].email) {
+        throw new Error("Missing or invalid passenger email address");
+      }
+
       // Convert database booking to BookingInfo format
       const bookingInfo: BookingInfo = {
         from: booking.from_location,
@@ -137,6 +142,7 @@ const BookingsManager = () => {
         };
       }
 
+      console.log("Attempting to send email to:", booking.passenger_info[0].email);
       const { success, error } = await sendBookingConfirmationEmail(bookingInfo);
 
       if (!success || error) {
@@ -145,17 +151,17 @@ const BookingsManager = () => {
 
       toast({
         title: "Success",
-        description: "Confirmation email has been resent",
+        description: `Confirmation email sent to ${booking.passenger_info[0].email}`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending confirmation email:", error);
       toast({
         title: "Error",
-        description: "Failed to resend confirmation email",
+        description: `Failed to send email: ${error.message || "Unknown error"}`,
         variant: "destructive",
       });
     } finally {
-      setIsSendingEmail(false);
+      setIsSendingEmail(null);
     }
   };
 
@@ -167,7 +173,8 @@ const BookingsManager = () => {
       booking.user_email?.toLowerCase().includes(query) ||
       booking.payment_reference?.toLowerCase().includes(query) ||
       booking.from_location?.toLowerCase().includes(query) ||
-      booking.to_location?.toLowerCase().includes(query)
+      booking.to_location?.toLowerCase().includes(query) ||
+      (booking.passenger_info && booking.passenger_info[0]?.email?.toLowerCase().includes(query))
     );
   });
 
@@ -217,7 +224,7 @@ const BookingsManager = () => {
                 filteredBookings.map((booking) => (
                   <TableRow key={booking.id}>
                     <TableCell>{booking.payment_reference || "N/A"}</TableCell>
-                    <TableCell>{booking.user_email}</TableCell>
+                    <TableCell>{booking.passenger_info && booking.passenger_info[0]?.email || booking.user_email || "N/A"}</TableCell>
                     <TableCell>{booking.from_location}</TableCell>
                     <TableCell>{booking.to_location}</TableCell>
                     <TableCell>
@@ -247,9 +254,10 @@ const BookingsManager = () => {
                           variant="outline"
                           size="icon"
                           onClick={() => handleResendEmail(booking)}
-                          disabled={isSendingEmail}
+                          disabled={isSendingEmail !== null}
+                          className={isSendingEmail === booking.id ? "opacity-50" : ""}
                         >
-                          <Send className="h-4 w-4" />
+                          <Send className={`h-4 w-4 ${isSendingEmail === booking.id ? "animate-pulse" : ""}`} />
                         </Button>
                       </div>
                     </TableCell>

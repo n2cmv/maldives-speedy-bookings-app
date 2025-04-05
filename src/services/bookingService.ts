@@ -53,6 +53,12 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     const primaryPassenger = booking.passengers[0];
     console.log("Sending confirmation email to:", primaryPassenger.email);
     
+    // Validate email format
+    if (!primaryPassenger.email || !isValidEmail(primaryPassenger.email)) {
+      console.error("Invalid email address:", primaryPassenger.email);
+      return { success: false, error: "Invalid email address" };
+    }
+    
     const emailData = {
       email: primaryPassenger.email,
       name: primaryPassenger.name,
@@ -86,6 +92,12 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     console.error("Exception sending confirmation email:", error);
     return { success: false, error };
   }
+}
+
+// Helper function to validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 export async function getBookingsByEmail(email: string): Promise<{ data: any[]; error: any }> {
