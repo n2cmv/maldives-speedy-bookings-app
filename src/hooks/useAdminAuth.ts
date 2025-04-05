@@ -17,19 +17,19 @@ export const useAdminAuth = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          // Try to initialize admin user
-          await initializeAdminUser();
+          console.log("Existing session detected, checking if admin user");
           
           // Check if user is in admin_users table
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from('admin_users')
             .select('*')
             .eq('user_id', session.user.id)
             .maybeSingle();
             
           if (data) {
-            // Force navigation to admin dashboard
-            window.location.href = "/admin";
+            console.log("Admin status confirmed, redirecting to dashboard");
+            // Use replace instead of navigate for a clean redirect without history
+            window.location.replace("/admin");
           }
         }
       } catch (error) {
@@ -45,6 +45,8 @@ export const useAdminAuth = () => {
     setAuthError(null);
 
     try {
+      console.log("Attempting admin login with email:", email);
+      
       // Step 1: Sign in with email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
@@ -84,8 +86,9 @@ export const useAdminAuth = () => {
         description: "Welcome to the admin dashboard",
       });
       
-      // Use window.location.href instead of navigate for a full page refresh
-      window.location.href = "/admin";
+      // Use window.location.replace instead of navigate for a full page refresh
+      // This ensures that the dashboard completely reloads with fresh state
+      window.location.replace("/admin");
     } catch (error: any) {
       console.error("Login error:", error);
       toast({

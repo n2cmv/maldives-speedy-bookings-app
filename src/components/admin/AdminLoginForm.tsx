@@ -18,20 +18,30 @@ const AdminLoginForm = ({
 }: AdminLoginFormProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    
+    // Basic validation
+    setFormError(null);
+    if (!email) {
+      setFormError("Email is required");
       return;
     }
+    if (!password) {
+      setFormError("Password is required");
+      return;
+    }
+    
     await onSubmit(email, password);
   };
 
   return (
     <>
-      {authError && (
+      {(authError || formError) && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-          {authError}
+          {formError || authError}
         </div>
       )}
       
@@ -44,7 +54,7 @@ const AdminLoginForm = ({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            aria-required="true"
           />
         </div>
         <div className="space-y-2">
@@ -54,7 +64,7 @@ const AdminLoginForm = ({
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            aria-required="true"
             placeholder="Enter your password"
           />
         </div>
