@@ -129,20 +129,22 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const validatedAllTimes = Object.values(Time);
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4">
+    <div className="min-h-screen pb-16 px-4">
       <div className="max-w-lg mx-auto">
-        <Card className="p-8 shadow-lg bg-white/95 backdrop-blur-sm border border-ocean/10 rounded-xl">
-          <h2 className="text-2xl font-bold text-ocean-dark mb-8 text-center">Book Your Speedboat</h2>
+        <Card className="p-6 md:p-8 shadow-lg bg-white/95 backdrop-blur-sm border border-ocean/10 rounded-xl">
+          <h2 className="text-2xl font-bold text-ocean-dark mb-6 text-center">Book Your Speedboat</h2>
           
           <PopularDestinations onSelectDestination={() => {}} />
           
-          <BookingForm 
-            preSelectedIsland={preSelectedIsland}
-            islandNames={islandNames}
-            isLoading={isLoading}
-            timeRestrictions={{}}
-            allTimes={validatedAllTimes}
-          />
+          <div className="mt-6">
+            <BookingForm 
+              preSelectedIsland={preSelectedIsland}
+              islandNames={islandNames}
+              isLoading={isLoading}
+              timeRestrictions={{}}
+              allTimes={validatedAllTimes}
+            />
+          </div>
         </Card>
       </div>
     </div>
