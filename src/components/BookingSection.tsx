@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -103,16 +104,18 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               From
             </label>
             <div className="relative">
+              <div className="passenger-picker" onClick={() => document.getElementById('from-select')?.click()}>
+                <div className="flex items-center">
+                  <Navigation className="h-5 w-5 text-gray-400 mr-2" />
+                  <span className="text-base">{booking.from || 'Select departure island'}</span>
+                </div>
+                <ChevronDown className="h-5 w-5" />
+              </div>
               <Select
                 value={booking.from}
                 onValueChange={(value) => setBooking({ ...booking, from: value as Island })}
               >
-                <SelectTrigger className="custom-select-trigger">
-                  <div className="flex items-center">
-                    <Navigation className="h-5 w-5 text-gray-400 mr-2" />
-                    <SelectValue placeholder="Select departure island" />
-                  </div>
-                </SelectTrigger>
+                <SelectTrigger id="from-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
                 <SelectContent className="custom-dropdown">
                   {fromLocations.map((location) => (
                     <SelectItem 
@@ -133,16 +136,18 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Destination Island
             </label>
             <div className="relative">
+              <div className="passenger-picker" onClick={() => document.getElementById('island-select')?.click()}>
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 text-gray-400 mr-2" />
+                  <span className="text-base">{booking.island || 'Select an island'}</span>
+                </div>
+                <ChevronDown className="h-5 w-5" />
+              </div>
               <Select
                 value={booking.island}
                 onValueChange={(value) => setBooking({ ...booking, island: value as Island })}
               >
-                <SelectTrigger className="custom-select-trigger">
-                  <div className="flex items-center">
-                    <MapPin className="h-5 w-5 text-gray-400 mr-2" />
-                    <SelectValue placeholder="Select an island" />
-                  </div>
-                </SelectTrigger>
+                <SelectTrigger id="island-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
                 <SelectContent className="custom-dropdown">
                   {islands.map((island) => (
                     <SelectItem 
@@ -163,16 +168,18 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               Departure Time
             </label>
             <div className="relative">
+              <div className="passenger-picker" onClick={() => document.getElementById('time-select')?.click()}>
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                  <span className="text-base">{booking.time || 'Select a time'}</span>
+                </div>
+                <ChevronDown className="h-5 w-5" />
+              </div>
               <Select
                 value={booking.time}
                 onValueChange={(value) => setBooking({ ...booking, time: value as Time })}
               >
-                <SelectTrigger className="custom-select-trigger">
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                    <SelectValue placeholder="Select a time" />
-                  </div>
-                </SelectTrigger>
+                <SelectTrigger id="time-select" className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
                 <SelectContent className="custom-dropdown">
                   {times.map((time) => (
                     <SelectItem 
