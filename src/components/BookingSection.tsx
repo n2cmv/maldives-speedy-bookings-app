@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Select,
@@ -26,13 +26,28 @@ const islands: Island[] = [
 ];
 const times: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
 
-const BookingSection = () => {
+interface BookingSectionProps {
+  preSelectedIsland?: Island;
+}
+
+const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [booking, setBooking] = useState<BookingInfo>({
     island: '',
     time: '',
     seats: 1
   });
   const navigate = useNavigate();
+  
+  // Handle pre-selected island when component mounts
+  useEffect(() => {
+    if (preSelectedIsland) {
+      setBooking(prev => ({ ...prev, island: preSelectedIsland }));
+      toast({
+        title: "Destination selected",
+        description: `You selected ${preSelectedIsland}`,
+      });
+    }
+  }, [preSelectedIsland]);
 
   const handleSelectDestination = (island: Island) => {
     setBooking({ ...booking, island });
