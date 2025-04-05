@@ -71,16 +71,16 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     
     console.log("Email payload:", emailData);
     
-    const { error } = await supabase.functions.invoke("send-confirmation", {
+    const response = await supabase.functions.invoke("send-confirmation", {
       body: emailData
     });
 
-    if (error) {
-      console.error("Error sending confirmation email:", error);
-      return { success: false, error };
+    if (response.error) {
+      console.error("Error sending confirmation email:", response.error);
+      return { success: false, error: response.error };
     }
 
-    console.log("Confirmation email sent successfully");
+    console.log("Confirmation email response:", response.data);
     return { success: true };
   } catch (error) {
     console.error("Exception sending confirmation email:", error);

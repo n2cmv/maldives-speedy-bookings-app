@@ -39,6 +39,8 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log("Email function triggered");
+    
     // Check if Resend is properly initialized
     if (!resend) {
       console.error("Resend client not initialized - missing API key");
@@ -51,7 +53,21 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { email, name, bookingDetails }: BookingEmailRequest = await req.json();
+    const requestData = await req.json();
+    console.log("Request data received:", JSON.stringify(requestData));
+    
+    const { email, name, bookingDetails }: BookingEmailRequest = requestData;
+
+    if (!email || !name || !bookingDetails) {
+      console.error("Missing required email data:", { email, name, bookingDetails });
+      return new Response(
+        JSON.stringify({ error: "Missing required email data" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     // Format trip details
     const tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
@@ -61,6 +77,8 @@ const handler = async (req: Request): Promise<Response> => {
       ? `<p><strong>Return Trip:</strong> ${bookingDetails.to} to ${bookingDetails.from} on ${bookingDetails.returnDate} at ${bookingDetails.returnTime}</p>`
       : '';
 
+    console.log("Preparing to send email to:", email);
+    
     const emailResponse = await resend.emails.send({
       from: "Island Ferry Bookings <onboarding@resend.dev>",
       to: [email],
