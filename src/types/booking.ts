@@ -7,7 +7,9 @@ export type Island =
   | 'Ari Atoll'
   | 'A.Dh Dhigurah'
   | 'A.Dh Dhangethi'
-  | 'Aa. Mathiveri';
+  | 'Aa. Mathiveri'
+  | 'Male\' City'
+  | 'Male\' Airport';
 
 export type Time = 
   | '8:00 AM'

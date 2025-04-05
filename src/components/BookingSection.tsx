@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -14,7 +15,15 @@ import { MapPin, Clock, Users } from "lucide-react";
 import { BookingInfo, Island, Time } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
 
-const islands: Island[] = ['Male', 'Hulhumale', 'Maafushi', 'Baa Atoll', 'Ari Atoll'];
+const islands: Island[] = [
+  'Male', 
+  'Hulhumale', 
+  'Maafushi', 
+  'Baa Atoll', 
+  'Ari Atoll', 
+  'Male\' City', 
+  'Male\' Airport'
+];
 const times: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
 
 const BookingSection = () => {
