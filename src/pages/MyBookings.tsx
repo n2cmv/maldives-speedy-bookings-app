@@ -1,12 +1,10 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import HeaderExtras from "@/components/HeaderExtras";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBookingsByEmail } from "@/services/bookingService";
-import { ChevronLeft, Search, Ship, Calendar, MapPin, Loader2, Users } from "lucide-react";
+import { ChevronLeft, Search, Ship, Calendar, Loader2, Users } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -77,10 +75,6 @@ const MyBookings = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
-      <div className="absolute top-4 right-4 z-20">
-        <HeaderExtras />
-      </div>
-      
       <Header />
       
       <div className="pt-24 pb-12 px-4">
