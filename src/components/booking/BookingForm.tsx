@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -10,6 +11,7 @@ import TripLocationSelector from "./TripLocationSelector";
 import TripDateTimeSelector from "./TripDateTimeSelector";
 import ReturnTripSection from "./ReturnTripSection";
 import PassengerSelection from "./PassengerSelection";
+import { getAllRoutes } from "@/services/bookingService";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
@@ -24,12 +26,15 @@ const MAX_PASSENGERS = 15;
 const BookingForm = ({
   preSelectedIsland,
   islandNames,
-  isLoading,
+  isLoading: externalIsLoading,
   timeRestrictions,
   allTimes
 }: BookingFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(externalIsLoading || true);
+  const [fromLocations, setFromLocations] = useState<string[]>([]);
+  const [toLocations, setToLocations] = useState<string[]>([]);
   const [booking, setBooking] = useState<BookingInfo>({
     from: '',
     island: preSelectedIsland || '',
@@ -48,6 +53,36 @@ const BookingForm = ({
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
   const [departureDateOpen, setDepartureDateOpen] = useState(false);
   const [returnDateOpen, setReturnDateOpen] = useState(false);
+
+  // Fetch routes from the database
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await getAllRoutes();
+        
+        if (error) {
+          console.error("Error fetching routes:", error);
+          return;
+        }
+
+        if (data) {
+          // Extract unique from_locations and to_locations
+          const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
+          const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
+          
+          setFromLocations(uniqueFromLocations);
+          setToLocations(uniqueToLocations);
+        }
+      } catch (error) {
+        console.error("Exception fetching routes:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
 
   const availableTimes = booking.island ? 
     (timeRestrictions[booking.island] || allTimes) : 
@@ -180,7 +215,8 @@ const BookingForm = ({
       <TripLocationSelector
         fromLocation={booking.from}
         toLocation={booking.island}
-        islandNames={[]} // Empty array to not display any predefined islands
+        fromLocations={fromLocations}
+        toLocations={toLocations}
         isLoading={isLoading}
         onFromChange={(value) => setBooking({ ...booking, from: value })}
         onToChange={handleSelectDestination}

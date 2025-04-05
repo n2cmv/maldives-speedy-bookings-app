@@ -6,7 +6,8 @@ import IslandSelector from "./IslandSelector";
 interface TripLocationSelectorProps {
   fromLocation: string;
   toLocation: string;
-  islandNames: string[];
+  fromLocations: string[];
+  toLocations: string[];
   isLoading: boolean;
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
@@ -15,7 +16,8 @@ interface TripLocationSelectorProps {
 const TripLocationSelector = ({
   fromLocation,
   toLocation,
-  islandNames,
+  fromLocations,
+  toLocations,
   isLoading,
   onFromChange,
   onToChange
@@ -28,7 +30,7 @@ const TripLocationSelector = ({
         label={t("booking.form.from", "From")}
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={fromLocation}
-        islandNames={[]} // Empty array to not display any predefined islands
+        islandNames={fromLocations}
         onIslandChange={onFromChange}
         placeholder={t("booking.form.selectDeparture", "Select departure island")}
         isLoading={isLoading}
@@ -39,7 +41,7 @@ const TripLocationSelector = ({
         label={t("booking.form.destinationIsland", "Destination Island")}
         icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={toLocation}
-        islandNames={[]} // Empty array to not display any predefined islands
+        islandNames={toLocations}
         onIslandChange={onToChange}
         isLoading={isLoading}
         id="island-select"
