@@ -108,7 +108,10 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0">
         <Command>
-          <CommandInput placeholder="Search country..." icon={<Search className="w-4 h-4" />} />
+          <div className="flex items-center border-b px-3">
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <CommandInput placeholder="Search country..." />
+          </div>
           <CommandEmpty>No country found.</CommandEmpty>
           <ScrollArea className="h-[300px]">
             <CommandGroup>
