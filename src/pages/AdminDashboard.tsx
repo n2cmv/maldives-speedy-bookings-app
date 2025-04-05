@@ -21,8 +21,7 @@ const AdminDashboard = () => {
         return;
       }
       
-      // In a real world scenario, you'd check for admin role
-      // This is just a placeholder for demonstration
+      // Check if the authenticated user is in admin_users table
       const { data } = await supabase
         .from('admin_users')
         .select('*')

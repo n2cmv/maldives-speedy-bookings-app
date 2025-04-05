@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Json } from "@/integrations/supabase/types";
 
 interface BookingFormProps {
   booking?: any;
@@ -153,21 +153,24 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setIsLoading(true);
 
     try {
+      // Convert passenger info to a format that can be stored as Json
+      const passengerInfoAsJson: Json = JSON.parse(JSON.stringify(passengers));
+
       const bookingData = {
-        from_location: fromLocation,
-        to_location: toLocation,
+        from_location: fromLocation as string,
+        to_location: toLocation as string,
         departure_date: format(departureDate, 'yyyy-MM-dd'),
-        departure_time: departureTime,
-        passenger_count: passengerCount,
+        departure_time: departureTime as string,
+        passenger_count: Number(passengerCount),
         user_email: userEmail,
         return_trip: hasReturnTrip,
-        return_from_location: hasReturnTrip ? returnFromLocation : null,
-        return_to_location: hasReturnTrip ? returnToLocation : null,
+        return_from_location: hasReturnTrip ? returnFromLocation as string : null,
+        return_to_location: hasReturnTrip ? returnToLocation as string : null,
         return_date: hasReturnTrip && returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
-        return_time: hasReturnTrip ? returnTime : null,
+        return_time: hasReturnTrip ? returnTime as string : null,
         payment_complete: paymentComplete,
         payment_reference: paymentReference || null,
-        passenger_info: passengers,
+        passenger_info: passengerInfoAsJson
       };
 
       if (booking) {
