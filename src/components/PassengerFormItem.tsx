@@ -132,7 +132,7 @@ const PassengerFormItem = ({
               type="text"
               value={passenger.passport}
               onChange={(e) => onChange(passenger.id, "passport", e.target.value)}
-              placeholder="Enter passport number"
+              placeholder="Enter ID / passport number"
               className="h-[60px] pl-10 border-gray-300 hover:border-ocean focus:border-ocean focus:ring-ocean bg-white text-base"
               required
             />
