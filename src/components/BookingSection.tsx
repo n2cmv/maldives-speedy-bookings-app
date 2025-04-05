@@ -22,7 +22,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       // First get routes in the correct display order
       const { data: routesData, error: routesError } = await supabase
         .from('routes')
-        .select('from_location, to_location, display_order')
+        .select('from_location, to_location, display_order, timings')
         .order('display_order', { ascending: true });
         
       if (routesError) {
@@ -30,7 +30,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         throw routesError;
       }
       
-      console.log('Routes data with display order:', routesData);
+      console.log('Routes data with display order and timings:', routesData);
       
       // Extract unique islands from routes
       const uniqueIslands = new Set<string>();
@@ -48,6 +48,9 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           uniqueIslands.add(route.from_location);
           uniqueIslands.add(route.to_location);
+          
+          // Log route timings for debugging
+          console.log(`Route ${route.from_location} to ${route.to_location} timings:`, route.timings);
         });
       }
       
@@ -100,7 +103,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'routes' },
         (payload) => {
-          console.log('Route update detected:', payload);
+          console.log('Route update detected in booking section:', payload);
           // Refresh the islands data when routes are updated
           fetchIslands();
           toast.info('Routes have been updated', {

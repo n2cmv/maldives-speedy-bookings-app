@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -62,10 +63,17 @@ const BookingForm = ({
         
         if (error) {
           console.error("Error fetching routes:", error);
+          toast({
+            title: t("booking.error", "Error"),
+            description: t("booking.form.errorFetchingRoutes", "Failed to fetch available routes"),
+            variant: "destructive"
+          });
           return;
         }
 
         if (data) {
+          console.log("Routes data received:", data);
+          
           const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
           const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
           
@@ -83,15 +91,25 @@ const BookingForm = ({
               return Object.values<string>(Time).includes(time);
             });
             
+            // Log route timings for debugging
+            console.log(`Route timings for ${route.from_location} to ${route.to_location}:`, 
+              route.timings, "Valid timings:", validTimings);
+            
             timesMap[route.from_location][route.to_location] = validTimings.length > 0 ? validTimings : allTimes;
           });
           
+          console.log("Available times map:", timesMap);
           setAvailableTimesMap(timesMap);
           setFromLocations(uniqueFromLocations);
           setToLocations(uniqueToLocations);
         }
       } catch (error) {
         console.error("Exception fetching routes:", error);
+        toast({
+          title: t("booking.error", "Error"),
+          description: t("booking.form.exceptionFetchingRoutes", "An error occurred while fetching routes"),
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -121,12 +139,17 @@ const BookingForm = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [allTimes]);
+  }, [allTimes, t]);
 
   const getRouteTimings = (from: string, to: string): Time[] => {
+    // Check both directional routes if data exists (in case route is defined in reverse)
     if (availableTimesMap[from] && availableTimesMap[from][to] && availableTimesMap[from][to].length > 0) {
+      console.log(`Found timings for ${from} to ${to}:`, availableTimesMap[from][to]);
       return availableTimesMap[from][to];
     }
+    
+    // Log that we're falling back to default times
+    console.log(`No specific timings found for ${from} to ${to}, using default times`);
     return allTimes;
   };
   

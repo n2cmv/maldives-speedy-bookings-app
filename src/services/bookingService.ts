@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -182,7 +183,17 @@ export async function getAllRoutes(): Promise<{ data: RouteData[]; error: any }>
     const { data, error } = await supabase
       .from('routes')
       .select('*')
-      .order('from_location', { ascending: true }) as unknown as { data: RouteData[], error: any };
+      .order('display_order', { ascending: true }) as unknown as { data: RouteData[], error: any };
+    
+    if (data) {
+      console.log("Retrieved routes data:", data.length, "routes");
+      // Log the first few routes for debugging
+      data.slice(0, 3).forEach(route => {
+        console.log(`Route from ${route.from_location} to ${route.to_location}:`, 
+          "Timings:", route.timings, 
+          "Display order:", route.display_order);
+      });
+    }
       
     return { data: data || [], error };
   } catch (error) {
@@ -193,12 +204,18 @@ export async function getAllRoutes(): Promise<{ data: RouteData[]; error: any }>
 
 export async function getRouteDetails(fromLocation: string, toLocation: string): Promise<{ data: RouteData | null; error: any }> {
   try {
+    console.log(`Fetching route details for ${fromLocation} to ${toLocation}`);
+    
     const { data, error } = await supabase
       .from('routes')
       .select('*')
       .eq('from_location', fromLocation)
       .eq('to_location', toLocation)
       .maybeSingle() as unknown as { data: RouteData | null, error: any };
+    
+    if (data) {
+      console.log("Retrieved route details:", data);
+    }
       
     return { data, error };
   } catch (error) {

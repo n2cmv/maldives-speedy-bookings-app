@@ -3,6 +3,7 @@ import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from "@
 import { Time } from "@/types/booking";
 import { Clock, ChevronDown, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 interface TimeSelectorProps {
   label: string;
@@ -20,6 +21,11 @@ const TimeSelector = ({
   id = "time-select"
 }: TimeSelectorProps) => {
   const { t } = useTranslation();
+  
+  // Log available times when they change for debugging
+  useEffect(() => {
+    console.log(`TimeSelector - Available times for ${label}:`, availableTimes);
+  }, [availableTimes, label]);
   
   return (
     <div className="space-y-2">
@@ -40,7 +46,7 @@ const TimeSelector = ({
         >
           <SelectTrigger id={id} className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
           <SelectContent className="select-content">
-            {availableTimes.length > 0 ? (
+            {availableTimes && availableTimes.length > 0 ? (
               availableTimes.map((time) => (
                 <SelectItem 
                   key={time} 
