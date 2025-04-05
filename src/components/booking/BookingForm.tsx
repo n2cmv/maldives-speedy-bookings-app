@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -79,7 +78,13 @@ const BookingForm = ({
               timesMap[route.from_location] = {};
             }
             
-            timesMap[route.from_location][route.to_location] = route.timings || [];
+            // Convert string[] to Time[] with type checking
+            const validTimings: Time[] = (route.timings || []).filter((time): time is Time => {
+              // Verify each timing string is a valid Time enum value
+              return Object.values<string>(Time).includes(time);
+            });
+            
+            timesMap[route.from_location][route.to_location] = validTimings.length > 0 ? validTimings : allTimes;
           });
           
           setAvailableTimesMap(timesMap);
@@ -94,7 +99,7 @@ const BookingForm = ({
     };
 
     fetchRoutes();
-  }, []);
+  }, [allTimes]);
 
   // Get available times based on the selected route
   const getRouteTimings = (from: string, to: string): Time[] => {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
+import { Time } from "@/types/booking";
 import PopularDestinations from "./PopularDestinations";
 import { allTimes, fallbackIslands } from "./booking/constants";
 import BookingForm from "./booking/BookingForm";
@@ -45,6 +46,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     ? islandsData.map(island => island.name) 
     : fallbackIslands;
 
+  const validatedAllTimes = Object.values(Time);
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-md mx-auto booking-card">
@@ -57,7 +60,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           islandNames={islandNames}
           isLoading={isLoading}
           timeRestrictions={{}}
-          allTimes={allTimes}
+          allTimes={validatedAllTimes}
         />
       </div>
     </div>

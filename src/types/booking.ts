@@ -1,19 +1,20 @@
 
 export type Island = string;
 
-export type Time = 
-  | '6:30 AM'
-  | '7:00 AM'
-  | '8:00 AM'
-  | '10:00 AM' 
-  | '11:00 AM'
-  | '12:00 PM' 
-  | '1:10 PM'
-  | '1:30 PM'
-  | '2:00 PM' 
-  | '4:00 PM' 
-  | '6:00 PM' 
-  | '8:00 PM';
+export enum Time {
+  AM_630 = '6:30 AM',
+  AM_700 = '7:00 AM',
+  AM_800 = '8:00 AM',
+  AM_1000 = '10:00 AM',
+  AM_1100 = '11:00 AM',
+  PM_1200 = '12:00 PM',
+  PM_110 = '1:10 PM',
+  PM_130 = '1:30 PM',
+  PM_200 = '2:00 PM',
+  PM_400 = '4:00 PM',
+  PM_600 = '6:00 PM',
+  PM_800 = '8:00 PM'
+}
 
 export interface PassengerCount {
   adults: number;

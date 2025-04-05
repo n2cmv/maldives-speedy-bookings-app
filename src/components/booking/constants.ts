@@ -9,18 +9,18 @@ export const fromLocations: string[] = [
 ];
 
 export const allTimes: Time[] = [
-  '8:00 AM', 
-  '10:00 AM', 
-  '12:00 PM', 
-  '2:00 PM', 
-  '4:00 PM', 
-  '6:00 PM', 
-  '8:00 PM'
+  Time.AM_800,
+  Time.AM_1000, 
+  Time.PM_1200, 
+  Time.PM_200, 
+  Time.PM_400, 
+  Time.PM_600, 
+  Time.PM_800
 ];
 
 export const islandTimeRestrictions: Record<string, Time[]> = {
-  'A.Dh Dhigurah': ['6:30 AM', '1:10 PM'],
-  'A.Dh Dhangethi': ['7:00 AM', '1:30 PM'],
+  'A.Dh Dhigurah': [Time.AM_630, Time.PM_110],
+  'A.Dh Dhangethi': [Time.AM_700, Time.PM_130],
   'Male': allTimes,
   'Hulhumale': allTimes,
   'Maafushi': allTimes,
