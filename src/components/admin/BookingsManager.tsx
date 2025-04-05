@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +27,7 @@ import BookingForm from "@/components/admin/BookingForm";
 import SearchBar from "@/components/admin/common/SearchBar";
 import BookingTable from "@/components/admin/bookings/BookingTable";
 import { BookingData } from "@/types/database";
+import { Time } from "@/types/booking";
 
 const BookingsManager = () => {
   const { toast } = useToast();
@@ -124,7 +124,7 @@ const BookingsManager = () => {
       const bookingInfo: BookingInfo = {
         from: booking.from_location,
         island: booking.to_location,
-        time: booking.departure_time,
+        time: booking.departure_time as Time | '',
         date: new Date(booking.departure_date),
         seats: booking.passenger_count,
         passengers: booking.passenger_info,
@@ -138,7 +138,7 @@ const BookingsManager = () => {
         bookingInfo.returnTripDetails = {
           from: booking.return_from_location || "",
           island: booking.return_to_location || "",
-          time: booking.return_time || "",
+          time: booking.return_time as Time | '',
           date: booking.return_date ? new Date(booking.return_date) : undefined,
         };
       }

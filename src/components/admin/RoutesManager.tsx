@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +23,7 @@ import { Plus } from "lucide-react";
 import SearchBar from "@/components/admin/common/SearchBar";
 import RouteTable from "@/components/admin/routes/RouteTable";
 import RouteForm, { Route, RouteFormValues } from "@/components/admin/routes/RouteForm";
+import { RouteData } from "@/types/database";
 
 const RoutesManager = () => {
   const { toast } = useToast();
@@ -42,8 +42,6 @@ const RoutesManager = () => {
   const fetchRoutes = async () => {
     setIsLoading(true);
     try {
-      // The type error was because Supabase client doesn't know about the 'routes' table
-      // We need to cast the result to any first, then to our Route type
       const { data, error } = await supabase
         .from('routes')
         .select('*')
@@ -75,7 +73,6 @@ const RoutesManager = () => {
     if (!routeToDelete) return;
 
     try {
-      // Cast the operation to handle the type issue
       const { error } = await supabase
         .from('routes')
         .delete()
@@ -106,10 +103,19 @@ const RoutesManager = () => {
   const handleSaveRoute = async (values: RouteFormValues) => {
     try {
       if (currentRoute) {
-        // Update existing route
+        const updatedRoute: RouteData = {
+          id: currentRoute.id,
+          from_location: values.from_location,
+          to_location: values.to_location,
+          price: Number(values.price),
+          duration: Number(values.duration),
+          created_at: currentRoute.created_at,
+          updated_at: currentRoute.updated_at
+        };
+        
         const { error } = await supabase
           .from('routes')
-          .update(values)
+          .update(updatedRoute)
           .eq('id', currentRoute.id) as any;
 
         if (error) throw error;
@@ -119,10 +125,16 @@ const RoutesManager = () => {
           description: "Route updated successfully",
         });
       } else {
-        // Create new route
+        const newRoute = {
+          from_location: values.from_location,
+          to_location: values.to_location,
+          price: Number(values.price),
+          duration: Number(values.duration)
+        };
+        
         const { error } = await supabase
           .from('routes')
-          .insert(values) as any;
+          .insert(newRoute) as any;
 
         if (error) throw error;
 
@@ -132,7 +144,6 @@ const RoutesManager = () => {
         });
       }
 
-      // Close form and refresh routes
       setIsRouteFormOpen(false);
       setCurrentRoute(null);
       fetchRoutes();
