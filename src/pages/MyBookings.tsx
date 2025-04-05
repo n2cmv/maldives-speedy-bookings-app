@@ -42,21 +42,24 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      // Send OTP via our custom edge function instead of Supabase auth
+      // Send OTP via our custom edge function
       const response = await supabase.functions.invoke("process-booking-otp", {
         body: { email }
       });
       
       if (response.error) {
+        console.error("Error from edge function:", response.error);
         toast.error("Error sending verification code", {
-          description: response.error
+          description: "Please try again later"
         });
         return;
       }
       
-      if (!response.data.success) {
+      if (!response.data?.success) {
+        const errorMsg = response.data?.error || "Please try again later";
+        console.error("Error response:", errorMsg);
         toast.error("Error sending verification code", {
-          description: response.data.error || "Please try again later"
+          description: errorMsg
         });
         return;
       }
@@ -67,6 +70,7 @@ const MyBookings = () => {
       
       setShowOTP(true);
     } catch (err) {
+      console.error("Exception sending OTP:", err);
       toast.error("Error sending verification code", {
         description: "Please try again later"
       });
@@ -84,7 +88,7 @@ const MyBookings = () => {
     setVerifying(true);
     
     try {
-      // Use a direct query to check the OTP
+      // Use the validate-booking-otp edge function
       const { data: validationResult, error: validationError } = await supabase.functions.invoke(
         "validate-booking-otp",
         {
@@ -95,10 +99,21 @@ const MyBookings = () => {
         }
       );
       
-      // If there's an error or the OTP is invalid
-      if (validationError || !validationResult || !validationResult.valid) {
+      // Handle validation errors
+      if (validationError) {
+        console.error("Edge function error:", validationError);
+        toast.error("Error verifying code", {
+          description: "Please try again later"
+        });
+        setVerifying(false);
+        return;
+      }
+      
+      // If the OTP is invalid
+      if (!validationResult?.valid) {
+        const errorMessage = validationResult?.error || "Please check the code and try again";
         toast.error("Invalid verification code", {
-          description: "Please check the code and try again"
+          description: errorMessage
         });
         setVerifying(false);
         return;
@@ -111,6 +126,7 @@ const MyBookings = () => {
       const { data: bookingsData, error: bookingsError } = await getBookingsByEmail(email);
       
       if (bookingsError) {
+        console.error("Error fetching bookings:", bookingsError);
         toast.error("Error fetching bookings", {
           description: "Please try again later"
         });
@@ -126,6 +142,7 @@ const MyBookings = () => {
         });
       }
     } catch (err) {
+      console.error("Exception verifying code:", err);
       toast.error("Error verifying code", {
         description: "Please try again later"
       });
