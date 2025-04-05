@@ -33,11 +33,9 @@ const islands: Island[] = [
 ];
 const allTimes: Time[] = ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM', '8:00 PM'];
 
-// Island-specific time restrictions
 const islandTimeRestrictions: Record<Island, Time[]> = {
   'A.Dh Dhigurah': ['11:00 AM', '4:00 PM'],
   'A.Dh Dhangethi': ['11:00 AM', '4:00 PM'],
-  // Add default times for all other islands
   'Male': allTimes,
   'Hulhumale': allTimes,
   'Maafushi': allTimes,
@@ -47,6 +45,8 @@ const islandTimeRestrictions: Record<Island, Time[]> = {
   'Male\' Airport': allTimes,
   'Aa. Mathiveri': allTimes
 };
+
+const MAX_PASSENGERS = 15;
 
 interface BookingSectionProps {
   preSelectedIsland?: Island;
@@ -65,10 +65,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     }
   });
   const navigate = useNavigate();
-  // Reference to island select trigger for programmatic clicking
   const islandSelectRef = useRef<HTMLButtonElement>(null);
 
-  // Available times based on selected island
   const availableTimes = booking.island ? 
     (islandTimeRestrictions[booking.island] || allTimes) : 
     allTimes;
@@ -79,7 +77,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     }
   }, [preSelectedIsland]);
 
-  // Reset time when island changes if the current time is not available for the new island
   useEffect(() => {
     if (booking.island && booking.time) {
       const availableTimesForIsland = islandTimeRestrictions[booking.island] || allTimes;
@@ -109,6 +106,15 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       toast({
         title: "Invalid booking",
         description: "Please fill in all the fields correctly.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (booking.seats > MAX_PASSENGERS) {
+      toast({
+        title: "Too many passengers",
+        description: `Maximum ${MAX_PASSENGERS} passengers allowed per booking.`,
         variant: "destructive"
       });
       return;
@@ -233,7 +239,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               onChange={handlePassengerCountChange}
               initialCount={booking.passengerCounts}
             />
-            <p className="text-xs text-gray-500 mt-1">Maximum 10 seats per booking</p>
+            <p className="text-xs text-gray-500 mt-1">Maximum {MAX_PASSENGERS} seats per booking</p>
           </div>
           
           <Button 

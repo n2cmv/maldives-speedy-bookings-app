@@ -14,6 +14,8 @@ interface SeatPickerProps {
   initialCount?: PassengerCount;
 }
 
+const MAX_PASSENGERS = 15;
+
 const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [counts, setCounts] = useState<PassengerCount>({
@@ -34,8 +36,17 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
     e.stopPropagation();
     
     setCounts(prev => {
-      const newCount = Math.max(type === 'adults' ? 1 : 0, prev[type] + delta);
-      return { ...prev, [type]: newCount };
+      // Calculate the potential new total
+      const currentValue = prev[type];
+      const newValue = Math.max(type === 'adults' ? 1 : 0, currentValue + delta);
+      const otherPassengers = totalPassengers - currentValue;
+      
+      // Check if we would exceed the maximum
+      if (otherPassengers + newValue > MAX_PASSENGERS && delta > 0) {
+        return prev; // Don't update if it would exceed the max
+      }
+      
+      return { ...prev, [type]: newValue };
     });
   };
 
@@ -78,6 +89,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                disabled={totalPassengers >= MAX_PASSENGERS}
                 type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
@@ -110,6 +122,7 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                disabled={totalPassengers >= MAX_PASSENGERS}
                 type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
@@ -142,12 +155,15 @@ const SeatPicker = ({ onChange, initialCount }: SeatPickerProps) => {
                 variant="outline"
                 size="icon"
                 className="rounded-full h-10 w-10 border-gray-300 hover:bg-white hover:text-primary hover:border-primary"
+                disabled={totalPassengers >= MAX_PASSENGERS}
                 type="button" // Explicitly set type to button
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
+          
+          <p className="text-xs text-gray-500">Maximum {MAX_PASSENGERS} passengers per booking</p>
         </div>
       )}
     </div>

@@ -8,6 +8,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Plus, Trash2, User } from "lucide-react";
 import Header from "@/components/Header";
 
+const MAX_PASSENGERS = 15;
+
 const PassengerDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -82,6 +84,15 @@ const PassengerDetails = () => {
   };
   
   const handleAddPassenger = () => {
+    if (passengers.length >= MAX_PASSENGERS) {
+      toast({
+        title: "Maximum passengers reached",
+        description: `You cannot add more than ${MAX_PASSENGERS} passengers.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const newId = Math.max(...passengers.map(p => p.id), 0) + 1;
     setPassengers(prevPassengers => [
       ...prevPassengers, 
@@ -221,10 +232,14 @@ const PassengerDetails = () => {
                 onClick={handleAddPassenger}
                 variant="outline"
                 className="w-full border-dashed border-gray-300 py-3 flex items-center justify-center text-ocean hover:bg-ocean/5"
+                disabled={passengers.length >= MAX_PASSENGERS}
               >
                 <Plus className="h-5 w-5 mr-2" />
                 Add Another Passenger
               </Button>
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                Maximum {MAX_PASSENGERS} passengers per booking ({passengers.length}/{MAX_PASSENGERS})
+              </p>
             </div>
             
             <Button 
