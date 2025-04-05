@@ -4,14 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { MapPin, Navigation } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import SeatPicker from "../SeatPicker";
 import PopularDestinations from "../PopularDestinations";
-import IslandSelector from "./IslandSelector";
-import DateSelector from "./DateSelector";
-import TimeSelector from "./TimeSelector";
 import ReturnTripSwitch from "./ReturnTripSwitch";
+import TripLocationSelector from "./TripLocationSelector";
+import TripDateTimeSelector from "./TripDateTimeSelector";
+import ReturnTripSection from "./ReturnTripSection";
+import PassengerSelection from "./PassengerSelection";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
@@ -179,84 +178,50 @@ const BookingForm = ({
         onReturnTripChange={handleReturnToggle}
       />
 
-      <IslandSelector
-        label={t("booking.form.from", "From")}
-        icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
-        selectedIsland={booking.from}
+      <TripLocationSelector
+        fromLocation={booking.from}
+        toLocation={booking.island}
         islandNames={islandNames}
-        onIslandChange={(value) => setBooking({ ...booking, from: value })}
-        placeholder={t("booking.form.selectDeparture", "Select departure island")}
         isLoading={isLoading}
-        id="from-select"
+        onFromChange={(value) => setBooking({ ...booking, from: value })}
+        onToChange={handleSelectDestination}
       />
       
-      <IslandSelector
-        label={t("booking.form.destinationIsland", "Destination Island")}
-        icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
-        selectedIsland={booking.island}
-        islandNames={islandNames}
-        onIslandChange={handleSelectDestination}
-        isLoading={isLoading}
-        id="island-select"
-      />
-      
-      <DateSelector
-        label={t("booking.form.departureDate", "Departure Date")}
-        selectedDate={departureDate}
-        onDateSelect={handleDepartureDateSelect}
-        minDate={today}
-        isOpen={departureDateOpen}
-        setIsOpen={setDepartureDateOpen}
-      />
-      
-      <TimeSelector
-        label={t("booking.form.departureTime", "Departure Time")}
-        selectedTime={booking.time}
+      <TripDateTimeSelector
+        date={departureDate}
+        time={booking.time}
         availableTimes={availableTimes}
+        minDate={today}
+        isDateOpen={departureDateOpen}
+        setIsDateOpen={setDepartureDateOpen}
+        onDateSelect={handleDepartureDateSelect}
         onTimeChange={(value) => setBooking({ ...booking, time: value })}
       />
       
       {booking.returnTrip && (
-        <>
-          <div className="border-t border-gray-200 pt-4 mt-4">
-            <h3 className="font-medium text-ocean-dark mb-4">{t("booking.summary.returnJourney", "Return Journey")}</h3>
-          </div>
-          
-          <DateSelector
-            label={t("booking.form.returnDate", "Return Date")}
-            selectedDate={returnDate}
-            onDateSelect={handleReturnDateSelect}
-            minDate={departureDate}
-            isOpen={returnDateOpen}
-            setIsOpen={setReturnDateOpen}
-          />
-          
-          <TimeSelector
-            label={t("booking.form.returnTime", "Return Time")}
-            selectedTime={booking.returnTripDetails?.time || ''}
-            availableTimes={returnAvailableTimes}
-            onTimeChange={(value) => setBooking({ 
-              ...booking, 
-              returnTripDetails: { 
-                ...booking.returnTripDetails!, 
-                time: value 
-              } 
-            })}
-            id="return-time-select"
-          />
-        </>
+        <ReturnTripSection
+          returnTime={booking.returnTripDetails?.time || ''}
+          availableTimes={returnAvailableTimes}
+          returnDate={returnDate}
+          minDate={departureDate}
+          returnDateOpen={returnDateOpen}
+          setReturnDateOpen={setReturnDateOpen}
+          onReturnDateSelect={handleReturnDateSelect}
+          onReturnTimeChange={(value) => setBooking({ 
+            ...booking, 
+            returnTripDetails: { 
+              ...booking.returnTripDetails!, 
+              time: value 
+            } 
+          })}
+        />
       )}
       
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t("booking.form.passengers", "Number of Passengers")}
-        </label>
-        <SeatPicker 
-          onChange={handlePassengerCountChange}
-          initialCount={booking.passengerCounts}
-        />
-        <p className="text-xs text-gray-500 mt-1">{t("booking.form.maxPassengersInfo", "Maximum {{max}} seats per booking", {max: MAX_PASSENGERS})}</p>
-      </div>
+      <PassengerSelection 
+        onChange={handlePassengerCountChange}
+        initialCount={booking.passengerCounts || {adults: 1, children: 0, seniors: 0}}
+        maxPassengers={MAX_PASSENGERS}
+      />
       
       <Button 
         type="submit" 
