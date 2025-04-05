@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -57,19 +56,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   useEffect(() => {
     if (preSelectedIsland) {
       setBooking(prev => ({ ...prev, island: preSelectedIsland }));
-      toast({
-        title: "Destination selected",
-        description: `You selected ${preSelectedIsland}`,
-      });
     }
   }, [preSelectedIsland]);
 
   const handleSelectDestination = (island: Island) => {
     setBooking(prev => ({ ...prev, island }));
-    toast({
-      title: "Destination selected",
-      description: `You selected ${island}`,
-    });
   };
 
   const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
