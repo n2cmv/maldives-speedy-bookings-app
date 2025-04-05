@@ -125,37 +125,39 @@ const CountryCodeSelector = ({ value, onChange }: CountryCodeSelectorProps) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0" ref={popoverRef}>
-        <Command>
-          <div className="flex items-center border-b px-3">
-            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <CommandInput placeholder="Search country..." />
-          </div>
-          <CommandEmpty>No country found.</CommandEmpty>
-          <ScrollArea className="h-[300px]">
-            <CommandGroup>
-              {countryCodes.map((country) => (
-                <CommandItem
-                  key={country.code}
-                  value={country.name + country.dial_code}
-                  onSelect={() => {
-                    onChange(country.dial_code);
-                    setOpen(false);
-                  }}
-                >
-                  <span className="mr-2">{country.flag}</span>
-                  <span>{country.name}</span>
-                  <span className="ml-2 text-gray-500">{country.dial_code}</span>
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      value === country.dial_code ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </ScrollArea>
-        </Command>
+        {open && (
+          <Command>
+            <div className="flex items-center border-b px-3">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <CommandInput placeholder="Search country..." />
+            </div>
+            <CommandEmpty>No country found.</CommandEmpty>
+            <ScrollArea className="h-[300px]">
+              <CommandGroup>
+                {countryCodes.map((country) => (
+                  <CommandItem
+                    key={country.code}
+                    value={`${country.name}${country.dial_code}`}
+                    onSelect={() => {
+                      onChange(country.dial_code);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className="mr-2">{country.flag}</span>
+                    <span>{country.name}</span>
+                    <span className="ml-2 text-gray-500">{country.dial_code}</span>
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        value === country.dial_code ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
+          </Command>
+        )}
       </PopoverContent>
     </Popover>
   );
