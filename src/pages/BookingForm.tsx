@@ -15,8 +15,7 @@ const BookingForm = () => {
       <Header />
       
       <motion.div
-        // Increased padding top from pt-8 to pt-20
-        className="max-w-4xl mx-auto pt-20 px-4"
+        className="max-w-4xl mx-auto pt-24 px-4"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
