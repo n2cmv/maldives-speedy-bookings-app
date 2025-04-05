@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -74,10 +73,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const navigate = useNavigate();
   const islandSelectRef = useRef<HTMLButtonElement>(null);
   
-  // Get today's date for the date picker
   const today = new Date();
   const [departureDate, setDepartureDate] = useState<Date | undefined>(today);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
+  const [departureDateOpen, setDepartureDateOpen] = useState(false);
+  const [returnDateOpen, setReturnDateOpen] = useState(false);
 
   const availableTimes = booking.island ? 
     (islandTimeRestrictions[booking.island] || allTimes) : 
@@ -104,7 +104,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   
   useEffect(() => {
     if (booking.returnTrip && booking.island && booking.from) {
-      // Initialize return trip details when returnTrip is toggled on
       setBooking(prev => ({
         ...prev,
         returnTripDetails: {
@@ -120,7 +119,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const handleSelectDestination = (island: Island) => {
     setBooking(prev => ({ ...prev, island }));
     
-    // Update return trip details if return trip is enabled
     if (booking.returnTrip) {
       setBooking(prev => ({
         ...prev,
@@ -186,7 +184,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       return;
     }
     
-    // Add date to booking information
     const bookingWithDates = {
       ...booking,
       date: departureDate,
@@ -199,6 +196,16 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     navigate("/passenger-details", { state: bookingWithDates });
   };
 
+  const handleDepartureDateSelect = (date: Date | undefined) => {
+    setDepartureDate(date);
+    setDepartureDateOpen(false);
+  };
+
+  const handleReturnDateSelect = (date: Date | undefined) => {
+    setReturnDate(date);
+    setReturnDateOpen(false);
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-md mx-auto booking-card">
@@ -207,7 +214,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         <PopularDestinations onSelectDestination={handleSelectDestination} />
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Return trip toggle */}
           <div className="flex items-center justify-between">
             <Label htmlFor="return-trip" className="text-sm font-medium text-gray-700">
               Return Trip
@@ -287,13 +293,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             </div>
           </div>
           
-          {/* Departure Date */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Departure Date
             </label>
             <div className="relative">
-              <Popover>
+              <Popover open={departureDateOpen} onOpenChange={setDepartureDateOpen}>
                 <PopoverTrigger asChild>
                   <div className="passenger-picker cursor-pointer">
                     <div className="flex items-center">
@@ -305,11 +310,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                     <ChevronDown className="h-5 w-5 text-ocean/70" />
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                   <CalendarComponent
                     mode="single"
                     selected={departureDate}
-                    onSelect={setDepartureDate}
+                    onSelect={handleDepartureDateSelect}
                     initialFocus
                     disabled={(date) => date < today}
                   />
@@ -350,20 +355,18 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
             </div>
           </div>
           
-          {/* Return Trip Fields (conditional) */}
           {booking.returnTrip && (
             <>
               <div className="border-t border-gray-200 pt-4 mt-4">
                 <h3 className="font-medium text-ocean-dark mb-4">Return Journey</h3>
               </div>
               
-              {/* Return Date */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Return Date
                 </label>
                 <div className="relative">
-                  <Popover>
+                  <Popover open={returnDateOpen} onOpenChange={setReturnDateOpen}>
                     <PopoverTrigger asChild>
                       <div className="passenger-picker cursor-pointer">
                         <div className="flex items-center">
@@ -375,11 +378,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                         <ChevronDown className="h-5 w-5 text-ocean/70" />
                       </div>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0" align="start">
                       <CalendarComponent
                         mode="single"
                         selected={returnDate}
-                        onSelect={setReturnDate}
+                        onSelect={handleReturnDateSelect}
                         initialFocus
                         disabled={(date) => departureDate ? date < departureDate : date < today}
                       />
@@ -388,7 +391,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
                 </div>
               </div>
               
-              {/* Return Time */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Return Time
