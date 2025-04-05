@@ -3,15 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -30,14 +21,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Search, Edit, Trash2, Send, Plus, AlertCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import { sendBookingConfirmationEmail } from "@/services/bookingService";
 import BookingForm from "@/components/admin/BookingForm";
+import SearchBar from "@/components/admin/common/SearchBar";
+import BookingTable from "@/components/admin/bookings/BookingTable";
+import { BookingData } from "@/types/database";
 
 const BookingsManager = () => {
   const { toast } = useToast();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isBookingFormOpen, setIsBookingFormOpen] = useState<boolean>(false);
@@ -58,7 +52,7 @@ const BookingsManager = () => {
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }) as unknown as { data: BookingData[], error: any };
 
       if (error) {
         throw error;
@@ -77,7 +71,7 @@ const BookingsManager = () => {
     }
   };
 
-  const handleEdit = (booking: any) => {
+  const handleEdit = (booking: BookingData) => {
     setCurrentBooking(booking);
     setIsBookingFormOpen(true);
   };
@@ -89,7 +83,7 @@ const BookingsManager = () => {
       const { error } = await supabase
         .from('bookings')
         .delete()
-        .eq('id', bookingToDelete);
+        .eq('id', bookingToDelete) as any;
 
       if (error) {
         throw error;
@@ -113,7 +107,7 @@ const BookingsManager = () => {
     }
   };
 
-  const handleResendEmail = async (booking: any) => {
+  const handleResendEmail = async (booking: BookingData) => {
     // Update email status to sending
     setEmailStatus(prev => ({
       ...prev,
@@ -142,9 +136,9 @@ const BookingsManager = () => {
 
       if (booking.return_trip) {
         bookingInfo.returnTripDetails = {
-          from: booking.return_from_location,
-          island: booking.return_to_location,
-          time: booking.return_time,
+          from: booking.return_from_location || "",
+          island: booking.return_to_location || "",
+          time: booking.return_time || "",
           date: booking.return_date ? new Date(booking.return_date) : undefined,
         };
       }
@@ -217,15 +211,11 @@ const BookingsManager = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search bookings..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <SearchBar
+          placeholder="Search bookings..."
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
         <Button onClick={() => setIsBookingFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Booking
         </Button>
@@ -236,89 +226,17 @@ const BookingsManager = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Reference</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>From</TableHead>
-                <TableHead>To</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Passengers</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredBookings.length > 0 ? (
-                filteredBookings.map((booking) => (
-                  <TableRow key={booking.id}>
-                    <TableCell>{booking.payment_reference || "N/A"}</TableCell>
-                    <TableCell>{booking.passenger_info && booking.passenger_info[0]?.email || booking.user_email || "N/A"}</TableCell>
-                    <TableCell>{booking.from_location}</TableCell>
-                    <TableCell>{booking.to_location}</TableCell>
-                    <TableCell>
-                      {new Date(booking.departure_date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>{booking.passenger_count}</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleEdit(booking)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            setBookingToDelete(booking.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <div className="relative">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleResendEmail(booking)}
-                            disabled={emailStatus[booking.id]?.sending}
-                            className={emailStatus[booking.id]?.sending ? "opacity-50" : ""}
-                          >
-                            {emailStatus[booking.id]?.sending ? (
-                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-                            ) : (
-                              <Send className="h-4 w-4" />
-                            )}
-                          </Button>
-                          {emailStatus[booking.id]?.error && (
-                            <Button
-                              variant="ghost" 
-                              size="icon"
-                              className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-red-100 p-0 text-red-600 hover:bg-red-200"
-                              onClick={() => showEmailError(booking.id)}
-                            >
-                              <AlertCircle className="h-3 w-3" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
-                    No bookings found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <BookingTable
+          bookings={filteredBookings}
+          onEdit={handleEdit}
+          onDelete={(bookingId) => {
+            setBookingToDelete(bookingId);
+            setIsDeleteDialogOpen(true);
+          }}
+          onSendEmail={handleResendEmail}
+          emailStatus={emailStatus}
+          onShowEmailError={showEmailError}
+        />
       )}
 
       <Dialog open={isBookingFormOpen} onOpenChange={setIsBookingFormOpen}>

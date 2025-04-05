@@ -3,20 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -30,35 +20,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Search, Edit, Trash2, Plus } from "lucide-react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-interface Route {
-  id: string;
-  from_location: string;
-  to_location: string;
-  price: number;
-  duration: number; // in minutes
-  created_at: string;
-  updated_at: string;
-}
-
-const routeSchema = z.object({
-  from_location: z.string().min(1, "From location is required"),
-  to_location: z.string().min(1, "To location is required"),
-  price: z.coerce.number().positive("Price must be positive"),
-  duration: z.coerce.number().positive("Duration must be positive"),
-});
+import { Plus } from "lucide-react";
+import SearchBar from "@/components/admin/common/SearchBar";
+import RouteTable from "@/components/admin/routes/RouteTable";
+import RouteForm, { Route, RouteFormValues } from "@/components/admin/routes/RouteForm";
 
 const RoutesManager = () => {
   const { toast } = useToast();
@@ -70,45 +35,19 @@ const RoutesManager = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [routeToDelete, setRouteToDelete] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof routeSchema>>({
-    resolver: zodResolver(routeSchema),
-    defaultValues: {
-      from_location: "",
-      to_location: "",
-      price: 0,
-      duration: 0,
-    },
-  });
-
   useEffect(() => {
     fetchRoutes();
   }, []);
 
-  useEffect(() => {
-    if (currentRoute) {
-      form.reset({
-        from_location: currentRoute.from_location,
-        to_location: currentRoute.to_location,
-        price: currentRoute.price,
-        duration: currentRoute.duration,
-      });
-    } else {
-      form.reset({
-        from_location: "",
-        to_location: "",
-        price: 0,
-        duration: 0,
-      });
-    }
-  }, [currentRoute, form]);
-
   const fetchRoutes = async () => {
     setIsLoading(true);
     try {
+      // The type error was because Supabase client doesn't know about the 'routes' table
+      // We need to cast the result to any first, then to our Route type
       const { data, error } = await supabase
         .from('routes')
         .select('*')
-        .order('from_location', { ascending: true });
+        .order('from_location', { ascending: true }) as unknown as { data: Route[], error: any };
 
       if (error) {
         throw error;
@@ -136,10 +75,11 @@ const RoutesManager = () => {
     if (!routeToDelete) return;
 
     try {
+      // Cast the operation to handle the type issue
       const { error } = await supabase
         .from('routes')
         .delete()
-        .eq('id', routeToDelete);
+        .eq('id', routeToDelete) as any;
 
       if (error) {
         throw error;
@@ -163,14 +103,14 @@ const RoutesManager = () => {
     }
   };
 
-  const onSubmit = async (values: z.infer<typeof routeSchema>) => {
+  const handleSaveRoute = async (values: RouteFormValues) => {
     try {
       if (currentRoute) {
         // Update existing route
         const { error } = await supabase
           .from('routes')
           .update(values)
-          .eq('id', currentRoute.id);
+          .eq('id', currentRoute.id) as any;
 
         if (error) throw error;
 
@@ -182,7 +122,7 @@ const RoutesManager = () => {
         // Create new route
         const { error } = await supabase
           .from('routes')
-          .insert(values);
+          .insert(values) as any;
 
         if (error) throw error;
 
@@ -196,7 +136,7 @@ const RoutesManager = () => {
       setIsRouteFormOpen(false);
       setCurrentRoute(null);
       fetchRoutes();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving route:", error);
       toast({
         title: "Error",
@@ -219,15 +159,11 @@ const RoutesManager = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search routes..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <SearchBar 
+          placeholder="Search routes..."
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
         <Button onClick={() => {
           setCurrentRoute(null);
           setIsRouteFormOpen(true);
@@ -241,58 +177,14 @@ const RoutesManager = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>From</TableHead>
-                <TableHead>To</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRoutes.length > 0 ? (
-                filteredRoutes.map((route) => (
-                  <TableRow key={route.id}>
-                    <TableCell>{route.from_location}</TableCell>
-                    <TableCell>{route.to_location}</TableCell>
-                    <TableCell>${route.price.toFixed(2)}</TableCell>
-                    <TableCell>{route.duration} minutes</TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleEdit(route)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            setRouteToDelete(route.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center py-4">
-                    No routes found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <RouteTable 
+          routes={filteredRoutes} 
+          onEdit={handleEdit} 
+          onDelete={(routeId) => {
+            setRouteToDelete(routeId);
+            setIsDeleteDialogOpen(true);
+          }}
+        />
       )}
 
       <Dialog open={isRouteFormOpen} onOpenChange={setIsRouteFormOpen}>
@@ -308,88 +200,14 @@ const RoutesManager = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="from_location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>From Location</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="to_location"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>To Location</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        min="0"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration (minutes)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="1"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsRouteFormOpen(false);
-                    setCurrentRoute(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Save</Button>
-              </DialogFooter>
-            </form>
-          </Form>
+          <RouteForm 
+            route={currentRoute} 
+            onSave={handleSaveRoute}
+            onCancel={() => {
+              setIsRouteFormOpen(false);
+              setCurrentRoute(null);
+            }}
+          />
         </DialogContent>
       </Dialog>
 

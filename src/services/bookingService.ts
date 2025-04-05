@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
+import { RouteData } from "@/types/database";
 
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
@@ -176,12 +177,12 @@ export async function getBookingByReference(reference: string): Promise<{ data: 
   }
 }
 
-export async function getAllRoutes(): Promise<{ data: any[]; error: any }> {
+export async function getAllRoutes(): Promise<{ data: RouteData[]; error: any }> {
   try {
     const { data, error } = await supabase
       .from('routes')
       .select('*')
-      .order('from_location', { ascending: true });
+      .order('from_location', { ascending: true }) as unknown as { data: RouteData[], error: any };
       
     return { data: data || [], error };
   } catch (error) {
@@ -190,14 +191,14 @@ export async function getAllRoutes(): Promise<{ data: any[]; error: any }> {
   }
 }
 
-export async function getRouteDetails(fromLocation: string, toLocation: string): Promise<{ data: any; error: any }> {
+export async function getRouteDetails(fromLocation: string, toLocation: string): Promise<{ data: RouteData | null; error: any }> {
   try {
     const { data, error } = await supabase
       .from('routes')
       .select('*')
       .eq('from_location', fromLocation)
       .eq('to_location', toLocation)
-      .maybeSingle();
+      .maybeSingle() as unknown as { data: RouteData | null, error: any };
       
     return { data, error };
   } catch (error) {
