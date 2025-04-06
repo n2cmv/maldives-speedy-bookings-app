@@ -56,13 +56,9 @@ const TripLocationSelector = ({
           type="button"
           variant="outline"
           size="icon"
-          onClick={(e) => {
-            e.preventDefault(); // Prevent form submission
-            onSwitchRoutes();
-          }}
+          onClick={onSwitchRoutes}
           className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark transition-all duration-300"
           title={t("booking.form.switchRoutes", "Switch routes")}
-          disabled={!fromLocation && !toLocation} // Only disable if both fields are empty
         >
           <RotateCw className="h-4 w-4" />
         </Button>

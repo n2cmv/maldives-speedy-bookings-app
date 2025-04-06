@@ -42,41 +42,38 @@ const RouteSelectionForm = ({
     }
   };
 
-  // Fixed function to properly handle the route switch
+  // Simplified function to always swap routes without conditions
   const handleSwitchRoutes = () => {
-    // Store current values - make sure we're using the actual values, not empty strings
+    // Store current values
     const fromLocation = booking.from;
     const toLocation = booking.island;
     
-    // Only proceed if at least one field has a value
-    if (fromLocation || toLocation) {
-      // Create new booking object with swapped routes and reset time selection
-      const updatedBooking: BookingInfo = {
-        ...booking,
-        from: toLocation || '', // Use empty string if toLocation is empty
-        island: fromLocation || '', // Use empty string if fromLocation is empty
-        time: '' as '', // Reset time selection
+    // Create new booking object with swapped routes and reset time selection
+    const updatedBooking: BookingInfo = {
+      ...booking,
+      from: toLocation,        // Set from to what was previously the destination
+      island: fromLocation,    // Set destination to what was previously from
+      time: '' as '',          // Reset time selection
+    };
+    
+    // If there's a return trip, swap those routes too
+    if (booking.returnTrip && booking.returnTripDetails) {
+      updatedBooking.returnTripDetails = {
+        ...booking.returnTripDetails,
+        from: fromLocation,
+        island: toLocation,
+        time: '' as '',
       };
-      
-      // If there's a return trip, swap those routes too
-      if (booking.returnTrip && booking.returnTripDetails) {
-        updatedBooking.returnTripDetails = {
-          ...booking.returnTripDetails,
-          from: fromLocation || '',
-          island: toLocation || '',
-          time: '' as '',
-        };
-      }
-      
-      // Apply the changes
-      onBookingChange(updatedBooking);
-      
-      // Show a toast notification to confirm the switch
-      toast({
-        title: t("booking.form.routesSwitched", "Routes Switched"),
-        description: t("booking.form.routesSwitchedDescription", "Departure and destination have been switched."),
-      });
     }
+    
+    // Apply the changes
+    onBookingChange(updatedBooking);
+    
+    // Show a toast notification to confirm the switch
+    toast({
+      title: t("booking.form.routesSwitched", "Routes Switched"),
+      description: t("booking.form.routesSwitchedDescription", "Departure and destination have been switched."),
+    });
   };
 
   return (
