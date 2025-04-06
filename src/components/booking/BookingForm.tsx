@@ -43,7 +43,7 @@ const BookingForm = ({
   
   const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || routesLoading);
   const [booking, setBooking] = useState<BookingInfo>({
-    from: preSelectedFrom || '',
+    from: '',
     island: preSelectedIsland || '',
     time: '',
     seats: 1,
@@ -61,15 +61,29 @@ const BookingForm = ({
     console.log("BookingForm - Current from location:", booking.from);
   }, [preSelectedFrom, booking.from]);
   
-  // Update form when preSelectedFrom changes
+  // Update form when preSelectedFrom changes - using a ref to prevent infinite loops
+  const isInitialMount = React.useRef(true);
+  const prevPreSelectedFrom = React.useRef<string | undefined>(preSelectedFrom);
+
   useEffect(() => {
-    if (preSelectedFrom) {
+    // Only update if:
+    // 1. It's the initial mount, or
+    // 2. preSelectedFrom has changed and is not empty
+    if (
+      (isInitialMount.current && preSelectedFrom) || 
+      (preSelectedFrom !== prevPreSelectedFrom.current && preSelectedFrom)
+    ) {
       console.log("BookingForm - Updating 'from' to:", preSelectedFrom);
       setBooking(prev => ({
         ...prev,
         from: preSelectedFrom
       }));
     }
+    
+    // No longer initial mount
+    isInitialMount.current = false;
+    // Store current value for next comparison
+    prevPreSelectedFrom.current = preSelectedFrom;
   }, [preSelectedFrom]);
   
   // Date state
@@ -92,9 +106,9 @@ const BookingForm = ({
       setBooking(prev => ({
         ...prev,
         returnTripDetails: {
+          ...prev.returnTripDetails,
           from: prev.island,
           island: prev.from,
-          time: '',
           date: returnDate
         }
       }));

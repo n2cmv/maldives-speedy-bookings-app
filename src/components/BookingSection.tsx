@@ -129,9 +129,13 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
   const validatedAllTimes = Object.values(Time);
 
+  // Handle selecting from location - but don't trigger updates when not needed
   const handleSelectFromLocation = (island: string) => {
     console.log("Popular island selected as FROM location:", island);
-    setSelectedFromLocation(island);
+    // Only update if it's different, to avoid unnecessary re-renders
+    if (selectedFromLocation !== island) {
+      setSelectedFromLocation(island);
+    }
   };
 
   return (
