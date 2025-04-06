@@ -14,6 +14,7 @@ import BookingFormFooter from "./forms/BookingFormFooter";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
+  preSelectedFrom?: string;
   islandNames: string[];
   isLoading: boolean;
   timeRestrictions: Record<string, Time[]>;
@@ -24,6 +25,7 @@ const MAX_PASSENGERS = 15;
 
 const BookingForm = ({
   preSelectedIsland,
+  preSelectedFrom,
   islandNames,
   isLoading: externalIsLoading,
   timeRestrictions,
@@ -42,7 +44,7 @@ const BookingForm = ({
   
   const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || routesLoading);
   const [booking, setBooking] = useState<BookingInfo>({
-    from: '',
+    from: preSelectedFrom || '',
     island: preSelectedIsland || '',
     time: '',
     seats: 1,
@@ -53,6 +55,16 @@ const BookingForm = ({
     },
     returnTrip: false
   });
+  
+  // Update form when preSelectedFrom changes
+  useEffect(() => {
+    if (preSelectedFrom) {
+      setBooking(prev => ({
+        ...prev,
+        from: preSelectedFrom
+      }));
+    }
+  }, [preSelectedFrom]);
   
   // Date state
   const today = new Date();

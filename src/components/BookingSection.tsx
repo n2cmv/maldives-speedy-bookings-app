@@ -16,7 +16,7 @@ interface BookingSectionProps {
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [islandsData, setIslandsData] = useState<Island[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedDestination, setSelectedDestination] = useState<string>(preSelectedIsland || '');
+  const [selectedFromLocation, setSelectedFromLocation] = useState<string>(preSelectedIsland || '');
   
   const fetchIslands = async () => {
     setIsLoading(true);
@@ -129,8 +129,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
   const validatedAllTimes = Object.values(Time);
 
-  const handleSelectDestination = (island: string) => {
-    setSelectedDestination(island);
+  const handleSelectFromLocation = (island: string) => {
+    setSelectedFromLocation(island);
   };
 
   return (
@@ -139,11 +139,12 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         <Card className="p-6 md:p-8 shadow-lg bg-white/95 backdrop-blur-sm border border-ocean/10 rounded-xl">
           <h2 className="text-2xl font-bold text-ocean-dark mb-6 text-center">Book Your Speedboat</h2>
           
-          <PopularDestinations onSelectDestination={handleSelectDestination} />
+          <PopularDestinations onSelectDestination={handleSelectFromLocation} />
           
           <div className="mt-6">
             <BookingForm 
-              preSelectedIsland={selectedDestination}
+              preSelectedIsland={preSelectedIsland}
+              preSelectedFrom={selectedFromLocation}
               islandNames={islandNames}
               isLoading={isLoading}
               timeRestrictions={{}}
