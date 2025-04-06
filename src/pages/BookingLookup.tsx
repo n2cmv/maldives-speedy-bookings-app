@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import { useTranslation } from "react-i18next";
 import { getBookingByReference } from "@/services/bookingService";
@@ -26,6 +26,7 @@ type FormValues = z.infer<typeof formSchema>;
 const BookingLookup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [booking, setBooking] = useState<BookingInfo | null>(null);
   
@@ -36,10 +37,13 @@ const BookingLookup = () => {
     }
   });
   
-  const onSubmit = async (values: FormValues) => {
+  // Function to fetch booking by reference
+  const fetchBookingByReference = async (reference: string) => {
+    if (!reference) return;
+    
     setIsLoading(true);
     try {
-      const { data, error } = await getBookingByReference(values.reference);
+      const { data, error } = await getBookingByReference(reference);
       if (error || !data) {
         toast.error(t("lookup.error", "Error finding booking"), {
           description: t("lookup.notFound", "No booking found with that reference")
@@ -80,6 +84,24 @@ const BookingLookup = () => {
     }
   };
   
+  // Check for reference in URL on component mount
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const reference = queryParams.get('ref');
+    
+    if (reference) {
+      // Update the form value to match the reference
+      form.setValue('reference', reference);
+      
+      // Fetch booking information automatically
+      fetchBookingByReference(reference);
+    }
+  }, [location.search]);
+  
+  const onSubmit = async (values: FormValues) => {
+    await fetchBookingByReference(values.reference);
+  };
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
@@ -116,7 +138,7 @@ const BookingLookup = () => {
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? (
                       <div className="flex items-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         {t("common.searching", "Searching...")}
                       </div>
                     ) : (
