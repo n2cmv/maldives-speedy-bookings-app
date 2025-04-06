@@ -9,14 +9,9 @@ const TripSummaryCardHeader = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <CardHeader className="bg-ocean-light/10 dark:bg-ocean-dark/20 border-b border-ocean-light/20 dark:border-ocean-dark/30 rounded-t-xl">
-        <CardTitle className="text-xl font-bold text-ocean-dark dark:text-ocean-light flex items-center">
-          <span>Booking Summary</span>
-          <div className="ml-auto bg-ocean dark:bg-ocean-light/70 h-1.5 w-1.5 rounded-full"></div>
-          <div className="ml-1 bg-ocean-dark/70 dark:bg-white/70 h-1.5 w-1.5 rounded-full"></div>
-          <div className="ml-1 bg-sand-dark/70 dark:bg-sand-light/70 h-1.5 w-1.5 rounded-full"></div>
-        </CardTitle>
-        <div className="w-20 h-1 bg-ocean dark:bg-ocean-light/70 mt-2"></div>
+      <CardHeader className="bg-ocean-light/10 border-b border-ocean-light/20">
+        <CardTitle className="text-xl font-bold text-ocean-dark">Booking Summary</CardTitle>
+        <div className="w-20 h-1 bg-ocean mt-2"></div>
       </CardHeader>
     </motion.div>
   );

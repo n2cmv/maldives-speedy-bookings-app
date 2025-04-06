@@ -5,11 +5,11 @@ import { Island } from "@/types/booking";
 import { useTranslation } from "react-i18next";
 
 interface IslandDetailsProps {
-  islandName: string;
+  islandName: Island;
 }
 
 interface IslandData {
-  name: string;
+  name: Island;
   fullDescription: string;
   imageUrl: string;
   travelTime: string;
@@ -24,7 +24,7 @@ interface IslandData {
 }
 
 // Sample island data - in a real app this would come from an API or database
-const islandDataMap: Record<string, IslandData> = {
+const islandDataMap: Record<Island, IslandData> = {
   "A.Dh Dhigurah": {
     name: "A.Dh Dhigurah",
     fullDescription: "Dhigurah is a beautiful island located in the South Ari Atoll, famous for its pristine beaches and stunning coral reefs. The island stretches about 3 km in length but is only about 300 meters wide. A paradise for nature lovers, it's known for whale shark sightings year-round and its vibrant marine ecosystem.",

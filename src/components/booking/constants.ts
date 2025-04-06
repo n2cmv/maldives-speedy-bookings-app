@@ -5,19 +5,12 @@ export const MAX_PASSENGERS = 15;
 
 export const fromLocations: string[] = [
   'Male\' City',
-  'Male\' Airport',
-  'Dhigurah',
-  'Dhangethi'
+  'Male\' Airport'
 ];
 
 export const allTimes: Time[] = [
-  Time.AM_630,
-  Time.AM_700,
   Time.AM_800,
   Time.AM_1000, 
-  Time.AM_1100,
-  Time.PM_110,
-  Time.PM_130,
   Time.PM_1200, 
   Time.PM_200, 
   Time.PM_400, 
@@ -35,16 +28,18 @@ export const islandTimeRestrictions: Record<string, Time[]> = {
   'Ari Atoll': allTimes,
   'Male\' City': allTimes,
   'Male\' Airport': allTimes,
-  'Aa. Mathiveri': allTimes,
-  'Dhigurah': [Time.AM_630, Time.PM_110],
-  'Dhangethi': [Time.AM_700, Time.PM_130]
+  'Aa. Mathiveri': allTimes
 };
 
 export const fallbackIslands = [
+  'Male', 
+  'Hulhumale', 
+  'Maafushi', 
+  'Baa Atoll', 
+  'Ari Atoll', 
   'Male\' City', 
   'Male\' Airport',
-  'Dhigurah',
-  'Dhangethi',
-  'Hulhumale', 
-  'Maafushi'
+  'A.Dh Dhigurah',
+  'A.Dh Dhangethi',
+  'Aa. Mathiveri'
 ];

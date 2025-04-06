@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Time, Passenger } from "@/types/booking";
+import { Island, Time } from "@/types/booking";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import {
@@ -29,12 +30,22 @@ interface BookingFormProps {
   onCancel: () => void;
 }
 
+interface Passenger {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  countryCode: string;
+  passport: string;
+  type: 'adult' | 'child' | 'senior';
+}
+
 const availableTimes: Time[] = [
   Time.AM_630, Time.AM_700, Time.AM_800, Time.AM_1000, Time.AM_1100,
   Time.PM_1200, Time.PM_110, Time.PM_130, Time.PM_200, Time.PM_400, Time.PM_600, Time.PM_800
 ];
 
-const availableIslands: string[] = [
+const availableIslands: Island[] = [
   'Male', 'Hulhumale', 'Maafushi', 'Baa Atoll', 'Ari Atoll',
   'A.Dh Dhigurah', 'A.Dh Dhangethi', 'Aa. Mathiveri', 'Male\' City', 'Male\' Airport'
 ];
@@ -43,10 +54,10 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
-  const [fromLocation, setFromLocation] = useState<string>(
+  const [fromLocation, setFromLocation] = useState<Island | ''>(
     booking?.from_location || ''
   );
-  const [toLocation, setToLocation] = useState<string>(
+  const [toLocation, setToLocation] = useState<Island | ''>(
     booking?.to_location || ''
   );
   const [departureDate, setDepartureDate] = useState<Date | undefined>(
@@ -55,15 +66,15 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const [departureTime, setDepartureTime] = useState<Time | ''>(
     booking?.departure_time || ''
   );
-  const [passengerCount, setPassengerCount] = useState<number>(
-    booking?.passenger_count ? Number(booking.passenger_count) : 1
+  const [passengerCount, setPassengerCount] = useState(
+    booking?.passenger_count || 1
   );
   const [userEmail, setUserEmail] = useState(booking?.user_email || '');
   const [hasReturnTrip, setHasReturnTrip] = useState(Boolean(booking?.return_trip));
-  const [returnFromLocation, setReturnFromLocation] = useState<string>(
+  const [returnFromLocation, setReturnFromLocation] = useState<Island | ''>(
     booking?.return_from_location || ''
   );
-  const [returnToLocation, setReturnToLocation] = useState<string>(
+  const [returnToLocation, setReturnToLocation] = useState<Island | ''>(
     booking?.return_to_location || ''
   );
   const [returnDate, setReturnDate] = useState<Date | undefined>(
@@ -81,7 +92,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const [passengers, setPassengers] = useState<Passenger[]>(
     booking?.passenger_info || [
       {
-        id: "1",
+        id: 1,
         name: '',
         email: '',
         phone: '',
@@ -94,7 +105,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
 
   const handleAddPassenger = () => {
     const newPassenger: Passenger = {
-      id: String(passengers.length + 1),
+      id: passengers.length + 1,
       name: '',
       email: '',
       phone: '',
@@ -106,13 +117,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setPassengerCount(passengerCount + 1);
   };
 
-  const handleRemovePassenger = (id: string | number) => {
+  const handleRemovePassenger = (id: number) => {
     const updatedPassengers = passengers.filter(p => p.id !== id);
     setPassengers(updatedPassengers);
     setPassengerCount(updatedPassengers.length);
   };
 
-  const handlePassengerChange = (id: string | number, field: keyof Passenger, value: any) => {
+  const handlePassengerChange = (id: number, field: keyof Passenger, value: any) => {
     setPassengers(passengers.map(p => 
       p.id === id ? { ...p, [field]: value } : p
     ));
@@ -142,18 +153,19 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setIsLoading(true);
 
     try {
+      // Convert passenger info to a format that can be stored as Json
       const passengerInfoAsJson: Json = JSON.parse(JSON.stringify(passengers));
 
       const bookingData = {
-        from_location: fromLocation,
-        to_location: toLocation,
+        from_location: fromLocation as string,
+        to_location: toLocation as string,
         departure_date: format(departureDate, 'yyyy-MM-dd'),
         departure_time: departureTime as string,
         passenger_count: Number(passengerCount),
         user_email: userEmail,
         return_trip: hasReturnTrip,
-        return_from_location: hasReturnTrip ? returnFromLocation : null,
-        return_to_location: hasReturnTrip ? returnToLocation : null,
+        return_from_location: hasReturnTrip ? returnFromLocation as string : null,
+        return_to_location: hasReturnTrip ? returnToLocation as string : null,
         return_date: hasReturnTrip && returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
         return_time: hasReturnTrip ? returnTime as string : null,
         payment_complete: paymentComplete,
@@ -162,6 +174,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
       };
 
       if (booking) {
+        // Update existing booking
         const { error } = await supabase
           .from('bookings')
           .update(bookingData)
@@ -174,6 +187,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
           description: "Booking has been updated",
         });
       } else {
+        // Create new booking
         const { error } = await supabase
           .from('bookings')
           .insert(bookingData);
@@ -245,7 +259,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             <Label htmlFor="fromLocation">From</Label>
             <Select
               value={fromLocation}
-              onValueChange={setFromLocation}
+              onValueChange={(value) => setFromLocation(value as Island)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select location" />
@@ -264,7 +278,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             <Label htmlFor="toLocation">To</Label>
             <Select
               value={toLocation}
-              onValueChange={setToLocation}
+              onValueChange={(value) => setToLocation(value as Island)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select destination" />
@@ -349,7 +363,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
               <Label htmlFor="returnFromLocation">From</Label>
               <Select
                 value={returnFromLocation}
-                onValueChange={setReturnFromLocation}
+                onValueChange={(value) => setReturnFromLocation(value as Island)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select location" />
@@ -368,7 +382,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
               <Label htmlFor="returnToLocation">To</Label>
               <Select
                 value={returnToLocation}
-                onValueChange={setReturnToLocation}
+                onValueChange={(value) => setReturnToLocation(value as Island)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select destination" />
@@ -448,7 +462,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </div>
         
         {passengers.map((passenger, index) => (
-          <div key={String(passenger.id)} className="border p-4 rounded-md mb-4">
+          <div key={passenger.id} className="border p-4 rounded-md mb-4">
             <div className="flex justify-between items-center mb-3">
               <h4 className="font-medium">Passenger {index + 1}</h4>
               {passengers.length > 1 && (

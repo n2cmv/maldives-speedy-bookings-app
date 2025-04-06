@@ -1,16 +1,16 @@
 
-import { PassengerInfo } from "@/types/booking";
+import { Passenger } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, User, Mail, Phone, FileText } from "lucide-react";
 import CountryCodeSelector from "@/components/CountryCodeSelector";
 
 interface PassengerFormItemProps {
-  passenger: PassengerInfo;
+  passenger: Passenger;
   index: number;
   isRemovable: boolean;
-  onRemove: (id: string) => void;
-  onChange: (id: string, field: keyof PassengerInfo, value: string) => void;
+  onRemove: (id: number) => void;
+  onChange: (id: number, field: keyof Passenger, value: string) => void;
 }
 
 const PassengerFormItem = ({
@@ -100,7 +100,7 @@ const PassengerFormItem = ({
             </label>
             <div className="flex items-center gap-2">
               <CountryCodeSelector 
-                value={passenger.countryCode || "+960"}
+                value={passenger.countryCode}
                 onChange={(value) => onChange(passenger.id, "countryCode", value)}
               />
               <div className="relative flex-1">

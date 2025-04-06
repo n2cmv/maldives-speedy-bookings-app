@@ -1,6 +1,7 @@
 
 import { MapPin, Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
+import { TripDetails as TripDetailsType } from "@/types/booking";
 import { useTranslation } from "react-i18next";
 
 interface TripDetailsProps {
