@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
 import { saveBookingToDatabase, sendBookingConfirmationEmail } from "@/services/bookingService";
+import QrCodeDisplay from "@/components/confirmation/QrCodeDisplay";
 
 const Confirmation = () => {
   const { t } = useTranslation();
@@ -148,6 +149,14 @@ const Confirmation = () => {
           >
             <motion.div variants={itemVariants}>
               <ConfirmationHeader />
+            </motion.div>
+            
+            {/* QR Code Display */}
+            <motion.div variants={itemVariants}>
+              <QrCodeDisplay 
+                booking={booking} 
+                paymentReference={booking.paymentReference} 
+              />
             </motion.div>
             
             <div className="space-y-6 mb-8">

@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import { Island } from "@/types/booking";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
+import HeaderExtras from "@/components/HeaderExtras";
 
 const BookingForm = () => {
   const location = useLocation();
@@ -12,6 +13,10 @@ const BookingForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      <div className="absolute top-4 right-4 z-20">
+        <HeaderExtras />
+      </div>
+      
       <Header />
       
       <motion.div

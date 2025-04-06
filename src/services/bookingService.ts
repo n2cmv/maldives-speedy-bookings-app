@@ -61,6 +61,9 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
       };
     }
     
+    // Get current domain from window for QR code generation
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    
     const emailData = {
       email: primaryPassenger.email.trim().toLowerCase(),
       name: primaryPassenger.name,
@@ -73,7 +76,8 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
         returnDate: booking.returnTripDetails?.date ? new Date(booking.returnTripDetails.date).toLocaleDateString() : undefined,
         returnTime: booking.returnTripDetails?.time,
         passengerCount: booking.seats,
-        paymentReference: booking.paymentReference || "Unknown"
+        paymentReference: booking.paymentReference || "Unknown",
+        origin: origin // Add origin for QR code generation
       }
     };
     

@@ -164,7 +164,12 @@ const handler = async (req: Request): Promise<Response> => {
         ? `<p><strong>Return Trip:</strong> ${bookingDetails.to} to ${bookingDetails.from} on ${bookingDetails.returnDate} at ${bookingDetails.returnTime}</p>`
         : '';
 
+      // Generate QR code URL using a service like QR Server
+      const bookingLookupUrl = `${req.headers.get('origin') || 'https://your-site.lovable.app'}/booking-lookup?ref=${bookingDetails.paymentReference}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(bookingLookupUrl)}`;
+
       console.log("[send-confirmation] Preparing to send booking confirmation email to:", email);
+      console.log("[send-confirmation] QR Code URL:", qrCodeUrl);
       
       try {
         console.log("[send-confirmation] Calling Resend API with from: Island Ferry Bookings <onboarding@resend.dev>");
@@ -191,6 +196,15 @@ const handler = async (req: Request): Promise<Response> => {
                   <p><strong>Trip:</strong> ${tripInfo}</p>
                   ${returnInfo}
                   <p><strong>Passengers:</strong> ${bookingDetails.passengerCount}</p>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                  <h3 style="color: #0AB3B8;">Your Ticket QR Code</h3>
+                  <p>Scan this QR code to access your booking details</p>
+                  <img src="${qrCodeUrl}" alt="Booking QR Code" style="width: 150px; height: 150px; margin: 10px auto; display: block;">
+                  <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    You can also access your booking at: ${bookingLookupUrl}
+                  </p>
                 </div>
                 
                 <p>Please arrive at the ferry terminal at least 30 minutes before your scheduled departure time.</p>
