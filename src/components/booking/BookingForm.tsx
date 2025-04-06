@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
 import { toast } from "@/components/ui/use-toast";
@@ -43,7 +44,7 @@ const BookingForm = ({
   
   const [isLoading, setIsLoading] = useState<boolean>(externalIsLoading || routesLoading);
   const [booking, setBooking] = useState<BookingInfo>({
-    from: '',
+    from: preSelectedFrom || '',
     island: preSelectedIsland || '',
     time: '',
     seats: 1,
@@ -61,30 +62,33 @@ const BookingForm = ({
     console.log("BookingForm - Current from location:", booking.from);
   }, [preSelectedFrom, booking.from]);
   
-  // Update form when preSelectedFrom changes - using a ref to prevent infinite loops
-  const isInitialMount = React.useRef(true);
-  const prevPreSelectedFrom = React.useRef<string | undefined>(preSelectedFrom);
+  // Using useRef for tracking initial mount and previous props
+  const isInitialMount = useRef(true);
+  const prevPreSelectedFrom = useRef<string | undefined>(preSelectedFrom);
 
+  // Only update booking.from when preSelectedFrom changes (not on every render)
   useEffect(() => {
-    // Only update if:
-    // 1. It's the initial mount, or
-    // 2. preSelectedFrom has changed and is not empty
-    if (
-      (isInitialMount.current && preSelectedFrom) || 
-      (preSelectedFrom !== prevPreSelectedFrom.current && preSelectedFrom)
-    ) {
+    // Skip if preSelectedFrom is undefined or empty
+    if (!preSelectedFrom) return;
+    
+    // Update only on initial mount with value or when value changes
+    if (isInitialMount.current || preSelectedFrom !== prevPreSelectedFrom.current) {
       console.log("BookingForm - Updating 'from' to:", preSelectedFrom);
-      setBooking(prev => ({
-        ...prev,
-        from: preSelectedFrom
-      }));
+      
+      // Only update if the new value is different from current booking.from
+      if (booking.from !== preSelectedFrom) {
+        setBooking(prev => ({
+          ...prev,
+          from: preSelectedFrom
+        }));
+      }
     }
     
     // No longer initial mount
     isInitialMount.current = false;
     // Store current value for next comparison
     prevPreSelectedFrom.current = preSelectedFrom;
-  }, [preSelectedFrom]);
+  }, [preSelectedFrom, booking.from]);
   
   // Date state
   const today = new Date();
