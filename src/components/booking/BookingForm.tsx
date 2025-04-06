@@ -4,7 +4,6 @@ import { BookingInfo, Time, PassengerCount } from "@/types/booking";
 import { useBookingForm } from "./hooks/useBookingForm";
 import { useRouteTimesMap } from "./hooks/useRouteTimesMap";
 import { useAvailableTimes } from "./hooks/useAvailableTimes";
-import ReturnTripSwitch from "./ReturnTripSwitch";
 import PassengerSelection from "./PassengerSelection";
 import RouteSelectionForm from "./forms/RouteSelectionForm";
 import TripDatesForm from "./forms/TripDatesForm";
@@ -53,7 +52,6 @@ const BookingForm = ({
     returnDateOpen,
     setReturnDateOpen,
     handlePassengerCountChange,
-    handleReturnToggle,
     handleSubmit,
     today
   } = useBookingForm({
@@ -87,11 +85,6 @@ const BookingForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full isolate">
-      <ReturnTripSwitch
-        isReturnTrip={booking.returnTrip}
-        onReturnTripChange={handleReturnToggle}
-      />
-
       <RouteSelectionForm
         fromLocations={fromLocations}
         toLocations={toLocations}

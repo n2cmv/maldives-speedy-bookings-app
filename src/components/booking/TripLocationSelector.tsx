@@ -31,7 +31,7 @@ const TripLocationSelector = ({
   const filteredToLocations = toLocations.filter(island => island !== fromLocation);
   
   return (
-    <div className="relative space-y-3">
+    <div className="route-selectors-container relative">
       <IslandSelector
         label={t("booking.form.from", "From")}
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}

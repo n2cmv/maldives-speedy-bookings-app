@@ -81,20 +81,6 @@ export const useBookingForm = ({
     });
   };
   
-  // Return trip toggle
-  const handleReturnToggle = (isChecked: boolean) => {
-    setBooking(prev => ({ 
-      ...prev, 
-      returnTrip: isChecked,
-      returnTripDetails: isChecked ? {
-        from: prev.island || '',
-        island: prev.from || '',
-        time: '',
-        date: returnDate
-      } : undefined
-    }));
-  };
-  
   // Booking form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,7 +138,6 @@ export const useBookingForm = ({
     returnDateOpen,
     setReturnDateOpen,
     handlePassengerCountChange,
-    handleReturnToggle,
     handleSubmit,
     today
   };
