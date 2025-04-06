@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
@@ -133,7 +132,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           <div className="mt-6">
             <BookingForm 
               preSelectedIsland={preSelectedIsland}
-              preSelectedFrom={undefined}
               islandNames={islandNames}
               isLoading={isLoading}
               timeRestrictions={{}}
