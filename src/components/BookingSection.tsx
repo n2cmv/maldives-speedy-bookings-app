@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
@@ -133,8 +132,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   return (
     <div className="min-h-screen pb-16 px-4">
       <div className="max-w-lg mx-auto">
-        <Card className="p-6 md:p-8 shadow-lg bg-white/95 backdrop-blur-sm border border-ocean/10 rounded-xl">
-          <h2 className="text-2xl font-bold text-ocean-dark mb-6 text-center">Book Your Speedboat</h2>
+        <Card className="p-6 md:p-8 shadow-xl bg-white/95 dark:bg-gray-800/90 backdrop-blur-md border border-ocean/10 dark:border-ocean/5 rounded-2xl">
+          <h2 className="text-2xl font-bold text-ocean-dark dark:text-white mb-6 text-center">Book Your Speedboat</h2>
           
           <PopularDestinations onSelectFromIsland={handleSelectFromIsland} />
           

@@ -82,7 +82,9 @@ export default {
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        sm: 'calc(var(--radius) - 4px)',
+        xl: 'calc(var(--radius) + 2px)',
+        '2xl': 'calc(var(--radius) + 4px)',
       },
       keyframes: {
         'accordion-down': {
@@ -105,17 +107,29 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '50%': { transform: 'translateX(-10px)' },
           '100%': { transform: 'translateX(0)' }
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' }
+        },
+        'scale-in': {
+          from: { transform: 'scale(0.95)', opacity: '0' },
+          to: { transform: 'scale(1)', opacity: '1' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'wave': 'wave 3s ease-in-out infinite'
+        'wave': 'wave 3s ease-in-out infinite',
+        'fade-in': 'fade-in 0.3s ease-out',
+        'scale-in': 'scale-in 0.2s ease-out',
+        'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
       },
       backgroundImage: {
         'maldives-pattern': "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMEFCM0I4Ij48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMwMDVDOTkiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')",
         'ocean-gradient': "linear-gradient(to bottom right, #0AB3B8, #005C99)",
         'sunset-gradient': "linear-gradient(45deg, #F2E3C9, #FF9F80)",
+        'dark-ocean-gradient': "linear-gradient(to bottom right, rgba(10, 100, 130, 0.5), rgba(0, 30, 60, 0.5))",
       }
     }
   },
