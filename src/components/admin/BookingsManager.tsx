@@ -108,19 +108,16 @@ const BookingsManager = () => {
   };
 
   const handleResendEmail = async (booking: BookingData) => {
-    // Update email status to sending
     setEmailStatus(prev => ({
       ...prev,
       [booking.id]: { sending: true }
     }));
     
     try {
-      // Check if passenger info contains valid email
       if (!booking.passenger_info || booking.passenger_info.length === 0 || !booking.passenger_info[0].email) {
         throw new Error("Missing or invalid passenger email address");
       }
 
-      // Convert database booking to BookingInfo format
       const bookingInfo: BookingInfo = {
         from: booking.from_location,
         island: booking.to_location,
@@ -147,7 +144,6 @@ const BookingsManager = () => {
       const { success, error, emailSentTo } = await sendBookingConfirmationEmail(bookingInfo);
 
       if (!success || error) {
-        // Store error details for potential viewing
         const errorMessage = typeof error === 'object' 
           ? JSON.stringify(error, null, 2) 
           : String(error);
@@ -160,7 +156,6 @@ const BookingsManager = () => {
         throw error || new Error("Failed to send email");
       }
 
-      // Email sent successfully
       setEmailStatus(prev => ({
         ...prev,
         [booking.id]: { sending: false }
@@ -240,12 +235,12 @@ const BookingsManager = () => {
       )}
 
       <Dialog open={isBookingFormOpen} onOpenChange={setIsBookingFormOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-w-2xl bg-white p-4">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-lg">
               {currentBooking ? "Edit Booking" : "Add New Booking"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               {currentBooking
                 ? "Update booking details"
                 : "Enter booking information"}
@@ -279,7 +274,7 @@ const BookingsManager = () => {
       </AlertDialog>
       
       <Dialog open={emailDetailsDialogOpen} onOpenChange={setEmailDetailsDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl bg-white">
           <DialogHeader>
             <DialogTitle>Email Error Details</DialogTitle>
           </DialogHeader>

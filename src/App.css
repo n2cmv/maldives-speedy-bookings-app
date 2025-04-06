@@ -55,3 +55,13 @@ header,
     padding-right: 1rem;
   }
 }
+
+/* Admin dialogs - make them more compact */
+.dialog-form-compact .dialog-content {
+  padding: 1rem;
+  gap: 0.5rem;
+}
+
+.dialog-form-compact .dialog-header {
+  margin-bottom: 0.5rem;
+}

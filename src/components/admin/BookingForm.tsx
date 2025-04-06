@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,7 +152,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setIsLoading(true);
 
     try {
-      // Convert passenger info to a format that can be stored as Json
       const passengerInfoAsJson: Json = JSON.parse(JSON.stringify(passengers));
 
       const bookingData = {
@@ -174,7 +172,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
       };
 
       if (booking) {
-        // Update existing booking
         const { error } = await supabase
           .from('bookings')
           .update(bookingData)
@@ -187,7 +184,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
           description: "Booking has been updated",
         });
       } else {
-        // Create new booking
         const { error } = await supabase
           .from('bookings')
           .insert(bookingData);
@@ -214,26 +210,28 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="userEmail">Customer Email</Label>
+    <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <Label htmlFor="userEmail" className="text-sm">Customer Email</Label>
           <Input
             id="userEmail"
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
             placeholder="customer@example.com"
             required
+            className="h-9"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="paymentReference">Payment Reference</Label>
+        <div className="space-y-1">
+          <Label htmlFor="paymentReference" className="text-sm">Payment Reference</Label>
           <Input
             id="paymentReference"
             value={paymentReference}
             onChange={(e) => setPaymentReference(e.target.value)}
             placeholder="ABC123"
+            className="h-9"
           />
         </div>
       </div>
@@ -252,16 +250,16 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </label>
       </div>
 
-      <div className="border-t pt-4">
-        <h3 className="text-lg font-medium mb-4">Outbound Trip</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="fromLocation">From</Label>
+      <div className="border-t pt-3">
+        <h3 className="text-sm font-medium mb-3">Outbound Trip</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label htmlFor="fromLocation" className="text-sm">From</Label>
             <Select
               value={fromLocation}
               onValueChange={(value) => setFromLocation(value as Island)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent>
@@ -274,13 +272,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="toLocation">To</Label>
+          <div className="space-y-1">
+            <Label htmlFor="toLocation" className="text-sm">To</Label>
             <Select
               value={toLocation}
               onValueChange={(value) => setToLocation(value as Island)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select destination" />
               </SelectTrigger>
               <SelectContent>
@@ -293,13 +291,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Departure Date</Label>
+          <div className="space-y-1">
+            <Label className="text-sm">Departure Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal h-9"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {departureDate ? (
@@ -320,13 +318,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             </Popover>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="departureTime">Departure Time</Label>
+          <div className="space-y-1">
+            <Label htmlFor="departureTime" className="text-sm">Departure Time</Label>
             <Select
               value={departureTime}
               onValueChange={(value) => setDepartureTime(value as Time)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select time" />
               </SelectTrigger>
               <SelectContent>
@@ -356,16 +354,16 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
       </div>
 
       {hasReturnTrip && (
-        <div className="border-t pt-4">
-          <h3 className="text-lg font-medium mb-4">Return Trip</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="returnFromLocation">From</Label>
+        <div className="border-t pt-3">
+          <h3 className="text-sm font-medium mb-3">Return Trip</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="returnFromLocation" className="text-sm">From</Label>
               <Select
                 value={returnFromLocation}
                 onValueChange={(value) => setReturnFromLocation(value as Island)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
                 <SelectContent>
@@ -378,13 +376,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="returnToLocation">To</Label>
+            <div className="space-y-1">
+              <Label htmlFor="returnToLocation" className="text-sm">To</Label>
               <Select
                 value={returnToLocation}
                 onValueChange={(value) => setReturnToLocation(value as Island)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select destination" />
                 </SelectTrigger>
                 <SelectContent>
@@ -397,13 +395,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Return Date</Label>
+            <div className="space-y-1">
+              <Label className="text-sm">Return Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    className="w-full justify-start text-left font-normal h-9"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {returnDate ? (
@@ -424,13 +422,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
               </Popover>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="returnTime">Return Time</Label>
+            <div className="space-y-1">
+              <Label htmlFor="returnTime" className="text-sm">Return Time</Label>
               <Select
                 value={returnTime}
                 onValueChange={(value) => setReturnTime(value as Time)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select time" />
                 </SelectTrigger>
                 <SelectContent>
@@ -446,15 +444,16 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </div>
       )}
 
-      <div className="border-t pt-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Passengers</h3>
+      <div className="border-t pt-3">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-medium">Passengers</h3>
           {passengers.length < 10 && (
             <Button 
               type="button" 
               variant="outline" 
               size="sm" 
               onClick={handleAddPassenger}
+              className="h-7 text-xs"
             >
               Add Passenger
             </Button>
@@ -462,51 +461,54 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </div>
         
         {passengers.map((passenger, index) => (
-          <div key={passenger.id} className="border p-4 rounded-md mb-4">
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-medium">Passenger {index + 1}</h4>
+          <div key={passenger.id} className="border p-3 rounded-md mb-3">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium text-sm">Passenger {index + 1}</h4>
               {passengers.length > 1 && (
                 <Button 
                   type="button" 
                   variant="ghost" 
                   size="sm"
                   onClick={() => handleRemovePassenger(passenger.id)}
+                  className="h-7 text-xs"
                 >
                   Remove
                 </Button>
               )}
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Full Name</Label>
                 <Input
                   value={passenger.name}
                   onChange={(e) => handlePassengerChange(passenger.id, 'name', e.target.value)}
                   placeholder="John Doe"
+                  className="h-8 text-sm"
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label>Email</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Email</Label>
                 <Input
                   value={passenger.email}
                   onChange={(e) => handlePassengerChange(passenger.id, 'email', e.target.value)}
                   placeholder="john@example.com"
+                  className="h-8 text-sm"
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label>Phone</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Phone</Label>
                 <div className="flex space-x-2">
                   <Input
-                    className="w-20"
+                    className="w-20 h-8 text-sm"
                     value={passenger.countryCode}
                     onChange={(e) => handlePassengerChange(passenger.id, 'countryCode', e.target.value)}
                     placeholder="+960"
                   />
                   <Input
-                    className="flex-1"
+                    className="flex-1 h-8 text-sm"
                     value={passenger.phone}
                     onChange={(e) => handlePassengerChange(passenger.id, 'phone', e.target.value)}
                     placeholder="7777777"
@@ -514,22 +516,23 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label>Passport</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Passport</Label>
                 <Input
                   value={passenger.passport}
                   onChange={(e) => handlePassengerChange(passenger.id, 'passport', e.target.value)}
                   placeholder="AB123456"
+                  className="h-8 text-sm"
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label>Type</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Type</Label>
                 <Select
                   value={passenger.type}
                   onValueChange={(value) => handlePassengerChange(passenger.id, 'type', value as 'adult' | 'child' | 'senior')}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -544,14 +547,14 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         ))}
       </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+      <div className="flex justify-end space-x-2 pt-3 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading} size="sm">
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} size="sm">
           {isLoading ? (
             <>
-              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
               Saving...
             </>
           ) : booking ? "Update Booking" : "Create Booking"}
