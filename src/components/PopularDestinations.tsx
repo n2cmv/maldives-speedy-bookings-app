@@ -23,23 +23,30 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
     const fetchPopularIslands = async () => {
       setIsLoading(true);
       try {
-        // Fetch islands from Supabase
-        // In a real app, you might have a "popular" flag or sort by booking count
+        // Prioritize Dhigurah and Dhangethi as popular islands
+        const popularNames = ["A.Dh Dhigurah", "A.Dh Dhangethi"];
+        
+        // Attempt to fetch islands to include a third option if available
         const { data, error } = await supabase
           .from('islands')
           .select('name')
-          .limit(3);
+          .not('name', 'in', `(${popularNames.join(',')})`)
+          .limit(1);
         
         if (error) {
           console.error('Error fetching popular islands:', error);
+          setPopularIslands(popularNames);
           return;
         }
         
         if (data && data.length > 0) {
-          setPopularIslands(data.map(island => island.name));
+          setPopularIslands([...popularNames, data[0].name]);
+        } else {
+          setPopularIslands(popularNames);
         }
       } catch (error) {
         console.error('Error fetching popular islands:', error);
+        setPopularIslands(["A.Dh Dhigurah", "A.Dh Dhangethi"]);
       } finally {
         setIsLoading(false);
       }
