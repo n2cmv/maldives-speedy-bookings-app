@@ -2,7 +2,7 @@
 import { useLocation } from "react-router-dom";
 import BookingSection from "@/components/booking/BookingSection";
 import Header from "@/components/Header";
-import { Island } from "@/types/booking";
+import { Island } from "@/types/island";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
 

@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next";
 import { MapPin, Navigation } from "lucide-react";
 import IslandSelector from "./IslandSelector";
+import { useEffect, useState } from "react";
 
 interface TripLocationSelectorProps {
   fromLocation: string;
@@ -23,9 +24,14 @@ const TripLocationSelector = ({
   onToChange
 }: TripLocationSelectorProps) => {
   const { t } = useTranslation();
+  const [filteredToLocations, setFilteredToLocations] = useState<string[]>([]);
   
-  // Filter out the currently selected fromLocation from toLocations
-  const filteredToLocations = toLocations.filter(island => island !== fromLocation);
+  // Filter out the currently selected fromLocation from toLocations whenever changes occur
+  useEffect(() => {
+    const filtered = toLocations.filter(island => island !== fromLocation);
+    console.log("Filtered destination islands:", filtered);
+    setFilteredToLocations(filtered);
+  }, [fromLocation, toLocations]);
   
   return (
     <>
@@ -35,6 +41,7 @@ const TripLocationSelector = ({
         selectedIsland={fromLocation}
         islandNames={fromLocations}
         onIslandChange={(value) => {
+          console.log("From location changed to:", value);
           onFromChange(value);
           // If the newly selected 'from' location is the same as the current 'to' location,
           // clear the 'to' location to avoid having the same island as both departure and destination
@@ -52,7 +59,10 @@ const TripLocationSelector = ({
         icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
         selectedIsland={toLocation}
         islandNames={filteredToLocations}
-        onIslandChange={onToChange}
+        onIslandChange={(value) => {
+          console.log("Destination changed to:", value);
+          onToChange(value);
+        }}
         isLoading={isLoading}
         id="island-select"
       />

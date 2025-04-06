@@ -1,59 +1,60 @@
 
-export type Island = string;
-
 export enum Time {
-  AM_630 = '6:30 AM',
-  AM_700 = '7:00 AM',
-  AM_800 = '8:00 AM',
-  AM_1000 = '10:00 AM',
-  AM_1100 = '11:00 AM',
-  PM_1200 = '12:00 PM',
-  PM_110 = '1:10 PM',
-  PM_130 = '1:30 PM',
-  PM_200 = '2:00 PM',
-  PM_400 = '4:00 PM',
-  PM_600 = '6:00 PM',
-  PM_800 = '8:00 PM'
+  AM_630 = "6:30 AM",
+  AM_700 = "7:00 AM",
+  AM_800 = "8:00 AM",
+  AM_1000 = "10:00 AM",
+  AM_1100 = "11:00 AM",
+  PM_110 = "1:10 PM",
+  PM_130 = "1:30 PM",
+  PM_1200 = "12:00 PM",
+  PM_200 = "2:00 PM",
+  PM_400 = "4:00 PM",
+  PM_600 = "6:00 PM",
+  PM_800 = "8:00 PM",
 }
 
-export interface PassengerCount {
+export type PassengerCount = {
   adults: number;
   children: number;
   seniors: number;
-}
+};
 
-export interface Passenger {
-  id: number;
+export type PassengerInfo = {
   name: string;
   email: string;
   phone: string;
-  countryCode: string;
-  passport: string;
-  type: 'adult' | 'child' | 'senior';
-}
-
-export interface TripDetails {
-  from: Island | '';
-  island: Island | '';
-  time: Time | '';
-  date?: Date;
-}
+  age?: number;
+  nationality?: string;
+  idNumber?: string;
+  id: string;
+};
 
 export interface BookingInfo {
-  from: Island | '';
-  island: Island | '';
-  time: Time | '';
-  seats: number;
+  from: string;
+  island: string;
+  time: string;
   date?: Date;
+  seats: number;
   passengerCounts?: PassengerCount;
-  passengers?: Passenger[];
-  returnTrip?: boolean;
-  returnTripDetails?: TripDetails;
+  returnTrip: boolean;
+  returnTripDetails?: {
+    from: string;
+    island: string;
+    time: string;
+    date?: Date;
+  };
+  id?: string;
+  passengers?: PassengerInfo[];
   paymentComplete?: boolean;
   paymentReference?: string;
-  id?: string; // For saved bookings
 }
 
-export interface SavedBooking extends BookingInfo {
-  id: string;
+export interface Island {
+  id?: string;
+  name: string;
+  description: string;
+  image_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }

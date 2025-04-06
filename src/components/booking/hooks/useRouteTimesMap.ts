@@ -27,9 +27,12 @@ export const useRouteTimesMap = () => {
       
       console.log("useRouteTimesMap - Routes data received:", data);
       
-      if (data) {
+      if (data && data.length > 0) {
         const uniqueFromLocations = Array.from(new Set(data.map(route => route.from_location)));
         const uniqueToLocations = Array.from(new Set(data.map(route => route.to_location)));
+        
+        console.log("useRouteTimesMap - Unique from locations:", uniqueFromLocations);
+        console.log("useRouteTimesMap - Unique to locations:", uniqueToLocations);
         
         // Build a map of available times for each route
         const timesMap: Record<string, Record<string, Time[]>> = {};
@@ -56,6 +59,11 @@ export const useRouteTimesMap = () => {
         setAvailableTimesMap(timesMap);
         setFromLocations(uniqueFromLocations);
         setToLocations(uniqueToLocations);
+      } else {
+        console.log("useRouteTimesMap - No routes data received or empty array");
+        setFromLocations([]);
+        setToLocations([]);
+        setAvailableTimesMap({});
       }
     } catch (error) {
       console.error("Exception fetching routes:", error);

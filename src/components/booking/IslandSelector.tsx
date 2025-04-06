@@ -2,7 +2,7 @@
 import { SelectContent, SelectItem, SelectTrigger, Select } from "@/components/ui/select";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ForwardedRef, forwardRef } from "react";
+import { ForwardedRef, forwardRef, useEffect, useState } from "react";
 
 interface IslandSelectorProps {
   label: string;
@@ -27,6 +27,14 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
   id = "island-select"
 }, ref) => {
   const { t } = useTranslation();
+  const [options, setOptions] = useState<string[]>([]);
+  
+  // Update options when islandNames changes
+  useEffect(() => {
+    if (islandNames && islandNames.length > 0) {
+      setOptions(islandNames);
+    }
+  }, [islandNames]);
   
   return (
     <div className="space-y-2 relative">
@@ -44,6 +52,7 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
         <Select
           value={selectedIsland}
           onValueChange={onIslandChange}
+          disabled={isLoading || options.length === 0}
         >
           <SelectTrigger 
             ref={ref}
@@ -57,8 +66,8 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
           >
             {isLoading ? (
               <SelectItem value="loading">Loading...</SelectItem>
-            ) : (
-              islandNames.map((islandName) => (
+            ) : options.length > 0 ? (
+              options.map((islandName) => (
                 <SelectItem 
                   key={islandName} 
                   value={islandName}
@@ -67,6 +76,8 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
                   {islandName}
                 </SelectItem>
               ))
+            ) : (
+              <SelectItem value="no-options">No islands available</SelectItem>
             )}
           </SelectContent>
         </Select>

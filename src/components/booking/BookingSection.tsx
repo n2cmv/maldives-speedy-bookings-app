@@ -35,11 +35,14 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         throw routesError;
       }
       
+      // Log for debugging
+      console.log("Routes data fetched:", routesData ? routesData.length : 0, "routes");
+      
       // Extract unique islands from routes
       const uniqueIslands = new Set<string>();
       const islandOrder = new Map<string, number>();
       
-      if (routesData) {
+      if (routesData && routesData.length > 0) {
         routesData.forEach(route => {
           if (!islandOrder.has(route.from_location)) {
             islandOrder.set(route.from_location, route.display_order || 0);
@@ -52,6 +55,10 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           uniqueIslands.add(route.from_location);
           uniqueIslands.add(route.to_location);
         });
+        
+        console.log("Unique islands from routes:", Array.from(uniqueIslands));
+      } else {
+        console.log("No routes data found or empty array");
       }
       
       // Then get island details from islands table
@@ -64,6 +71,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         console.error('Error fetching islands:', error);
         throw error;
       }
+      
+      console.log("Islands data fetched:", data ? data.length : 0, "islands");
       
       if (data && data.length > 0) {
         // Sort islands according to route display order if possible
@@ -83,15 +92,17 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           });
         }
         
+        console.log("Sorted islands for display:", sortedIslands.map(i => i.name));
         setIslandsData(sortedIslands);
         setIsInitialized(true);
+      } else {
+        console.log("No island data found or empty array, using fallback");
+        setIslandsData([]);
       }
     } catch (error) {
       console.error('Error fetching islands:', error);
       // Use fallback islands if there's an error
-      if (!isInitialized) {
-        setIslandsData([]);
-      }
+      setIslandsData([]);
     } finally {
       setIsLoading(false);
     }
@@ -127,6 +138,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const islandNames = islandsData.length > 0 
     ? islandsData.map(island => island.name) 
     : fallbackIslands;
+
+  console.log("Island names available for selection:", islandNames);
 
   const validatedAllTimes = Object.values(Time);
   
