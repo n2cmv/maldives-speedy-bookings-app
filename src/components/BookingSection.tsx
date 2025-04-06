@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
 import { Time } from "@/types/booking";
 import { toast } from "sonner";
-import PopularDestinations from "./PopularDestinations";
 import { allTimes, fallbackIslands } from "./booking/constants";
 import BookingForm from "./booking/BookingForm";
 import { Card } from "./ui/card";
@@ -15,7 +15,6 @@ interface BookingSectionProps {
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [islandsData, setIslandsData] = useState<Island[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedFromLocation, setSelectedFromLocation] = useState<string>(preSelectedIsland || '');
   
   const fetchIslands = async () => {
     setIsLoading(true);
@@ -125,24 +124,16 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
   const validatedAllTimes = Object.values(Time);
 
-  // Handle selecting from location
-  const handleSelectFromLocation = (island: string) => {
-    console.log("Popular island selected in BookingSection:", island);
-    setSelectedFromLocation(island);
-  };
-
   return (
     <div className="min-h-screen pb-16 px-4">
       <div className="max-w-lg mx-auto">
         <Card className="p-6 md:p-8 shadow-lg bg-white/95 backdrop-blur-sm border border-ocean/10 rounded-xl">
           <h2 className="text-2xl font-bold text-ocean-dark mb-6 text-center">Book Your Speedboat</h2>
           
-          <PopularDestinations onSelectDestination={handleSelectFromLocation} />
-          
           <div className="mt-6">
             <BookingForm 
               preSelectedIsland={preSelectedIsland}
-              preSelectedFrom={selectedFromLocation}
+              preSelectedFrom={undefined}
               islandNames={islandNames}
               isLoading={isLoading}
               timeRestrictions={{}}

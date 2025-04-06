@@ -12,7 +12,7 @@ import BookingFormFooter from "./forms/BookingFormFooter";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
-  preSelectedFrom?: string;
+  preSelectedFrom?: string; // We'll keep this to avoid interface changes but won't use it
   islandNames: string[];
   isLoading: boolean;
   timeRestrictions: Record<string, Time[]>;
@@ -23,7 +23,6 @@ const MAX_PASSENGERS = 15;
 
 const BookingForm = ({
   preSelectedIsland,
-  preSelectedFrom,
   islandNames,
   isLoading: externalIsLoading,
   timeRestrictions,
@@ -58,7 +57,6 @@ const BookingForm = ({
     today
   } = useBookingForm({
     preSelectedIsland,
-    preSelectedFrom,
     isLoading
   });
 

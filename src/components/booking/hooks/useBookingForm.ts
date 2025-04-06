@@ -6,13 +6,11 @@ import { useTranslation } from "react-i18next";
 
 interface UseBookingFormProps {
   preSelectedIsland?: string;
-  preSelectedFrom?: string;
   isLoading: boolean;
 }
 
 export const useBookingForm = ({
   preSelectedIsland,
-  preSelectedFrom,
   isLoading: externalIsLoading
 }: UseBookingFormProps) => {
   const { t } = useTranslation();
@@ -20,7 +18,7 @@ export const useBookingForm = ({
   
   // Booking state
   const [booking, setBooking] = useState<BookingInfo>({
-    from: preSelectedFrom || '',
+    from: '',
     island: preSelectedIsland || '',
     time: '',
     seats: 1,
@@ -33,25 +31,8 @@ export const useBookingForm = ({
   });
 
   // Using useRef for tracking previous props to avoid infinite loops
-  const prevPreSelectedFrom = useRef<string | undefined>(preSelectedFrom);
   const prevPreSelectedIsland = useRef<string | undefined>(preSelectedIsland);
 
-  // Update booking when preSelectedFrom changes
-  useEffect(() => {
-    if (preSelectedFrom && preSelectedFrom !== prevPreSelectedFrom.current) {
-      console.log("BookingForm - Updating 'from' due to prop change:", preSelectedFrom);
-      
-      setBooking(prev => ({
-        ...prev,
-        from: preSelectedFrom,
-        // Keep the island selection if it doesn't match the new from location
-        island: preSelectedFrom === prev.island ? '' : prev.island
-      }));
-      
-      prevPreSelectedFrom.current = preSelectedFrom;
-    }
-  }, [preSelectedFrom]);
-  
   // Update booking when preSelectedIsland changes
   useEffect(() => {
     if (preSelectedIsland && preSelectedIsland !== prevPreSelectedIsland.current) {
