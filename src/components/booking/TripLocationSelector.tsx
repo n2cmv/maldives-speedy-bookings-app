@@ -31,7 +31,7 @@ const TripLocationSelector = ({
   const filteredToLocations = toLocations.filter(island => island !== fromLocation);
   
   return (
-    <div className="relative">
+    <div className="relative space-y-3">
       <IslandSelector
         label={t("booking.form.from", "From")}
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
@@ -52,16 +52,16 @@ const TripLocationSelector = ({
       
       {/* Switch Routes Button - Only show when both selections are made */}
       {fromLocation && toLocation && (
-        <div className="flex justify-center my-2">
+        <div className="flex justify-center my-0">
           <Button 
             type="button"
             variant="outline"
             size="icon"
             onClick={onSwitchRoutes}
-            className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark"
+            className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark h-6 w-6 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
             title={t("booking.form.switchRoutes", "Switch routes")}
           >
-            <RotateCw className="h-4 w-4" />
+            <RotateCw className="h-3 w-3" />
           </Button>
         </div>
       )}
