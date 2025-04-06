@@ -1,21 +1,16 @@
 
-import { Ship, Calendar, Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Ship, Calendar } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 
 const Header = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  
+  // Check if we're on the home page
+  const isHomePage = location.pathname === '/';
   
   return (
     <header className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50">
@@ -30,9 +25,11 @@ const Header = () => {
         </Link>
         
         <nav className="flex items-center space-x-4">
-          <Link to="/booking" className="inline-flex items-center gap-2 bg-ocean hover:bg-ocean-dark text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
-            {t("common.bookNow", "Book Now")}
-          </Link>
+          {isHomePage && (
+            <Link to="/booking" className="inline-flex items-center gap-2 bg-ocean hover:bg-ocean-dark text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+              {t("common.bookNow", "Book Now")}
+            </Link>
+          )}
           
           <Link to="/my-bookings" className={`flex items-center ${isMobile ? "" : "space-x-1"} text-ocean-dark hover:text-ocean transition-colors font-medium`}>
             <Calendar className="h-5 w-5" />
