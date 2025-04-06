@@ -128,7 +128,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
   // Handle selecting from location
   const handleSelectFromLocation = (island: string) => {
-    console.log("Popular island selected as FROM location:", island);
+    console.log("Popular island selected in BookingSection:", island);
     setSelectedFromLocation(island);
   };
 

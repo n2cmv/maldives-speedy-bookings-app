@@ -56,24 +56,18 @@ const BookingForm = ({
     returnTrip: false
   });
   
-  // Log to debug the props and state
-  useEffect(() => {
-    console.log("BookingForm - preSelectedFrom:", preSelectedFrom);
-    console.log("BookingForm - Current from location:", booking.from);
-  }, [preSelectedFrom, booking.from]);
-  
-  // Using useRef for tracking initial mount and previous props
-  const isInitialMount = useRef(true);
+  // Using useRef for tracking previous props
   const prevPreSelectedFrom = useRef<string | undefined>(preSelectedFrom);
 
-  // Only update booking.from when preSelectedFrom changes directly from parent
+  // Update booking when preSelectedFrom changes
   useEffect(() => {
-    if (preSelectedFrom) {
+    if (preSelectedFrom && preSelectedFrom !== prevPreSelectedFrom.current) {
       console.log("BookingForm - Updating 'from' due to prop change:", preSelectedFrom);
       setBooking(prev => ({
         ...prev,
         from: preSelectedFrom
       }));
+      prevPreSelectedFrom.current = preSelectedFrom;
     }
   }, [preSelectedFrom]);
   
