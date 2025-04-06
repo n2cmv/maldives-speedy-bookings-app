@@ -29,7 +29,7 @@ const TimeSelector = ({
   }, [availableTimes, label, selectedTime]);
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
@@ -50,7 +50,7 @@ const TimeSelector = ({
         >
           <SelectTrigger id={id} className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" />
           <SelectContent
-            className="select-content max-h-[300px] overflow-auto bg-white z-50"
+            className="select-content max-h-[300px] overflow-auto bg-white z-50 shadow-lg"
             position="popper"
             sideOffset={5}
           >

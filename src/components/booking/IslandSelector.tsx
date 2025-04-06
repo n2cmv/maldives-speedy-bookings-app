@@ -29,7 +29,7 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
   const { t } = useTranslation();
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 relative">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
@@ -50,7 +50,11 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
             id={id} 
             className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" 
           />
-          <SelectContent className="select-content">
+          <SelectContent 
+            className="select-content z-50 bg-white shadow-lg"
+            position="popper"
+            sideOffset={5}
+          >
             {isLoading ? (
               <SelectItem value="loading">Loading...</SelectItem>
             ) : (

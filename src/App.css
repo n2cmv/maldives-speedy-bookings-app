@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +40,53 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Fix for layout shifts */
+html {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Prevent layout shifts for selectors */
+.select-content {
+  position: absolute;
+  width: auto !important;
+}
+
+/* Force hardware acceleration for smoother transitions */
+header, 
+.passenger-picker,
+.select-content {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.passenger-picker {
+  position: relative;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  height: 3.5rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out;
+}
+
+.passenger-picker:hover {
+  border-color: #a5b4fc;
+}
+
+.passenger-picker:focus-within {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
 }

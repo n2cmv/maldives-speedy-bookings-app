@@ -12,7 +12,6 @@ import BookingFormFooter from "./forms/BookingFormFooter";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
-  preSelectedFrom?: string; // We'll keep this to avoid interface changes but won't use it
   islandNames: string[];
   isLoading: boolean;
   timeRestrictions: Record<string, Time[]>;
@@ -73,7 +72,7 @@ const BookingForm = ({
   }, [externalIsLoading, routesLoading]);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 w-full isolate">
       <ReturnTripSwitch
         isReturnTrip={booking.returnTrip}
         onReturnTripChange={handleReturnToggle}
