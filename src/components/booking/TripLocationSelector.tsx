@@ -1,7 +1,8 @@
 
 import { useTranslation } from "react-i18next";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, Navigation, RotateCw } from "lucide-react";
 import IslandSelector from "./IslandSelector";
+import { Button } from "@/components/ui/button";
 
 interface TripLocationSelectorProps {
   fromLocation: string;
@@ -11,6 +12,7 @@ interface TripLocationSelectorProps {
   isLoading: boolean;
   onFromChange: (value: string) => void;
   onToChange: (value: string) => void;
+  onSwitchRoutes: () => void;
 }
 
 const TripLocationSelector = ({
@@ -20,7 +22,8 @@ const TripLocationSelector = ({
   toLocations,
   isLoading,
   onFromChange,
-  onToChange
+  onToChange,
+  onSwitchRoutes
 }: TripLocationSelectorProps) => {
   const { t } = useTranslation();
   
@@ -28,7 +31,7 @@ const TripLocationSelector = ({
   const filteredToLocations = toLocations.filter(island => island !== fromLocation);
   
   return (
-    <>
+    <div className="relative">
       <IslandSelector
         label={t("booking.form.from", "From")}
         icon={<Navigation className="h-5 w-5 text-ocean mr-2" />}
@@ -47,6 +50,22 @@ const TripLocationSelector = ({
         id="from-select"
       />
       
+      {/* Switch Routes Button - Only show when both selections are made */}
+      {fromLocation && toLocation && (
+        <div className="flex justify-center my-2">
+          <Button 
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={onSwitchRoutes}
+            className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark"
+            title={t("booking.form.switchRoutes", "Switch routes")}
+          >
+            <RotateCw className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      
       <IslandSelector
         label={t("booking.form.destinationIsland", "Destination Island")}
         icon={<MapPin className="h-5 w-5 text-ocean mr-2" />}
@@ -56,7 +75,7 @@ const TripLocationSelector = ({
         isLoading={isLoading}
         id="island-select"
       />
-    </>
+    </div>
   );
 };
 
