@@ -15,7 +15,7 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main className="pt-16">
+        <main className="pt-24 md:pt-16">
           <WelcomeSection />
         </main>
       </div>
