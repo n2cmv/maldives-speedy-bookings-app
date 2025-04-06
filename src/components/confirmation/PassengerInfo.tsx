@@ -1,11 +1,11 @@
 
 import { Users } from "lucide-react";
-import { Passenger } from "@/types/booking";
+import { PassengerInfo as PassengerInfoType } from "@/types/booking";
 import { useTranslation } from "react-i18next";
 
 interface PassengerInfoProps {
   seats: number;
-  passengers?: Passenger[];
+  passengers?: PassengerInfoType[];
 }
 
 const PassengerInfo = ({ seats, passengers }: PassengerInfoProps) => {

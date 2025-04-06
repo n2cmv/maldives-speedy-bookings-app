@@ -2,13 +2,12 @@
 import { useLocation } from "react-router-dom";
 import BookingSection from "@/components/booking/BookingSection";
 import Header from "@/components/Header";
-import { Island } from "@/types/island";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
 
 const BookingForm = () => {
   const location = useLocation();
-  const preSelectedIsland = location.state?.island as Island | undefined;
+  const preSelectedIsland = location.state?.island as string | undefined;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">

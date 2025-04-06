@@ -28,7 +28,13 @@ export type PassengerInfo = {
   nationality?: string;
   idNumber?: string;
   id: string;
+  type?: 'adult' | 'child' | 'senior';
+  passport?: string;
+  countryCode?: string;
 };
+
+// Alias for backward compatibility
+export type Passenger = PassengerInfo;
 
 export interface BookingInfo {
   from: string;
@@ -48,6 +54,16 @@ export interface BookingInfo {
   passengers?: PassengerInfo[];
   paymentComplete?: boolean;
   paymentReference?: string;
+}
+
+// For backward compatibility with components that expect this type
+export type TripDetails = {
+  from: string;
+  to: string;
+  time: string;
+  date?: Date;
+  isOutbound?: boolean;
+  isReturn?: boolean;
 }
 
 export interface Island {

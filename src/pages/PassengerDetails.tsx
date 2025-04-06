@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BookingInfo, Passenger } from "@/types/booking";
+import { BookingInfo, PassengerInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import TripSummaryCard from "@/components/TripSummaryCard";
 import PassengerForm from "@/components/PassengerForm";
@@ -16,7 +16,7 @@ const PassengerDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
-  const [passengers, setPassengers] = useState<Passenger[]>([]);
+  const [passengers, setPassengers] = useState<PassengerInfo[]>([]);
   
   // Initialize from location state
   useEffect(() => {
@@ -30,13 +30,13 @@ const PassengerDetails = () => {
     
     // Initialize passenger list based on counts
     if (booking.passengerCounts) {
-      const initialPassengers: Passenger[] = [];
+      const initialPassengers: PassengerInfo[] = [];
       let id = 1;
       
       // Add adults
       for (let i = 0; i < booking.passengerCounts.adults; i++) {
         initialPassengers.push({
-          id,
+          id: String(id),
           name: "",
           email: "",
           phone: "",
@@ -50,7 +50,7 @@ const PassengerDetails = () => {
       // Add children
       for (let i = 0; i < booking.passengerCounts.children; i++) {
         initialPassengers.push({
-          id,
+          id: String(id),
           name: "",
           email: "",
           phone: "",
@@ -64,7 +64,7 @@ const PassengerDetails = () => {
       // Add seniors
       for (let i = 0; i < booking.passengerCounts.seniors; i++) {
         initialPassengers.push({
-          id,
+          id: String(id),
           name: "",
           email: "",
           phone: "",

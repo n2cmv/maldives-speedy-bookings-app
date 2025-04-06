@@ -1,7 +1,6 @@
 
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Island } from "@/types/booking";
 import { useNavigate } from "react-router-dom";
 import IslandCarousel from "./IslandCarousel";
 import IslandCards from "./IslandCards";
@@ -9,7 +8,7 @@ import IslandCards from "./IslandCards";
 const WelcomeSection = () => {
   const navigate = useNavigate();
   
-  const handleSelectDestination = (island: Island) => {
+  const handleSelectDestination = (island: string) => {
     navigate("/booking", { state: { island } });
   };
 
