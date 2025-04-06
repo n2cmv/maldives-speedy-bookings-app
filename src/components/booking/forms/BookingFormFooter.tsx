@@ -15,8 +15,11 @@ const BookingFormFooter = ({ onSubmit, isDisabled = false }: BookingFormFooterPr
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       <Button 
-        type="button"
-        onClick={onSubmit}
+        type="submit"
+        onClick={(e) => {
+          e.preventDefault();
+          onSubmit(e);
+        }}
         disabled={isDisabled}
         className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium rounded-xl shadow-md transition-all duration-300"
       >

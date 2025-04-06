@@ -1,6 +1,6 @@
 
 import { useLocation } from "react-router-dom";
-import BookingSection from "@/components/BookingSection";
+import BookingSection from "@/components/booking/BookingSection";
 import Header from "@/components/Header";
 import { Island } from "@/types/booking";
 import StepIndicator from "@/components/StepIndicator";

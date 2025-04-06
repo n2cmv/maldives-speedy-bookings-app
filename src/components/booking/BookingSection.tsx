@@ -16,11 +16,13 @@ interface BookingSectionProps {
 
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [islandsData, setIslandsData] = useState<Island[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedFromIsland, setSelectedFromIsland] = useState<string>("");
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   
   const fetchIslands = async () => {
-    setIsLoading(true);
+    if (!isInitialized) setIsLoading(true);
+    
     try {
       // First get routes in the correct display order
       const { data: routesData, error: routesError } = await supabase
@@ -32,8 +34,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         console.error('Error fetching routes:', routesError);
         throw routesError;
       }
-      
-      console.log('BookingSection - Routes data with display order and timings:', routesData);
       
       // Extract unique islands from routes
       const uniqueIslands = new Set<string>();
@@ -54,8 +54,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         });
       }
       
-      console.log('BookingSection - Unique islands with order:', Array.from(islandOrder.entries()));
-      
       // Then get island details from islands table
       const { data, error } = await supabase
         .from('islands')
@@ -64,7 +62,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       
       if (error) {
         console.error('Error fetching islands:', error);
-        return;
+        throw error;
       }
       
       if (data && data.length > 0) {
@@ -85,17 +83,24 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           });
         }
         
-        console.log('BookingSection - Sorted islands:', sortedIslands.map(i => i.name));
         setIslandsData(sortedIslands);
+        setIsInitialized(true);
       }
     } catch (error) {
       console.error('Error fetching islands:', error);
+      // Use fallback islands if there's an error
+      if (!isInitialized) {
+        setIslandsData([]);
+      }
     } finally {
       setIsLoading(false);
     }
   };
   
   useEffect(() => {
+    // Initial data fetch
+    fetchIslands();
+    
     // Set up real-time subscription to listen for route changes
     const channel = supabase
       .channel('routes-changes')
@@ -112,8 +117,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         }
       )
       .subscribe();
-    
-    fetchIslands();
     
     // Clean up subscription on unmount
     return () => {
