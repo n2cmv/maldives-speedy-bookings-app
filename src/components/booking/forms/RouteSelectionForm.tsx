@@ -42,6 +42,27 @@ const RouteSelectionForm = ({
     }
   };
 
+  // Function to handle the route switch
+  const handleSwitchRoutes = () => {
+    if (booking.from && booking.island) {
+      const newFrom = booking.island;
+      const newTo = booking.from;
+      
+      onBookingChange({
+        ...booking,
+        from: newFrom,
+        island: newTo,
+        time: '', // Reset time as available times may change
+        returnTripDetails: booking.returnTrip ? {
+          ...booking.returnTripDetails!,
+          from: newTo,
+          island: newFrom,
+          time: ''
+        } : undefined
+      });
+    }
+  };
+
   return (
     <TripLocationSelector
       fromLocation={booking.from}
@@ -59,6 +80,7 @@ const RouteSelectionForm = ({
         });
       }}
       onToChange={handleSelectDestination}
+      onSwitchRoutes={handleSwitchRoutes}
     />
   );
 };

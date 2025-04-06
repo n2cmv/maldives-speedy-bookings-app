@@ -16,16 +16,14 @@ const PopularDestinations = ({ onSelectFromIsland }: PopularDestinationsProps) =
 
   return (
     <div className="mt-4 mb-6">
-      <p className="text-lg font-medium text-ocean-dark dark:text-white/90 mb-4 text-center">Popular Islands</p>
+      <p className="text-lg font-medium text-ocean-dark mb-4 text-center">Popular Islands</p>
       <div className="flex flex-wrap justify-center gap-3">
         {popularIslands.map((island) => (
           <Button
             key={island.name}
             variant="outline"
             size="sm"
-            className="bg-white dark:bg-gray-800 text-ocean-dark dark:text-white/90 border-ocean-light/30 
-                      hover:bg-ocean/5 dark:hover:bg-ocean/10 rounded-full pl-3 pr-4 py-5 flex gap-2 
-                      items-center font-medium transition-all shadow-sm"
+            className="bg-white text-ocean-dark border-ocean-light/30 hover:bg-ocean/5 rounded-full pl-3 pr-4 py-5 flex gap-2 items-center font-medium transition-all"
             onClick={() => onSelectFromIsland(island.name)}
           >
             {island.icon}

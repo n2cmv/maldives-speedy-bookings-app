@@ -52,10 +52,6 @@ body {
   width: 100%;
   overflow-x: hidden;
   position: relative;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Prevent layout shifts for selectors */
@@ -76,112 +72,21 @@ header,
   position: relative;
   background-color: white;
   border: 1px solid #e5e7eb;
-  border-radius: 1rem;
+  border-radius: 0.375rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
   height: 3.5rem;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.dark .passenger-picker {
-  background-color: #1f2937;
-  border-color: #374151;
+  transition: border-color 0.15s ease-in-out;
 }
 
 .passenger-picker:hover {
-  border-color: #0AB3B8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-}
-
-.dark .passenger-picker:hover {
-  border-color: #0AB3B8;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2);
+  border-color: #a5b4fc;
 }
 
 .passenger-picker:focus-within {
-  outline: 2px solid #0AB3B8;
+  outline: 2px solid #6366f1;
   outline-offset: 2px;
-}
-
-/* Apple-inspired inputs */
-input, select, textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
-
-/* Apple-inspired focus states */
-button:focus, 
-input:focus, 
-select:focus, 
-textarea:focus {
-  outline: 2px solid rgba(10, 179, 184, 0.5);
-  outline-offset: 2px;
-}
-
-/* Improve button press feedback */
-button:active {
-  transform: scale(0.97);
-}
-
-/* Apple-inspired card styles */
-.apple-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
-}
-
-.dark .apple-card {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-}
-
-.apple-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-/* Apple-inspired toggle switch */
-.apple-toggle {
-  width: 50px;
-  height: 28px;
-  background: rgba(0, 0, 0, 0.1);
-  display: flex;
-  border-radius: 50px;
-  align-items: center;
-  cursor: pointer;
-  padding: 2px;
-  transition: all 0.3s ease;
-}
-
-.dark .apple-toggle {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.apple-toggle-circle {
-  width: 24px;
-  height: 24px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dark .apple-toggle-circle {
-  transform: translateX(22px);
 }
