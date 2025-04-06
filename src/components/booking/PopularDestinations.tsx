@@ -7,8 +7,8 @@ interface PopularDestinationsProps {
 
 const PopularDestinations = ({ onSelectFromIsland }: PopularDestinationsProps) => {
   const popularIslands = [
-    "A.Dh Dhigurah",
-    "A.Dh Dhangethi",
+    "Dhigurah",
+    "Dhangethi",
     "Male' City"
   ];
 
