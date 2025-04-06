@@ -27,7 +27,7 @@ export type PassengerInfo = {
   age?: number;
   nationality?: string;
   idNumber?: string;
-  id: string;
+  id: string | number;
   type?: 'adult' | 'child' | 'senior';
   passport?: string;
   countryCode?: string;

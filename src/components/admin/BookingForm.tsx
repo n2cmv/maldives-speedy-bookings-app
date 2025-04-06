@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,8 +55,8 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const [departureTime, setDepartureTime] = useState<Time | ''>(
     booking?.departure_time || ''
   );
-  const [passengerCount, setPassengerCount] = useState(
-    booking?.passenger_count || 1
+  const [passengerCount, setPassengerCount] = useState<number>(
+    booking?.passenger_count ? Number(booking.passenger_count) : 1
   );
   const [userEmail, setUserEmail] = useState(booking?.user_email || '');
   const [hasReturnTrip, setHasReturnTrip] = useState(Boolean(booking?.return_trip));
@@ -82,7 +81,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const [passengers, setPassengers] = useState<Passenger[]>(
     booking?.passenger_info || [
       {
-        id: 1,
+        id: "1",
         name: '',
         email: '',
         phone: '',
@@ -95,7 +94,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
 
   const handleAddPassenger = () => {
     const newPassenger: Passenger = {
-      id: passengers.length + 1,
+      id: String(passengers.length + 1),
       name: '',
       email: '',
       phone: '',
@@ -107,13 +106,13 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setPassengerCount(passengerCount + 1);
   };
 
-  const handleRemovePassenger = (id: number) => {
+  const handleRemovePassenger = (id: string | number) => {
     const updatedPassengers = passengers.filter(p => p.id !== id);
     setPassengers(updatedPassengers);
     setPassengerCount(updatedPassengers.length);
   };
 
-  const handlePassengerChange = (id: number, field: keyof Passenger, value: any) => {
+  const handlePassengerChange = (id: string | number, field: keyof Passenger, value: any) => {
     setPassengers(passengers.map(p => 
       p.id === id ? { ...p, [field]: value } : p
     ));
@@ -143,7 +142,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
     setIsLoading(true);
 
     try {
-      // Convert passenger info to a format that can be stored as Json
       const passengerInfoAsJson: Json = JSON.parse(JSON.stringify(passengers));
 
       const bookingData = {
@@ -164,7 +162,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
       };
 
       if (booking) {
-        // Update existing booking
         const { error } = await supabase
           .from('bookings')
           .update(bookingData)
@@ -177,7 +174,6 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
           description: "Booking has been updated",
         });
       } else {
-        // Create new booking
         const { error } = await supabase
           .from('bookings')
           .insert(bookingData);
@@ -452,7 +448,7 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </div>
         
         {passengers.map((passenger, index) => (
-          <div key={passenger.id} className="border p-4 rounded-md mb-4">
+          <div key={String(passenger.id)} className="border p-4 rounded-md mb-4">
             <div className="flex justify-between items-center mb-3">
               <h4 className="font-medium">Passenger {index + 1}</h4>
               {passengers.length > 1 && (
