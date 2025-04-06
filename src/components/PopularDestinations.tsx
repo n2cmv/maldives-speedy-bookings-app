@@ -12,8 +12,8 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
   const [popularIslands, setPopularIslands] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Map for translating between display names and actual locations
-  const islandMappings: Record<string, string> = {
+  // Display names for popular islands (what's shown in the UI)
+  const displayNames = {
     "A.Dh Dhigurah": "A.Dh Dhigurah",
     "A.Dh Dhangethi": "A.Dh Dhangethi",
     "Male": "Male' City"
@@ -78,11 +78,12 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
             size="sm"
             className="flex items-center gap-1.5 bg-white border-primary/30 hover:bg-white hover:border-primary hover:text-primary"
             onClick={() => {
-              console.log("Popular island selected:", dest.name);
-              // Map to the correct island name if needed
-              const mappedName = islandMappings[dest.name] || dest.name;
-              console.log("Mapped to:", mappedName);
-              onSelectDestination(mappedName);
+              const displayName = dest.name;
+              console.log("Popular island selected:", displayName);
+              // Map the display name to the correct island name in the database
+              const actualIsland = displayNames[displayName as keyof typeof displayNames] || displayName;
+              console.log("Mapped to:", actualIsland);
+              onSelectDestination(actualIsland);
             }}
           >
             {dest.icon}

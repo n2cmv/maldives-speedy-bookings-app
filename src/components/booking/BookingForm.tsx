@@ -63,13 +63,20 @@ const BookingForm = ({
   useEffect(() => {
     if (preSelectedFrom && preSelectedFrom !== prevPreSelectedFrom.current) {
       console.log("BookingForm - Updating 'from' due to prop change:", preSelectedFrom);
-      setBooking(prev => ({
-        ...prev,
-        from: preSelectedFrom
-      }));
+      
+      // Only update the from location if it's different to avoid loops
+      if (booking.from !== preSelectedFrom) {
+        setBooking(prev => ({
+          ...prev,
+          from: preSelectedFrom,
+          // Reset the island selection if needed
+          island: preSelectedFrom === prev.island ? '' : prev.island
+        }));
+      }
+      
       prevPreSelectedFrom.current = preSelectedFrom;
     }
-  }, [preSelectedFrom]);
+  }, [preSelectedFrom, booking.from]);
   
   // Date state
   const today = new Date();
