@@ -30,19 +30,9 @@ const RouteSelectionForm = ({
     }
   };
 
-  // Function to handle the route switch
+  // This function is kept for interface compatibility but isn't used anymore
   const handleSwitchRoutes = () => {
-    if (booking.from && booking.island) {
-      const newFrom = booking.island;
-      const newTo = booking.from;
-      
-      onBookingChange({
-        ...booking,
-        from: newFrom,
-        island: newTo,
-        time: '' // Reset time as available times may change
-      });
-    }
+    // No longer implemented
   };
 
   return (

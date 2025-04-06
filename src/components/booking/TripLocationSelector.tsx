@@ -1,8 +1,7 @@
 
 import { useTranslation } from "react-i18next";
-import { MapPin, Navigation, RotateCw } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import IslandSelector from "./IslandSelector";
-import { Button } from "@/components/ui/button";
 
 interface TripLocationSelectorProps {
   fromLocation: string;
@@ -49,22 +48,6 @@ const TripLocationSelector = ({
         isLoading={isLoading}
         id="from-select"
       />
-      
-      {/* Switch Routes Button - Only show when both selections are made */}
-      {fromLocation && toLocation && (
-        <div className="flex justify-center my-0">
-          <Button 
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={onSwitchRoutes}
-            className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark h-6 w-6 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
-            title={t("booking.form.switchRoutes", "Switch routes")}
-          >
-            <RotateCw className="h-3 w-3" />
-          </Button>
-        </div>
-      )}
       
       <IslandSelector
         label={t("booking.form.destinationIsland", "Destination Island")}
