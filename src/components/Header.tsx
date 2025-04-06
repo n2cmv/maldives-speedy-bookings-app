@@ -1,7 +1,8 @@
 
-import { Ship } from "lucide-react";
+import { Ship, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 
 const Header = () => {
   const { t } = useTranslation();
@@ -17,12 +18,13 @@ const Header = () => {
             {t("app.name", "Retour")}
           </span>
         </Link>
-        <nav className="flex items-center space-x-6">
-          <Link to="/booking" className="text-ocean-dark hover:text-ocean transition-colors font-medium">
+        <nav className="flex items-center space-x-4">
+          <Link to="/booking" className="inline-flex items-center gap-2 bg-ocean hover:bg-ocean-dark text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
             {t("common.bookNow", "Book Now")}
           </Link>
-          <Link to="/my-bookings" className="text-ocean-dark hover:text-ocean transition-colors font-medium">
-            {t("common.myBookings", "My Bookings")}
+          <Link to="/my-bookings" className="flex items-center space-x-1 text-ocean-dark hover:text-ocean transition-colors font-medium">
+            <Calendar className="h-5 w-5" />
+            <span>{t("common.myBookings", "My Bookings")}</span>
           </Link>
         </nav>
       </div>

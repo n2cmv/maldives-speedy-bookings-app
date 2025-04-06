@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Ship } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/ui/use-theme";
 import LanguageSwitcher from "./LanguageSwitcher";
 import SavedBookings from "./SavedBookings";
@@ -13,11 +13,6 @@ const HeaderExtras = () => {
     <div className="flex space-x-2">
       <LanguageSwitcher />
       <SavedBookings />
-      <Link to="/my-bookings">
-        <Button variant="ghost" size="icon" title="My Bookings">
-          <Ship className="h-5 w-5" />
-        </Button>
-      </Link>
       <Button
         variant="ghost"
         size="icon"
