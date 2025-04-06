@@ -50,11 +50,11 @@ const RouteSelectionForm = ({
       const toLocation = booking.island;
       
       // Create new booking object with swapped routes and reset time selection
-      const updatedBooking = {
+      const updatedBooking: BookingInfo = {
         ...booking,
         from: toLocation,
         island: fromLocation,
-        time: '', // Reset time as available times may change
+        time: '' as '', // Explicitly type the empty string as a valid Time value
       };
       
       // If there's a return trip, swap those routes too
@@ -63,7 +63,7 @@ const RouteSelectionForm = ({
           ...booking.returnTripDetails,
           from: fromLocation,
           island: toLocation,
-          time: '' // Reset return time as well
+          time: '' as '', // Explicitly type the empty string as a valid Time value
         };
       }
       
@@ -91,7 +91,7 @@ const RouteSelectionForm = ({
           ...booking, 
           from: value,
           island: value === booking.island ? '' : booking.island,
-          time: '' // Reset time as available times may change
+          time: '' as '' // Explicitly type as empty string
         });
       }}
       onToChange={handleSelectDestination}
