@@ -12,6 +12,7 @@ import BookingFormFooter from "./forms/BookingFormFooter";
 
 interface BookingFormProps {
   preSelectedIsland?: string;
+  preSelectedFrom?: string;
   islandNames: string[];
   isLoading: boolean;
   timeRestrictions: Record<string, Time[]>;
@@ -22,6 +23,7 @@ const MAX_PASSENGERS = 15;
 
 const BookingForm = ({
   preSelectedIsland,
+  preSelectedFrom,
   islandNames,
   isLoading: externalIsLoading,
   timeRestrictions,
@@ -70,6 +72,18 @@ const BookingForm = ({
   useEffect(() => {
     setIsLoading(externalIsLoading || routesLoading);
   }, [externalIsLoading, routesLoading]);
+
+  // Update from location when preSelectedFrom changes
+  useEffect(() => {
+    if (preSelectedFrom && preSelectedFrom !== booking.from) {
+      setBooking(prev => ({
+        ...prev,
+        from: preSelectedFrom,
+        // Clear destination if it's the same as the from location
+        island: preSelectedFrom === prev.island ? '' : prev.island
+      }));
+    }
+  }, [preSelectedFrom, setBooking]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full isolate">
