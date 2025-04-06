@@ -42,23 +42,38 @@ const RouteSelectionForm = ({
     }
   };
 
-  // Function to handle the route switch
+  // Improved function to handle the route switch with validation
   const handleSwitchRoutes = () => {
     if (booking.from && booking.island) {
-      const newFrom = booking.island;
-      const newTo = booking.from;
+      // Store current values
+      const fromLocation = booking.from;
+      const toLocation = booking.island;
       
-      onBookingChange({
+      // Create new booking object with swapped routes and reset time selection
+      const updatedBooking = {
         ...booking,
-        from: newFrom,
-        island: newTo,
+        from: toLocation,
+        island: fromLocation,
         time: '', // Reset time as available times may change
-        returnTripDetails: booking.returnTrip ? {
-          ...booking.returnTripDetails!,
-          from: newTo,
-          island: newFrom,
-          time: ''
-        } : undefined
+      };
+      
+      // If there's a return trip, swap those routes too
+      if (booking.returnTrip && booking.returnTripDetails) {
+        updatedBooking.returnTripDetails = {
+          ...booking.returnTripDetails,
+          from: fromLocation,
+          island: toLocation,
+          time: '' // Reset return time as well
+        };
+      }
+      
+      // Apply the changes
+      onBookingChange(updatedBooking);
+      
+      // Show a toast notification to confirm the switch
+      toast({
+        title: t("booking.form.routesSwitched", "Routes Switched"),
+        description: t("booking.form.routesSwitchedDescription", "Departure and destination have been switched."),
       });
     }
   };
