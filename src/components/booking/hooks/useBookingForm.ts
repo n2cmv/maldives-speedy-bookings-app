@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -33,27 +32,41 @@ export const useBookingForm = ({
     returnTrip: false
   });
 
-  // Using useRef for tracking previous props
+  // Using useRef for tracking previous props to avoid infinite loops
   const prevPreSelectedFrom = useRef<string | undefined>(preSelectedFrom);
+  const prevPreSelectedIsland = useRef<string | undefined>(preSelectedIsland);
 
   // Update booking when preSelectedFrom changes
   useEffect(() => {
     if (preSelectedFrom && preSelectedFrom !== prevPreSelectedFrom.current) {
       console.log("BookingForm - Updating 'from' due to prop change:", preSelectedFrom);
       
-      // Only update the from location if it's different to avoid loops
-      if (booking.from !== preSelectedFrom) {
-        setBooking(prev => ({
-          ...prev,
-          from: preSelectedFrom,
-          // Reset the island selection if needed
-          island: preSelectedFrom === prev.island ? '' : prev.island
-        }));
-      }
+      setBooking(prev => ({
+        ...prev,
+        from: preSelectedFrom,
+        // Keep the island selection if it doesn't match the new from location
+        island: preSelectedFrom === prev.island ? '' : prev.island
+      }));
       
       prevPreSelectedFrom.current = preSelectedFrom;
     }
-  }, [preSelectedFrom, booking.from]);
+  }, [preSelectedFrom]);
+  
+  // Update booking when preSelectedIsland changes
+  useEffect(() => {
+    if (preSelectedIsland && preSelectedIsland !== prevPreSelectedIsland.current) {
+      console.log("BookingForm - Updating 'island' due to prop change:", preSelectedIsland);
+      
+      setBooking(prev => ({
+        ...prev,
+        island: preSelectedIsland,
+        // Keep the from selection if it doesn't match the new island
+        from: preSelectedIsland === prev.from ? '' : prev.from
+      }));
+      
+      prevPreSelectedIsland.current = preSelectedIsland;
+    }
+  }, [preSelectedIsland]);
   
   // Date state
   const today = new Date();
