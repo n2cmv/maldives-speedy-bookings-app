@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookingInfo, Passenger } from "@/types/booking";
+import { BookingInfo, PassengerInfo } from "@/types/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import PassengerFormItem from "./PassengerFormItem";
@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next";
 
 interface PassengerFormProps {
   bookingInfo: BookingInfo;
-  passengers: Passenger[];
-  setPassengers: React.Dispatch<React.SetStateAction<Passenger[]>>;
+  passengers: PassengerInfo[];
+  setPassengers: React.Dispatch<React.SetStateAction<PassengerInfo[]>>;
 }
 
 const MAX_PASSENGERS = 15;
@@ -24,7 +24,7 @@ const PassengerForm = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   
-  const handlePassengerChange = (id: number, field: keyof Passenger, value: string) => {
+  const handlePassengerChange = (id: string, field: keyof PassengerInfo, value: string) => {
     setPassengers(prevPassengers => 
       prevPassengers.map(passenger => 
         passenger.id === id ? { ...passenger, [field]: value } : passenger
@@ -32,7 +32,7 @@ const PassengerForm = ({
     );
   };
   
-  const handleRemovePassenger = (id: number) => {
+  const handleRemovePassenger = (id: string) => {
     setPassengers(prevPassengers => prevPassengers.filter(passenger => passenger.id !== id));
   };
   
@@ -46,7 +46,7 @@ const PassengerForm = ({
       return;
     }
     
-    const newId = Math.max(...passengers.map(p => p.id), 0) + 1;
+    const newId = String(Math.max(...passengers.map(p => parseInt(p.id)), 0) + 1);
     setPassengers(prevPassengers => [
       ...prevPassengers, 
       {

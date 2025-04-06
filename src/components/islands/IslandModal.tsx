@@ -8,11 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { Island } from "@/types/booking";
 import IslandDetails from "./IslandDetails";
 
 interface IslandModalProps {
-  islandName: Island | '';
+  islandName: string | '';
   isOpen: boolean;
   onClose: () => void;
 }
@@ -32,7 +31,7 @@ const IslandModal = ({ islandName, isOpen, onClose }: IslandModalProps) => {
           </DialogClose>
         </DialogHeader>
         <div className="mt-2">
-          <IslandDetails islandName={islandName as Island} />
+          <IslandDetails islandName={islandName} />
         </div>
       </DialogContent>
     </Dialog>

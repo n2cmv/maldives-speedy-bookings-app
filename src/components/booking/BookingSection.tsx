@@ -1,12 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
 import { Time } from "@/types/booking";
 import { toast } from "sonner";
-import { allTimes, fallbackIslands } from "./booking/constants";
-import BookingForm from "./booking/BookingForm";
-import { Card } from "./ui/card";
-import PopularDestinations from "./booking/PopularDestinations";
+import { allTimes, fallbackIslands } from "./constants";
+import BookingForm from "./BookingForm";
+import { Card } from "@/components/ui/card";
+import PopularDestinations from "./PopularDestinations";
+import { motion } from "framer-motion";
 
 interface BookingSectionProps {
   preSelectedIsland?: string;
@@ -14,11 +16,13 @@ interface BookingSectionProps {
 
 const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const [islandsData, setIslandsData] = useState<Island[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedFromIsland, setSelectedFromIsland] = useState<string>("");
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   
   const fetchIslands = async () => {
-    setIsLoading(true);
+    if (!isInitialized) setIsLoading(true);
+    
     try {
       // First get routes in the correct display order
       const { data: routesData, error: routesError } = await supabase
@@ -31,13 +35,14 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
         throw routesError;
       }
       
-      console.log('BookingSection - Routes data with display order and timings:', routesData);
+      // Log for debugging
+      console.log("Routes data fetched:", routesData ? routesData.length : 0, "routes");
       
       // Extract unique islands from routes
       const uniqueIslands = new Set<string>();
       const islandOrder = new Map<string, number>();
       
-      if (routesData) {
+      if (routesData && routesData.length > 0) {
         routesData.forEach(route => {
           if (!islandOrder.has(route.from_location)) {
             islandOrder.set(route.from_location, route.display_order || 0);
@@ -50,9 +55,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           uniqueIslands.add(route.from_location);
           uniqueIslands.add(route.to_location);
         });
+        
+        console.log("Unique islands from routes:", Array.from(uniqueIslands));
+      } else {
+        console.log("No routes data found or empty array");
       }
-      
-      console.log('BookingSection - Unique islands with order:', Array.from(islandOrder.entries()));
       
       // Then get island details from islands table
       const { data, error } = await supabase
@@ -62,8 +69,10 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       
       if (error) {
         console.error('Error fetching islands:', error);
-        return;
+        throw error;
       }
+      
+      console.log("Islands data fetched:", data ? data.length : 0, "islands");
       
       if (data && data.length > 0) {
         // Sort islands according to route display order if possible
@@ -83,17 +92,26 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           });
         }
         
-        console.log('BookingSection - Sorted islands:', sortedIslands.map(i => i.name));
+        console.log("Sorted islands for display:", sortedIslands.map(i => i.name));
         setIslandsData(sortedIslands);
+        setIsInitialized(true);
+      } else {
+        console.log("No island data found or empty array, using fallback");
+        setIslandsData([]);
       }
     } catch (error) {
       console.error('Error fetching islands:', error);
+      // Use fallback islands if there's an error
+      setIslandsData([]);
     } finally {
       setIsLoading(false);
     }
   };
   
   useEffect(() => {
+    // Initial data fetch
+    fetchIslands();
+    
     // Set up real-time subscription to listen for route changes
     const channel = supabase
       .channel('routes-changes')
@@ -111,8 +129,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       )
       .subscribe();
     
-    fetchIslands();
-    
     // Clean up subscription on unmount
     return () => {
       supabase.removeChannel(channel);
@@ -123,6 +139,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     ? islandsData.map(island => island.name) 
     : fallbackIslands;
 
+  console.log("Island names available for selection:", islandNames);
+
   const validatedAllTimes = Object.values(Time);
   
   const handleSelectFromIsland = (island: string) => {
@@ -132,22 +150,32 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   return (
     <div className="min-h-screen pb-16 px-4">
       <div className="max-w-lg mx-auto">
-        <Card className="p-6 md:p-8 shadow-xl bg-white/95 dark:bg-gray-800/90 backdrop-blur-md border border-ocean/10 dark:border-ocean/5 rounded-2xl">
-          <h2 className="text-2xl font-bold text-ocean-dark dark:text-white mb-6 text-center">Book Your Speedboat</h2>
-          
-          <PopularDestinations onSelectFromIsland={handleSelectFromIsland} />
-          
-          <div className="mt-6">
-            <BookingForm 
-              preSelectedIsland={preSelectedIsland}
-              preSelectedFrom={selectedFromIsland}
-              islandNames={islandNames}
-              isLoading={isLoading}
-              timeRestrictions={{}}
-              allTimes={validatedAllTimes}
-            />
-          </div>
-        </Card>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 100,
+            damping: 20
+          }}
+        >
+          <Card className="p-6 md:p-8 shadow-xl bg-white/95 dark:bg-gray-800/90 backdrop-blur-md border border-ocean/10 dark:border-ocean/5 rounded-2xl apple-card">
+            <h2 className="text-2xl font-bold text-ocean-dark dark:text-white mb-6 text-center">Book Your Speedboat</h2>
+            
+            <PopularDestinations onSelectFromIsland={handleSelectFromIsland} />
+            
+            <div className="mt-6">
+              <BookingForm 
+                preSelectedIsland={preSelectedIsland}
+                preSelectedFrom={selectedFromIsland}
+                islandNames={islandNames}
+                isLoading={isLoading}
+                timeRestrictions={{}}
+                allTimes={validatedAllTimes}
+              />
+            </div>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

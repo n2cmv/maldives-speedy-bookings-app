@@ -33,7 +33,7 @@
     --input: 200 76% 90%;
     --ring: 184 91% 38%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -43,6 +43,44 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  
+  .dark {
+    --background: 200 64% 8%;
+    --foreground: 200 10% 90%;
+    
+    --card: 200 30% 15%;
+    --card-foreground: 200 10% 90%;
+    
+    --popover: 200 30% 15%;
+    --popover-foreground: 200 10% 90%;
+    
+    --primary: 184 70% 30%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 200 76% 20%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 200 20% 20%;
+    --muted-foreground: 200 10% 70%;
+    
+    --accent: 200 20% 30%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 84.2% 50.2%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 200 20% 25%;
+    --input: 200 20% 20%;
+    --ring: 184 70% 30%;
+    
+    --sidebar-background: 200 30% 14%;
+    --sidebar-foreground: 200 10% 80%;
+    --sidebar-primary: 200 10% 70%;
+    --sidebar-primary-foreground: 200 30% 10%;
+    --sidebar-accent: 200 20% 20%;
+    --sidebar-accent-foreground: 200 10% 80%;
+    --sidebar-border: 200 20% 25%;
   }
 }
 
@@ -56,58 +94,83 @@
     background-image: linear-gradient(to bottom right, rgba(10, 179, 184, 0.1), rgba(0, 92, 153, 0.1));
     background-attachment: fixed;
   }
+  
+  .dark body {
+    background-image: linear-gradient(to bottom right, rgba(10, 100, 130, 0.2), rgba(0, 30, 60, 0.2));
+  }
 }
 
 @layer components {
   .booking-card {
-    @apply bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg p-6;
+    @apply bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-80 backdrop-blur-sm rounded-xl shadow-lg p-6;
   }
   
   .ocean-button {
-    @apply bg-ocean text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-ocean-dark transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ocean focus:ring-opacity-50;
+    @apply bg-ocean dark:bg-ocean/90 text-white font-medium py-2 px-4 rounded-full shadow-md 
+           hover:bg-ocean-dark dark:hover:bg-ocean-dark/90 transition-all duration-300 
+           focus:outline-none focus:ring-2 focus:ring-ocean focus:ring-opacity-50;
   }
   
   .form-input {
-    @apply w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent transition-all duration-300;
+    @apply w-full border border-gray-300 dark:border-gray-600 rounded-xl p-3 bg-white dark:bg-gray-800
+           focus:outline-none focus:ring-2 focus:ring-ocean dark:focus:ring-ocean/70 focus:border-transparent transition-all duration-300;
   }
   
   .select-content {
-    @apply bg-white border border-ocean/20 rounded-lg shadow-md p-1 z-50;
+    @apply bg-white dark:bg-gray-800 border border-ocean/20 dark:border-ocean/10 rounded-xl shadow-md p-1 z-50;
   }
   
   .select-item {
-    @apply py-3 px-4 rounded-md cursor-pointer text-base flex items-center;
-    @apply hover:bg-ocean/20 hover:text-ocean-dark transition-colors;
-    @apply data-[highlighted]:bg-ocean/30 data-[highlighted]:text-ocean-dark;
-    @apply focus:bg-ocean/20 focus:text-ocean-dark outline-none;
-    @apply data-[state=checked]:bg-ocean/30 data-[state=checked]:text-ocean-dark;
+    @apply py-3 px-4 rounded-lg cursor-pointer text-base flex items-center;
+    @apply hover:bg-ocean/20 dark:hover:bg-ocean/30 hover:text-ocean-dark dark:hover:text-ocean-light transition-colors;
+    @apply data-[highlighted]:bg-ocean/30 data-[highlighted]:text-ocean-dark dark:data-[highlighted]:text-ocean-light;
+    @apply focus:bg-ocean/20 focus:text-ocean-dark dark:focus:text-ocean-light outline-none;
+    @apply data-[state=checked]:bg-ocean/30 data-[state=checked]:text-ocean-dark dark:data-[state=checked]:text-ocean-light;
   }
   
   .booking-select-trigger {
-    @apply h-[60px] w-full border border-gray-300 rounded-[0.5rem] bg-white transition-all duration-200;
-    @apply hover:border-ocean hover:bg-white hover:text-ocean;
+    @apply h-[60px] w-full border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 transition-all duration-200;
+    @apply hover:border-ocean hover:bg-white dark:hover:bg-gray-700 hover:text-ocean dark:hover:text-ocean-light;
     @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
   }
   
   .passenger-button {
     @apply w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200;
-    @apply border border-gray-200 hover:border-ocean hover:bg-ocean/10 hover:text-ocean;
+    @apply border border-gray-200 dark:border-gray-600 hover:border-ocean hover:bg-ocean/10 hover:text-ocean 
+           dark:hover:border-ocean/70 dark:hover:bg-ocean/20 dark:hover:text-ocean-light;
   }
   
   .custom-select-trigger {
-    @apply flex h-[60px] w-full items-center justify-between pl-3 pr-3 rounded-[0.5rem] border border-gray-300 bg-white text-base;
-    @apply hover:border-ocean hover:bg-white hover:text-ocean transition-colors;
+    @apply flex h-[60px] w-full items-center justify-between pl-3 pr-3 rounded-xl border border-gray-300 dark:border-gray-600 
+           bg-white dark:bg-gray-800 text-base;
+    @apply hover:border-ocean hover:bg-white dark:hover:bg-gray-700 hover:text-ocean dark:hover:text-ocean-light transition-colors;
     @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
-    @apply data-[placeholder]:text-gray-500;
+    @apply data-[placeholder]:text-gray-500 dark:data-[placeholder]:text-gray-400;
   }
   
   .custom-dropdown {
-    @apply mt-1 w-full bg-white border border-ocean/20 rounded-lg shadow-lg p-3 z-[100];
+    @apply mt-1 w-full bg-white dark:bg-gray-800 border border-ocean/20 dark:border-ocean/10 rounded-xl shadow-lg p-3 z-[100];
   }
   
   .passenger-picker {
-    @apply h-[60px] w-full border border-gray-300 rounded-[0.5rem] pl-3 pr-3 flex items-center justify-between bg-white cursor-pointer text-base;
-    @apply hover:border-ocean hover:text-ocean transition-colors;
+    @apply h-[60px] w-full border border-gray-300 dark:border-gray-600 rounded-xl pl-3 pr-3 
+           flex items-center justify-between bg-white dark:bg-gray-800 cursor-pointer text-base;
+    @apply hover:border-ocean hover:text-ocean dark:hover:border-ocean/70 dark:hover:text-ocean-light transition-colors;
     @apply focus:outline-none focus:ring-1 focus:ring-ocean focus:border-ocean;
+  }
+}
+
+@layer utilities {
+  /* Apple-inspired utilities */
+  .glassmorphism {
+    @apply backdrop-blur-md bg-white/70 dark:bg-black/40 border border-white/20 dark:border-white/10 shadow-xl;
+  }
+  
+  .soft-shadow {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+  }
+  
+  .dark .soft-shadow {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
   }
 }

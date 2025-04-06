@@ -42,40 +42,6 @@ const RouteSelectionForm = ({
     }
   };
 
-  // Simplified function to always swap routes without conditions
-  const handleSwitchRoutes = () => {
-    // Store current values
-    const fromLocation = booking.from;
-    const toLocation = booking.island;
-    
-    // Create new booking object with swapped routes and reset time selection
-    const updatedBooking: BookingInfo = {
-      ...booking,
-      from: toLocation,        // Set from to what was previously the destination
-      island: fromLocation,    // Set destination to what was previously from
-      time: '' as '',          // Reset time selection
-    };
-    
-    // If there's a return trip, swap those routes too
-    if (booking.returnTrip && booking.returnTripDetails) {
-      updatedBooking.returnTripDetails = {
-        ...booking.returnTripDetails,
-        from: fromLocation,
-        island: toLocation,
-        time: '' as '',
-      };
-    }
-    
-    // Apply the changes
-    onBookingChange(updatedBooking);
-    
-    // Show a toast notification to confirm the switch
-    toast({
-      title: t("booking.form.routesSwitched", "Routes Switched"),
-      description: t("booking.form.routesSwitchedDescription", "Departure and destination have been switched."),
-    });
-  };
-
   return (
     <TripLocationSelector
       fromLocation={booking.from}
@@ -89,11 +55,10 @@ const RouteSelectionForm = ({
           ...booking, 
           from: value,
           island: value === booking.island ? '' : booking.island,
-          time: '' as '' // Explicitly type as empty string
+          time: '' // Reset time as available times may change
         });
       }}
       onToChange={handleSelectDestination}
-      onSwitchRoutes={handleSwitchRoutes}
     />
   );
 };
