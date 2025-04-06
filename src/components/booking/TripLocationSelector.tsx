@@ -1,6 +1,6 @@
 
 import { useTranslation } from "react-i18next";
-import { MapPin, Navigation, ArrowLeftRight } from "lucide-react";
+import { MapPin, Navigation, RotateCw } from "lucide-react";
 import IslandSelector from "./IslandSelector";
 import { Button } from "@/components/ui/button";
 
@@ -50,24 +50,23 @@ const TripLocationSelector = ({
         id="from-select"
       />
       
-      {/* Switch Routes Button - Only show when both selections are made */}
-      {fromLocation && toLocation && (
-        <div className="flex justify-center my-2 relative z-10">
-          <Button 
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={(e) => {
-              e.preventDefault(); // Prevent form submission
-              onSwitchRoutes();
-            }}
-            className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark transition-all duration-300"
-            title={t("booking.form.switchRoutes", "Switch routes")}
-          >
-            <ArrowLeftRight className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
+      {/* Switch Routes Button - Always visible */}
+      <div className="flex justify-center my-2 relative z-10">
+        <Button 
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={(e) => {
+            e.preventDefault(); // Prevent form submission
+            onSwitchRoutes();
+          }}
+          className="rounded-full border-ocean text-ocean hover:bg-ocean-light/10 hover:text-ocean-dark transition-all duration-300"
+          title={t("booking.form.switchRoutes", "Switch routes")}
+          disabled={!fromLocation && !toLocation} // Only disable if both fields are empty
+        >
+          <RotateCw className="h-4 w-4" />
+        </Button>
+      </div>
       
       <IslandSelector
         label={t("booking.form.destinationIsland", "Destination Island")}
