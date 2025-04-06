@@ -1,7 +1,6 @@
 
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import PopularDestinations from "./PopularDestinations";
 import { Island } from "@/types/booking";
 import { useNavigate } from "react-router-dom";
 import IslandCarousel from "./IslandCarousel";
@@ -43,10 +42,6 @@ const WelcomeSection = () => {
       <div className="w-full max-w-6xl mx-auto mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-ocean-dark mb-8">Featured Destinations</h2>
         <IslandCards onSelectDestination={handleSelectDestination} />
-      </div>
-      
-      <div className="w-full max-w-md mx-auto">
-        <PopularDestinations onSelectDestination={handleSelectDestination} />
       </div>
       
       <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white/30 to-transparent"></div>
