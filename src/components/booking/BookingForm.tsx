@@ -66,29 +66,16 @@ const BookingForm = ({
   const isInitialMount = useRef(true);
   const prevPreSelectedFrom = useRef<string | undefined>(preSelectedFrom);
 
-  // Only update booking.from when preSelectedFrom changes (not on every render)
+  // Only update booking.from when preSelectedFrom changes directly from parent
   useEffect(() => {
-    // Skip if preSelectedFrom is undefined or empty
-    if (!preSelectedFrom) return;
-    
-    // Update only on initial mount with value or when value changes
-    if (isInitialMount.current || preSelectedFrom !== prevPreSelectedFrom.current) {
-      console.log("BookingForm - Updating 'from' to:", preSelectedFrom);
-      
-      // Only update if the new value is different from current booking.from
-      if (booking.from !== preSelectedFrom) {
-        setBooking(prev => ({
-          ...prev,
-          from: preSelectedFrom
-        }));
-      }
+    if (preSelectedFrom) {
+      console.log("BookingForm - Updating 'from' due to prop change:", preSelectedFrom);
+      setBooking(prev => ({
+        ...prev,
+        from: preSelectedFrom
+      }));
     }
-    
-    // No longer initial mount
-    isInitialMount.current = false;
-    // Store current value for next comparison
-    prevPreSelectedFrom.current = preSelectedFrom;
-  }, [preSelectedFrom, booking.from]);
+  }, [preSelectedFrom]);
   
   // Date state
   const today = new Date();

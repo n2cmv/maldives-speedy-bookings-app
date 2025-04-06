@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
@@ -49,9 +50,6 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
           
           uniqueIslands.add(route.from_location);
           uniqueIslands.add(route.to_location);
-          
-          // Enhanced logging for route timings
-          console.log(`BookingSection - Route ${route.from_location} to ${route.to_location} timings:`, route.timings);
         });
       }
       
@@ -128,13 +126,10 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
 
   const validatedAllTimes = Object.values(Time);
 
-  // Handle selecting from location - but don't trigger updates when not needed
+  // Handle selecting from location
   const handleSelectFromLocation = (island: string) => {
     console.log("Popular island selected as FROM location:", island);
-    // Only update if it's different, to avoid unnecessary re-renders
-    if (selectedFromLocation !== island) {
-      setSelectedFromLocation(island);
-    }
+    setSelectedFromLocation(island);
   };
 
   return (
