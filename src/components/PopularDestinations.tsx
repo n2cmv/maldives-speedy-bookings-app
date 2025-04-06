@@ -23,7 +23,7 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
     const fetchPopularIslands = async () => {
       setIsLoading(true);
       try {
-        // Prioritize Dhigurah and Dhangethi as popular islands
+        // Explicitly set Dhigurah and Dhangethi as popular islands
         const popularNames = ["A.Dh Dhigurah", "A.Dh Dhangethi"];
         
         // Attempt to fetch islands to include a third option if available
@@ -88,7 +88,10 @@ const PopularDestinations = ({ onSelectDestination }: PopularDestinationsProps) 
             variant="outline" 
             size="sm"
             className="flex items-center gap-1.5 bg-white border-primary/30 hover:bg-white hover:border-primary hover:text-primary"
-            onClick={() => onSelectDestination(dest.name)}
+            onClick={() => {
+              console.log("Popular island selected:", dest.name);
+              onSelectDestination(dest.name);
+            }}
           >
             {dest.icon}
             <span>{dest.name}</span>

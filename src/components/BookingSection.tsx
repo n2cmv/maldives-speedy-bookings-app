@@ -130,6 +130,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   const validatedAllTimes = Object.values(Time);
 
   const handleSelectFromLocation = (island: string) => {
+    console.log("Popular island selected as FROM location:", island);
     setSelectedFromLocation(island);
   };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookingInfo, Time, PassengerCount } from "@/types/booking";
@@ -56,9 +55,16 @@ const BookingForm = ({
     returnTrip: false
   });
   
+  // Log to debug the props and state
+  useEffect(() => {
+    console.log("BookingForm - preSelectedFrom:", preSelectedFrom);
+    console.log("BookingForm - Current from location:", booking.from);
+  }, [preSelectedFrom, booking.from]);
+  
   // Update form when preSelectedFrom changes
   useEffect(() => {
     if (preSelectedFrom) {
+      console.log("BookingForm - Updating 'from' to:", preSelectedFrom);
       setBooking(prev => ({
         ...prev,
         from: preSelectedFrom
