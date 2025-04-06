@@ -27,18 +27,6 @@ const RouteSelectionForm = ({
   const handleSelectDestination = (island: string) => {
     if (island !== booking.from) {
       onBookingChange({ ...booking, island });
-      
-      if (booking.returnTrip) {
-        onBookingChange({
-          ...booking,
-          island,
-          returnTripDetails: {
-            ...booking.returnTripDetails!,
-            island: booking.from,
-            from: island
-          }
-        });
-      }
     }
   };
 
@@ -52,13 +40,7 @@ const RouteSelectionForm = ({
         ...booking,
         from: newFrom,
         island: newTo,
-        time: '', // Reset time as available times may change
-        returnTripDetails: booking.returnTrip ? {
-          ...booking.returnTripDetails!,
-          from: newTo,
-          island: newFrom,
-          time: ''
-        } : undefined
+        time: '' // Reset time as available times may change
       });
     }
   };

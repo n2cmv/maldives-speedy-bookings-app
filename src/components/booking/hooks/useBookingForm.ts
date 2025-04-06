@@ -56,21 +56,6 @@ export const useBookingForm = ({
   const [departureDateOpen, setDepartureDateOpen] = useState(false);
   const [returnDateOpen, setReturnDateOpen] = useState(false);
   
-  // Update return trip details when route changes
-  useEffect(() => {
-    if (booking.returnTrip && booking.island && booking.from) {
-      setBooking(prev => ({
-        ...prev,
-        returnTripDetails: {
-          ...prev.returnTripDetails,
-          from: prev.island,
-          island: prev.from,
-          date: returnDate
-        }
-      }));
-    }
-  }, [booking.returnTrip, booking.island, booking.from, returnDate]);
-
   // Passengers handling
   const handlePassengerCountChange = (passengerCounts: PassengerCount) => {
     const totalSeats = passengerCounts.adults + passengerCounts.children + passengerCounts.seniors;
@@ -96,15 +81,6 @@ export const useBookingForm = ({
       return;
     }
     
-    if (booking.returnTrip && (!booking.returnTripDetails?.time || !returnDate)) {
-      toast({
-        title: t("booking.form.invalidReturn", "Invalid return booking"),
-        description: t("booking.form.fillReturnFields", "Please fill in all the return journey fields correctly."),
-        variant: "destructive"
-      });
-      return;
-    }
-    
     if (booking.seats > MAX_PASSENGERS) {
       toast({
         title: t("booking.form.tooManyPassengers", "Too many passengers"),
@@ -117,10 +93,7 @@ export const useBookingForm = ({
     const bookingWithDates = {
       ...booking,
       date: departureDate,
-      returnTripDetails: booking.returnTripDetails ? {
-        ...booking.returnTripDetails,
-        date: returnDate
-      } : undefined
+      returnTripDetails: undefined
     };
     
     navigate("/passenger-details", { state: bookingWithDates });
