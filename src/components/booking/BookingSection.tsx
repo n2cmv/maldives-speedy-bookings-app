@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
@@ -7,6 +8,7 @@ import { allTimes, fallbackIslands } from "./constants";
 import BookingForm from "./BookingForm";
 import { Card } from "@/components/ui/card";
 import PopularDestinations from "./PopularDestinations";
+import { motion } from "framer-motion";
 
 interface BookingSectionProps {
   preSelectedIsland?: string;
@@ -132,22 +134,32 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
   return (
     <div className="min-h-screen pb-16 px-4">
       <div className="max-w-lg mx-auto">
-        <Card className="p-6 md:p-8 shadow-xl bg-white/95 dark:bg-gray-800/90 backdrop-blur-md border border-ocean/10 dark:border-ocean/5 rounded-2xl">
-          <h2 className="text-2xl font-bold text-ocean-dark dark:text-white mb-6 text-center">Book Your Speedboat</h2>
-          
-          <PopularDestinations onSelectFromIsland={handleSelectFromIsland} />
-          
-          <div className="mt-6">
-            <BookingForm 
-              preSelectedIsland={preSelectedIsland}
-              preSelectedFrom={selectedFromIsland}
-              islandNames={islandNames}
-              isLoading={isLoading}
-              timeRestrictions={{}}
-              allTimes={validatedAllTimes}
-            />
-          </div>
-        </Card>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 100,
+            damping: 20
+          }}
+        >
+          <Card className="p-6 md:p-8 shadow-xl bg-white/95 dark:bg-gray-800/90 backdrop-blur-md border border-ocean/10 dark:border-ocean/5 rounded-2xl apple-card">
+            <h2 className="text-2xl font-bold text-ocean-dark dark:text-white mb-6 text-center">Book Your Speedboat</h2>
+            
+            <PopularDestinations onSelectFromIsland={handleSelectFromIsland} />
+            
+            <div className="mt-6">
+              <BookingForm 
+                preSelectedIsland={preSelectedIsland}
+                preSelectedFrom={selectedFromIsland}
+                islandNames={islandNames}
+                isLoading={isLoading}
+                timeRestrictions={{}}
+                allTimes={validatedAllTimes}
+              />
+            </div>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
