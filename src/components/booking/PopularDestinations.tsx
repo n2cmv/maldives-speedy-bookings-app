@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { Sun, Building, Anchor } from "lucide-react";
 
 interface PopularDestinationsProps {
   onSelectFromIsland: (island: string) => void;
@@ -7,24 +8,25 @@ interface PopularDestinationsProps {
 
 const PopularDestinations = ({ onSelectFromIsland }: PopularDestinationsProps) => {
   const popularIslands = [
-    "Dhigurah",
-    "Dhangethi",
-    "Male' City"
+    { name: "Dhigurah", icon: <Sun className="text-yellow-500" size={16} /> },
+    { name: "Dhangethi", icon: <Building className="text-blue-500" size={16} /> },
+    { name: "Male' City", icon: <Anchor className="text-teal-500" size={16} /> }
   ];
 
   return (
     <div className="mt-4 mb-6">
-      <p className="text-sm font-medium text-gray-700 mb-2">Popular Islands:</p>
-      <div className="flex flex-wrap gap-2">
+      <p className="text-lg font-medium text-ocean-dark mb-4 text-center">Popular Islands</p>
+      <div className="flex flex-wrap justify-center gap-3">
         {popularIslands.map((island) => (
           <Button
-            key={island}
+            key={island.name}
             variant="outline"
             size="sm"
-            className="text-ocean border-ocean hover:bg-ocean/10"
-            onClick={() => onSelectFromIsland(island)}
+            className="bg-white text-ocean-dark border-ocean-light/30 hover:bg-ocean/5 rounded-full pl-3 pr-4 py-5 flex gap-2 items-center font-medium transition-all"
+            onClick={() => onSelectFromIsland(island.name)}
           >
-            {island}
+            {island.icon}
+            {island.name}
           </Button>
         ))}
       </div>
