@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBookingsByEmail } from "@/services/bookingService";
-import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox, AlertCircle } from "lucide-react";
+import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox, AlertCircle, QrCode } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -16,6 +16,8 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import QRCode from "react-qr-code";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const MyBookings = () => {
   const navigate = useNavigate();
@@ -27,6 +29,8 @@ const MyBookings = () => {
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   const handleGoBack = () => {
     navigate("/");
@@ -178,6 +182,11 @@ const MyBookings = () => {
     } finally {
       setVerifying(false);
     }
+  };
+
+  const openQrDialog = (booking: any) => {
+    setSelectedBooking(booking);
+    setQrDialogOpen(true);
   };
 
   const containerVariants = {
@@ -380,7 +389,7 @@ const MyBookings = () => {
                       )}
                     </div>
                     
-                    <div className="text-right">
+                    <div className="text-right space-y-2">
                       <div className="mb-2">
                         {booking.payment_complete ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -393,13 +402,23 @@ const MyBookings = () => {
                         )}
                       </div>
                       
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex items-center gap-1"
+                        onClick={() => openQrDialog(booking)}
+                      >
+                        <QrCode className="h-3 w-3" />
+                        <span>Show QR</span>
+                      </Button>
+                      
                       {booking.payment_reference && (
                         <p className="text-xs text-gray-500">
                           Ref: {booking.payment_reference}
                         </p>
                       )}
                       
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500">
                         {format(new Date(booking.created_at), 'PP')}
                       </p>
                     </div>
@@ -410,6 +429,47 @@ const MyBookings = () => {
           )}
         </div>
       </div>
+      
+      <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Booking QR Code</DialogTitle>
+          </DialogHeader>
+          
+          {selectedBooking && (
+            <div className="flex flex-col items-center justify-center p-4">
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
+                <QRCode
+                  value={`${window.location.origin}/booking-lookup?ref=${selectedBooking.payment_reference}`}
+                  size={200}
+                  level="H"
+                />
+              </div>
+              
+              <p className="text-sm text-center text-gray-600 mb-4">
+                Scan this QR code to access your booking details
+              </p>
+              
+              <div className="w-full">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-500">Reference:</span>
+                  <span className="font-medium">{selectedBooking.payment_reference}</span>
+                </div>
+                
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-500">Trip:</span>
+                  <span className="font-medium">{selectedBooking.from_location} to {selectedBooking.to_location}</span>
+                </div>
+                
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-500">Date:</span>
+                  <span className="font-medium">{format(new Date(selectedBooking.departure_date), 'PP')}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
