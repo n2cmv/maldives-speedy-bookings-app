@@ -17,14 +17,6 @@ import MyBookings from "./pages/MyBookings";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 
-// Import i18n configuration
-import "./i18n/i18n";
-import { I18nextProvider } from "react-i18next";
-import i18n from "./i18n/i18n";
-
-// Import language context
-import { LanguageProvider } from "./contexts/LanguageContext";
-
 // Import local storage service
 import { saveBookingToLocalStorage } from "./services/bookingStorage";
 import { BookingInfo } from "./types/booking";
@@ -51,30 +43,26 @@ const App = () => {
   }, []);
   
   return (
-    <I18nextProvider i18n={i18n}>
-      <ThemeProvider defaultTheme="system">
-        <LanguageProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster position="top-center" richColors closeButton />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/booking" element={<BookingForm />} />
-                  <Route path="/passenger-details" element={<PassengerDetails />} />
-                  <Route path="/payment" element={<PaymentGateway />} />
-                  <Route path="/confirmation" element={<Confirmation />} />
-                  <Route path="/my-bookings" element={<MyBookings />} />
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </I18nextProvider>
+    <ThemeProvider defaultTheme="system">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster position="top-center" richColors closeButton />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/booking" element={<BookingForm />} />
+              <Route path="/passenger-details" element={<PassengerDetails />} />
+              <Route path="/payment" element={<PaymentGateway />} />
+              <Route path="/confirmation" element={<Confirmation />} />
+              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 };
 
