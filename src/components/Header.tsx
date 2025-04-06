@@ -1,5 +1,5 @@
 
-import { Ship, Calendar } from "lucide-react";
+import { Ship, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -32,7 +32,7 @@ const Header = () => {
           )}
           
           <Link to="/my-bookings" className={`flex items-center ${isMobile && isHomePage ? "" : "space-x-1"} text-ocean-dark hover:text-ocean transition-colors font-medium`}>
-            <Calendar className="h-5 w-5" />
+            <Ticket className="h-5 w-5" />
             {(!isMobile || !isHomePage) && <span>{t("common.myBookings", "My Bookings")}</span>}
           </Link>
         </nav>
