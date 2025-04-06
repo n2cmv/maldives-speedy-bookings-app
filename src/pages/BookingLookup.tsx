@@ -9,12 +9,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Shield, Eye } from "lucide-react";
 import Header from "@/components/Header";
 import { useTranslation } from "react-i18next";
 import { getBookingByReference } from "@/services/bookingService";
 import { BookingInfo } from "@/types/booking";
 import TripSummaryCard from "@/components/TripSummaryCard";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Form validation schema
 const formSchema = z.object({
@@ -29,6 +30,7 @@ const BookingLookup = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [booking, setBooking] = useState<BookingInfo | null>(null);
+  const [showSensitiveData, setShowSensitiveData] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -74,6 +76,8 @@ const BookingLookup = () => {
         }
         
         setBooking(bookingData);
+        // Reset sensitive data visibility on each new booking lookup
+        setShowSensitiveData(false);
         toast.success(t("lookup.success", "Booking found!"));
       }
     } catch (error) {
@@ -100,6 +104,71 @@ const BookingLookup = () => {
   
   const onSubmit = async (values: FormValues) => {
     await fetchBookingByReference(values.reference);
+  };
+
+  // Function to render masked passenger data (only first name and last initial)
+  const renderMaskedPassengers = () => {
+    if (!booking?.passengers?.length) return null;
+    
+    return (
+      <div className="mt-4 space-y-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-medium text-gray-800">Passenger Information</h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+            onClick={() => setShowSensitiveData(!showSensitiveData)}
+          >
+            <Eye className="w-4 h-4" />
+            {showSensitiveData ? "Hide Details" : "Show Details"}
+          </Button>
+        </div>
+        
+        {booking.passengers.map((passenger, index) => {
+          // Get first name and last initial for masked display
+          const nameParts = passenger.name.split(' ');
+          const firstName = nameParts[0];
+          const lastInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1][0] + '.' : '';
+          const maskedName = `${firstName} ${lastInitial}`;
+          
+          // Mask email and phone
+          const emailParts = passenger.email.split('@');
+          const maskedEmail = emailParts[0].substring(0, 2) + '***@' + emailParts[1];
+          const maskedPhone = passenger.phone ? passenger.phone.substring(0, 3) + '•••••' + passenger.phone.substring(passenger.phone.length - 3) : '';
+          
+          return (
+            <div key={index} className="bg-white p-3 rounded-md border border-gray-200">
+              <p className="font-medium">
+                {showSensitiveData ? passenger.name : maskedName}
+                {index === 0 && <span className="ml-2 text-xs bg-ocean-light/30 text-ocean-dark px-2 py-0.5 rounded-full">Lead Passenger</span>}
+              </p>
+              {showSensitiveData ? (
+                <>
+                  {passenger.email && <p className="text-sm text-gray-600">{passenger.email}</p>}
+                  {passenger.phone && <p className="text-sm text-gray-600">{passenger.phone}</p>}
+                </>
+              ) : (
+                <>
+                  {passenger.email && <p className="text-sm text-gray-600">{maskedEmail}</p>}
+                  {passenger.phone && <p className="text-sm text-gray-600">{maskedPhone}</p>}
+                </>
+              )}
+            </div>
+          );
+        })}
+        
+        {!showSensitiveData && (
+          <Alert className="mt-2 bg-blue-50 border-blue-200">
+            <Shield className="h-4 w-4 text-blue-600" />
+            <AlertTitle className="text-blue-800">Privacy Protection</AlertTitle>
+            <AlertDescription className="text-blue-700 text-sm">
+              For security reasons, passenger details are masked. Click "Show Details" to view full information.
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+    );
   };
   
   return (
@@ -159,6 +228,8 @@ const BookingLookup = () => {
                 {t("lookup.bookingDetails", "Booking Details")}
               </h2>
               <TripSummaryCard bookingInfo={booking} />
+              
+              {renderMaskedPassengers()}
               
               <div className="mt-6 flex justify-center">
                 <Button onClick={() => navigate("/booking")} variant="outline">
