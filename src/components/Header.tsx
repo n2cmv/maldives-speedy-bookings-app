@@ -31,9 +31,9 @@ const Header = () => {
             </Link>
           )}
           
-          <Link to="/my-bookings" className={`flex items-center ${isMobile ? "" : "space-x-1"} text-ocean-dark hover:text-ocean transition-colors font-medium`}>
+          <Link to="/my-bookings" className={`flex items-center ${isMobile && isHomePage ? "" : "space-x-1"} text-ocean-dark hover:text-ocean transition-colors font-medium`}>
             <Calendar className="h-5 w-5" />
-            {!isMobile && <span>{t("common.myBookings", "My Bookings")}</span>}
+            {(!isMobile || !isHomePage) && <span>{t("common.myBookings", "My Bookings")}</span>}
           </Link>
         </nav>
       </div>
