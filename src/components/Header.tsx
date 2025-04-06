@@ -17,6 +17,9 @@ const Header = () => {
           <Link to="/booking" className="text-ocean-dark dark:text-white hover:text-ocean transition-colors font-medium">
             Book Now
           </Link>
+          <Link to="/my-bookings" className="text-ocean-dark dark:text-white hover:text-ocean transition-colors font-medium">
+            My Bookings
+          </Link>
         </nav>
         <HeaderExtras />
       </div>
