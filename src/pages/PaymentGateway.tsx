@@ -10,6 +10,8 @@ import StepIndicator from "@/components/StepIndicator";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
 
+const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
+
 const PaymentGateway = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -101,19 +103,13 @@ const PaymentGateway = () => {
   }
 
   const calculateTotal = () => {
-    if (!bookingInfo.passengerCounts) return 0;
+    if (!bookingInfo.passengers) return 0;
     
-    const basePrice = 149;
-    const adultTotal = bookingInfo.passengerCounts.adults * basePrice;
-    const childTotal = bookingInfo.passengerCounts.children * (basePrice * 0.7); // 30% discount
-    const seniorTotal = bookingInfo.passengerCounts.seniors * (basePrice * 0.8); // 20% discount
+    const totalPassengers = bookingInfo.passengers.length || 0;
+    const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
+    const journeyMultiplier = isReturnTrip ? 2 : 1; // Double the price for return trips
     
-    let total = adultTotal + childTotal + seniorTotal;
-    if (bookingInfo.returnTrip) {
-      total = total * 2;
-    }
-    
-    return Math.round(total);
+    return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
   };
 
   return (
