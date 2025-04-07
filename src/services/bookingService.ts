@@ -1,12 +1,13 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
 
-// Function to generate a payment reference with RTM prefix
+// Function to generate a payment reference with RTM prefix and a shorter 4-digit number
 export const generatePaymentReference = () => {
-  const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
-  const timestamp = new Date().getTime().toString().slice(-5);
-  return `RTM-${randomPart}${timestamp}`;
+  // Generate a random 4-digit number (1000-9999)
+  const randomDigits = Math.floor(Math.random() * 9000) + 1000;
+  return `RTM-${randomDigits}`;
 };
 
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
