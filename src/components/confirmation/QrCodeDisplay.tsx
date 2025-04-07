@@ -1,4 +1,3 @@
-
 import React from 'react';
 import QRCode from 'react-qr-code';
 import { Card, CardContent } from '@/components/ui/card';

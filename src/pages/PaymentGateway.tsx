@@ -33,8 +33,8 @@ const PaymentGateway = () => {
     }
     
     setBookingInfo(booking);
-    // Generate a consistent reference number for this booking session
-    setBookingReference(`RTM-${Math.floor(Math.random() * 1000000)}`);
+    // Generate a consistent reference number for this booking session using our standardized function
+    setBookingReference(generatePaymentReference());
   }, [location.state, navigate]);
 
   const handleGoBack = () => {
