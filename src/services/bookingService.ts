@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -66,7 +67,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
     // Get current domain from window for QR code generation
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     
-    // Extract speedboat details for email
+    // Extract speedboat details for email - properly typing and handling null cases
     const outboundSpeedboat = booking.outboundSpeedboatDetails || {};
     const returnSpeedboat = booking.returnSpeedboatDetails || {};
     
@@ -84,15 +85,15 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
         passengerCount: booking.seats,
         paymentReference: booking.paymentReference || "Unknown",
         origin: origin, // Add origin for QR code generation
-        // Add speedboat details
-        outboundSpeedboatName: outboundSpeedboat.speedboat_name,
-        outboundSpeedboatImage: outboundSpeedboat.speedboat_image_url,
-        outboundPickupLocation: outboundSpeedboat.pickup_location,
-        outboundPickupMapUrl: outboundSpeedboat.pickup_map_url,
-        returnSpeedboatName: returnSpeedboat.speedboat_name,
-        returnSpeedboatImage: returnSpeedboat.speedboat_image_url,
-        returnPickupLocation: returnSpeedboat.pickup_location,
-        returnPickupMapUrl: returnSpeedboat.pickup_map_url
+        // Add speedboat details with proper type checking
+        outboundSpeedboatName: outboundSpeedboat?.speedboat_name || null,
+        outboundSpeedboatImage: outboundSpeedboat?.speedboat_image_url || null,
+        outboundPickupLocation: outboundSpeedboat?.pickup_location || null,
+        outboundPickupMapUrl: outboundSpeedboat?.pickup_map_url || null,
+        returnSpeedboatName: returnSpeedboat?.speedboat_name || null,
+        returnSpeedboatImage: returnSpeedboat?.speedboat_image_url || null,
+        returnPickupLocation: returnSpeedboat?.pickup_location || null,
+        returnPickupMapUrl: returnSpeedboat?.pickup_map_url || null
       }
     };
     
