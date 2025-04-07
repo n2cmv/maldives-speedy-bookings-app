@@ -1,4 +1,3 @@
-
 import { ArrowRight, Ship, MapPin, Calendar, Users, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -26,9 +25,6 @@ const WelcomeSection = () => {
             <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-4 px-8 rounded-xl shadow-lg transition-all duration-300 text-lg">
               {t('common.bookNow')}
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-            <Link to="/my-bookings" className="inline-flex items-center border-2 border-[#0AB3B8] text-[#0AB3B8] hover:bg-[#0AB3B8]/5 font-medium py-4 px-8 rounded-xl transition-all duration-300 text-lg">
-              Manage Bookings
             </Link>
           </div>
         </div>

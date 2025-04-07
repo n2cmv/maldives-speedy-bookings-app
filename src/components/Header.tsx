@@ -31,12 +31,10 @@ const Header = () => {
             </Link>
           )}
           
-          {!isHomePage && (
-            <Link to="/my-bookings" className={`flex items-center ${isMobile ? "" : "space-x-1"} text-[#005C99] hover:text-[#0AB3B8] transition-colors font-medium`}>
-              <Ticket className="h-5 w-5" />
-              {!isMobile && <span>{t("common.myBookings", "My Bookings")}</span>}
-            </Link>
-          )}
+          <Link to="/my-bookings" className={`flex items-center ${isMobile ? "" : "space-x-1"} text-[#005C99] hover:text-[#0AB3B8] transition-colors font-medium`}>
+            <Ticket className="h-5 w-5" />
+            {!isMobile && <span>{t("common.myBookings", "My Bookings")}</span>}
+          </Link>
         </nav>
       </div>
     </header>
