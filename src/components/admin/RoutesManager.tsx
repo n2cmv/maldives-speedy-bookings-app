@@ -221,7 +221,11 @@ const RoutesManager = () => {
           timings: values.timings || [],
           created_at: currentRoute.created_at,
           updated_at: currentRoute.updated_at,
-          display_order: currentRoute.display_order
+          display_order: currentRoute.display_order,
+          speedboat_name: values.speedboat_name,
+          speedboat_image_url: values.speedboat_image_url,
+          pickup_location: values.pickup_location,
+          pickup_map_url: values.pickup_map_url
         };
         
         console.log("Updating route with data:", updatedRoute);
@@ -244,7 +248,11 @@ const RoutesManager = () => {
           price: Number(values.price),
           duration: Number(values.duration),
           timings: values.timings || [],
-          display_order: maxDisplayOrder + 1
+          display_order: maxDisplayOrder + 1,
+          speedboat_name: values.speedboat_name,
+          speedboat_image_url: values.speedboat_image_url,
+          pickup_location: values.pickup_location,
+          pickup_map_url: values.pickup_map_url
         };
         
         console.log("Creating new route with data:", newRoute);
