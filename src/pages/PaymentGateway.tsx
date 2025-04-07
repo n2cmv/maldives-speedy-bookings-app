@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import PaymentProcessingScreen from "@/components/payment/PaymentProcessingScreen";
 import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
+import { generatePaymentReference } from "@/services/bookingService";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -22,6 +23,7 @@ const PaymentGateway = () => {
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [bookingReference, setBookingReference] = useState("");
 
   useEffect(() => {
     const booking = location.state as BookingInfo | null;
@@ -31,6 +33,8 @@ const PaymentGateway = () => {
     }
     
     setBookingInfo(booking);
+    // Generate a consistent reference number for this booking session
+    setBookingReference(`RTM-${Math.floor(Math.random() * 1000000)}`);
   }, [location.state, navigate]);
 
   const handleGoBack = () => {
@@ -60,14 +64,11 @@ const PaymentGateway = () => {
 
   const handlePaymentCompletion = (success: boolean) => {
     if (success && bookingInfo) {
-      // Create a unique payment reference
-      const paymentRef = `BML-${Math.floor(Math.random() * 1000000)}`;
-      
       navigate("/confirmation", { 
         state: {
           ...bookingInfo,
           paymentComplete: true,
-          paymentReference: paymentRef
+          paymentReference: bookingReference
         }
       });
     } else {
@@ -95,10 +96,6 @@ const PaymentGateway = () => {
   if (isRedirecting) {
     return <PaymentProcessingScreen bankLogo={BANK_LOGO} />;
   }
-
-  const generateBookingReference = () => {
-    return `MV-${Date.now().toString().slice(-6)}`;
-  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -140,7 +137,7 @@ const PaymentGateway = () => {
               
               <div className="p-6 space-y-6">
                 <PaymentSummary 
-                  bookingReference={generateBookingReference()}
+                  bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
                 />
                 

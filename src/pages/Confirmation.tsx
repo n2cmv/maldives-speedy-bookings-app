@@ -1,3 +1,4 @@
+
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
@@ -72,7 +73,8 @@ const Confirmation = () => {
           });
           setIsProcessing(false);
         } else {
-          if (!emailSent) {
+          // Only send email after we have route details
+          if (!emailSent && outboundRouteDetails) {
             const enhancedBooking = {
               ...booking,
               outboundSpeedboatDetails: outboundRouteDetails,

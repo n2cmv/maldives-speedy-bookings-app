@@ -2,8 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
 
-// Function to generate a payment reference with RTM prefix instead of BML
-const generatePaymentReference = () => {
+// Function to generate a payment reference with RTM prefix
+export const generatePaymentReference = () => {
   const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
   const timestamp = new Date().getTime().toString().slice(-5);
   return `RTM-${randomPart}${timestamp}`;
