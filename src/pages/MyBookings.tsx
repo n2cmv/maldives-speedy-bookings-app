@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -48,7 +47,6 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      // Send OTP via our custom edge function
       const response = await supabase.functions.invoke("process-booking-otp", {
         body: { email }
       });
@@ -106,7 +104,6 @@ const MyBookings = () => {
         code: otpValue 
       });
       
-      // Use the validate-booking-otp edge function
       const response = await supabase.functions.invoke("validate-booking-otp", {
         body: { 
           email: email.toLowerCase(),
@@ -116,7 +113,6 @@ const MyBookings = () => {
       
       console.log("Validation response:", response);
       
-      // Handle validation errors
       if (response.error) {
         console.error("Edge function error:", response.error);
         const errorMsg = typeof response.error === 'object' ? 
@@ -129,7 +125,6 @@ const MyBookings = () => {
         return;
       }
       
-      // If the OTP is invalid
       if (!response.data?.valid) {
         const errorMessage = response.data?.error || "Please check the code and try again";
         const details = response.data?.details ? `Details: ${response.data.details}` : '';
@@ -142,10 +137,8 @@ const MyBookings = () => {
         return;
       }
       
-      // OTP is valid, set verified state to true
       setVerified(true);
       
-      // Fetch bookings
       try {
         const { data: bookingsData, error: bookingsError } = await getBookingsByEmail(email);
         

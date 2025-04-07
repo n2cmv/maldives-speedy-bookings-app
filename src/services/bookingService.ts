@@ -1,10 +1,21 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
 
+// Function to generate a payment reference with RTM prefix instead of BML
+const generatePaymentReference = () => {
+  const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+  const timestamp = new Date().getTime().toString().slice(-5);
+  return `RTM-${randomPart}${timestamp}`;
+};
+
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
+    // Generate payment reference if not provided
+    if (booking.paymentComplete && !booking.paymentReference) {
+      booking.paymentReference = generatePaymentReference();
+    }
+
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
       from_location: booking.from,

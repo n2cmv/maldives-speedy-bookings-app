@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -39,7 +38,6 @@ const BookingLookup = () => {
     }
   });
   
-  // Function to fetch booking by reference
   const fetchBookingByReference = async (reference: string) => {
     if (!reference) return;
     
@@ -52,7 +50,6 @@ const BookingLookup = () => {
         });
         setBooking(null);
       } else {
-        // Format the data to match BookingInfo structure
         const bookingData: BookingInfo = {
           from: data.from_location as any,
           island: data.to_location as any,
@@ -76,7 +73,6 @@ const BookingLookup = () => {
         }
         
         setBooking(bookingData);
-        // Reset sensitive data visibility on each new booking lookup
         setShowSensitiveData(false);
         toast.success(t("lookup.success", "Booking found!"));
       }
@@ -88,16 +84,12 @@ const BookingLookup = () => {
     }
   };
   
-  // Check for reference in URL on component mount
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const reference = queryParams.get('ref');
     
     if (reference) {
-      // Update the form value to match the reference
       form.setValue('reference', reference);
-      
-      // Fetch booking information automatically
       fetchBookingByReference(reference);
     }
   }, [location.search]);
@@ -106,7 +98,6 @@ const BookingLookup = () => {
     await fetchBookingByReference(values.reference);
   };
 
-  // Function to render masked passenger data (only first name and last initial)
   const renderMaskedPassengers = () => {
     if (!booking?.passengers?.length) return null;
     
@@ -126,13 +117,11 @@ const BookingLookup = () => {
         </div>
         
         {booking.passengers.map((passenger, index) => {
-          // Get first name and last initial for masked display
           const nameParts = passenger.name.split(' ');
           const firstName = nameParts[0];
           const lastInitial = nameParts.length > 1 ? nameParts[nameParts.length - 1][0] + '.' : '';
           const maskedName = `${firstName} ${lastInitial}`;
           
-          // Mask email and phone
           const emailParts = passenger.email.split('@');
           const maskedEmail = emailParts[0].substring(0, 2) + '***@' + emailParts[1];
           const maskedPhone = passenger.phone ? passenger.phone.substring(0, 3) + '•••••' + passenger.phone.substring(passenger.phone.length - 3) : '';
@@ -197,7 +186,7 @@ const BookingLookup = () => {
                       <FormItem>
                         <FormLabel>{t("lookup.referenceNumber", "Reference Number")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g. ABC123" {...field} />
+                          <Input placeholder="e.g. RTM-ABC123" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
