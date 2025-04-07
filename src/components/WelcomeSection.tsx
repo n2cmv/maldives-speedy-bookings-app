@@ -1,4 +1,5 @@
-import { ArrowRight, Ship, MapPin, Calendar, Users, Star } from "lucide-react";
+
+import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,95 @@ const WelcomeSection = () => {
           <div className="flex flex-wrap gap-6 justify-center mb-16">
             <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-4 px-8 rounded-xl shadow-lg transition-all duration-300 text-lg">
               {t('common.bookNow')}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+        
+        {/* Tours & Activities Section */}
+        <div className="py-16">
+          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-6 text-center">Exciting Tours & Activities</h2>
+          <p className="text-center text-[#86868B] mb-12 max-w-2xl mx-auto">
+            Discover the beauty of Maldives with our curated experiences and guided tours
+          </p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Fish className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Manta Ray Experience</h3>
+              <p className="text-[#86868B] mb-4">Get up close with these majestic creatures in their natural habitat.</p>
+              <p className="text-[#0AB3B8] font-bold">$70 per person</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Fish className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Whale Shark Adventure</h3>
+              <p className="text-[#86868B] mb-4">Swim alongside the gentle giants of the ocean in crystal clear waters.</p>
+              <p className="text-[#0AB3B8] font-bold">$80 per person</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Turtle className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Turtle Expedition</h3>
+              <p className="text-[#86868B] mb-4">Meet sea turtles in their natural environment with expert guides.</p>
+              <p className="text-[#0AB3B8] font-bold">$50 per person</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sun className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Sand Bank Escape</h3>
+              <p className="text-[#86868B] mb-4">Visit a secluded sandbank near Machafushi Resort for a private beach day.</p>
+              <p className="text-[#0AB3B8] font-bold">$120 per trip</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MapPin className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Resort Day Trip</h3>
+              <p className="text-[#86868B] mb-4">Enjoy a full day of luxury amenities at one of our partner resorts.</p>
+              <p className="text-[#0AB3B8] font-bold">$75 per person</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Ship className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Resort Transfer</h3>
+              <p className="text-[#86868B] mb-4">Comfortable and swift boat transfers to and from your resort of choice.</p>
+              <p className="text-[#0AB3B8] font-bold">$45 per way</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Beach Dinner</h3>
+              <p className="text-[#86868B] mb-4">Romantic dining experience on the beach with à la carte menu options.</p>
+              <p className="text-[#0AB3B8] font-bold">$40 per person</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
+              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Fish className="h-8 w-8 text-[#0AB3B8]" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Sunset Fishing</h3>
+              <p className="text-[#86868B] mb-4">Traditional Maldivian line fishing during a breathtaking sunset.</p>
+              <p className="text-[#0AB3B8] font-bold">$55 per person</p>
+            </div>
+          </div>
+          
+          <div className="flex justify-center mt-12">
+            <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
+              Book an Activity
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
