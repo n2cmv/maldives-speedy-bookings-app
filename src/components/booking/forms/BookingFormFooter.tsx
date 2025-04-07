@@ -15,7 +15,7 @@ const BookingFormFooter = ({ onSubmit, isDisabled = false }: BookingFormFooterPr
       type="button"
       onClick={onSubmit}
       disabled={isDisabled}
-      className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
+      className="w-full bg-[#0AB3B8] hover:bg-[#005C99] text-white h-[60px] text-base font-medium"
     >
       {t("common.bookNow", "Book Now")}
     </Button>
