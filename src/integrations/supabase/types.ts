@@ -145,7 +145,11 @@ export type Database = {
           duration: number
           from_location: string
           id: string
+          pickup_location: string | null
+          pickup_map_url: string | null
           price: number
+          speedboat_image_url: string | null
+          speedboat_name: string | null
           timings: string[] | null
           to_location: string
           updated_at: string
@@ -156,7 +160,11 @@ export type Database = {
           duration: number
           from_location: string
           id?: string
+          pickup_location?: string | null
+          pickup_map_url?: string | null
           price: number
+          speedboat_image_url?: string | null
+          speedboat_name?: string | null
           timings?: string[] | null
           to_location: string
           updated_at?: string
@@ -167,7 +175,11 @@ export type Database = {
           duration?: number
           from_location?: string
           id?: string
+          pickup_location?: string | null
+          pickup_map_url?: string | null
           price?: number
+          speedboat_image_url?: string | null
+          speedboat_name?: string | null
           timings?: string[] | null
           to_location?: string
           updated_at?: string

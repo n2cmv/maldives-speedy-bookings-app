@@ -3,6 +3,7 @@ import { MapPin, Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { TripDetails as TripDetailsType } from "@/types/booking";
 import { useTranslation } from "react-i18next";
+import SpeedboatInfo from "./SpeedboatInfo";
 
 interface TripDetailsProps {
   title: string;
@@ -12,9 +13,25 @@ interface TripDetailsProps {
   date?: Date;
   isOutbound?: boolean;
   isReturn?: boolean;
+  speedboatName?: string | null;
+  speedboatImageUrl?: string | null;
+  pickupLocation?: string | null;
+  pickupMapUrl?: string | null;
 }
 
-const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: TripDetailsProps) => {
+const TripDetails = ({ 
+  title, 
+  from, 
+  to, 
+  time, 
+  date, 
+  isOutbound, 
+  isReturn,
+  speedboatName,
+  speedboatImageUrl,
+  pickupLocation,
+  pickupMapUrl 
+}: TripDetailsProps) => {
   const { t } = useTranslation();
   const formattedDate = date ? format(new Date(date), 'PPPP') : '';
   
@@ -59,6 +76,16 @@ const TripDetails = ({ title, from, to, time, date, isOutbound, isReturn }: Trip
           <p className="font-medium text-gray-900">{time}</p>
         </div>
       </div>
+
+      {(speedboatName || pickupLocation) && (
+        <SpeedboatInfo
+          speedboatName={speedboatName}
+          speedboatImageUrl={speedboatImageUrl}
+          pickupLocation={pickupLocation}
+          pickupMapUrl={pickupMapUrl}
+          isReturn={isReturn}
+        />
+      )}
     </div>
   );
 };

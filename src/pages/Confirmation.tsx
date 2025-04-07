@@ -1,4 +1,3 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
@@ -13,8 +12,9 @@ import { saveBookingToLocalStorage } from "@/services/bookingStorage";
 import { useTranslation } from "react-i18next";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
-import { saveBookingToDatabase, sendBookingConfirmationEmail } from "@/services/bookingService";
+import { saveBookingToDatabase, sendBookingConfirmationEmail, getRouteDetails } from "@/services/bookingService";
 import QrCodeDisplay from "@/components/confirmation/QrCodeDisplay";
+import { RouteData } from "@/types/database";
 
 const Confirmation = () => {
   const { t } = useTranslation();
@@ -24,8 +24,31 @@ const Confirmation = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [outboundRouteDetails, setOutboundRouteDetails] = useState<RouteData | null>(null);
+  const [returnRouteDetails, setReturnRouteDetails] = useState<RouteData | null>(null);
   
-  // Redirect if no booking data or if payment not complete
+  useEffect(() => {
+    if (booking?.from && booking?.island) {
+      getRouteDetails(booking.from, booking.island)
+        .then(({ data }) => {
+          setOutboundRouteDetails(data);
+        })
+        .catch(error => {
+          console.error("Error fetching outbound route details:", error);
+        });
+      
+      if (booking.returnTrip && booking.returnTripDetails) {
+        getRouteDetails(booking.returnTripDetails.from || booking.island, booking.returnTripDetails.island || booking.from)
+          .then(({ data }) => {
+            setReturnRouteDetails(data);
+          })
+          .catch(error => {
+            console.error("Error fetching return route details:", error);
+          });
+      }
+    }
+  }, [booking]);
+  
   useEffect(() => {
     if (!booking?.island || !booking?.passengers) {
       navigate("/booking");
@@ -33,17 +56,14 @@ const Confirmation = () => {
     }
     
     if (!booking.paymentComplete) {
-      // If someone tries to access confirmation without payment
       navigate("/passenger-details");
       return;
     }
     
-    // Save booking to local storage for future reference
     if (booking.paymentComplete && booking.paymentReference && !isSaved) {
       setIsProcessing(true);
       saveBookingToLocalStorage(booking);
       
-      // Save to database
       saveBookingToDatabase(booking).then(({ error }) => {
         if (error) {
           console.error("Error saving booking to database:", error);
@@ -52,9 +72,14 @@ const Confirmation = () => {
           });
           setIsProcessing(false);
         } else {
-          // Send confirmation email
           if (!emailSent) {
-            sendBookingConfirmationEmail(booking).then(({ success, error }) => {
+            const enhancedBooking = {
+              ...booking,
+              outboundSpeedboatDetails: outboundRouteDetails,
+              returnSpeedboatDetails: returnRouteDetails
+            };
+            
+            sendBookingConfirmationEmail(enhancedBooking).then(({ success, error }) => {
               if (!success) {
                 console.error("Error sending confirmation email:", error);
                 toast.error(t("error.emailSending", "Error sending confirmation email"), {
@@ -70,7 +95,6 @@ const Confirmation = () => {
               setIsProcessing(false);
               setIsSaved(true);
               
-              // Show success toast when page loads and data is saved
               toast.success(t("payment.success", "Payment Successful!"), {
                 description: t("payment.description", "Your booking has been confirmed.")
               });
@@ -79,7 +103,6 @@ const Confirmation = () => {
             setIsProcessing(false);
             setIsSaved(true);
             
-            // Show success toast when page loads and data is saved
             toast.success(t("payment.success", "Payment Successful!"), {
               description: t("payment.description", "Your booking has been confirmed.")
             });
@@ -87,7 +110,7 @@ const Confirmation = () => {
         }
       });
     }
-  }, [booking, navigate, t, isSaved, emailSent]);
+  }, [booking, navigate, t, isSaved, emailSent, outboundRouteDetails, returnRouteDetails]);
   
   if (!booking?.paymentComplete || isProcessing) {
     return (
@@ -139,8 +162,6 @@ const Confirmation = () => {
         
         <Header />
         <main className="pt-20 pb-12 px-4">
-          {/* StepIndicator component removed */}
-          
           <motion.div 
             className="max-w-md mx-auto booking-card mt-8"
             variants={containerVariants}
@@ -151,7 +172,6 @@ const Confirmation = () => {
               <ConfirmationHeader />
             </motion.div>
             
-            {/* QR Code Display */}
             <motion.div variants={itemVariants}>
               <QrCodeDisplay 
                 booking={booking} 
@@ -160,12 +180,10 @@ const Confirmation = () => {
             </motion.div>
             
             <div className="space-y-6 mb-8">
-              {/* Payment Information */}
               <motion.div variants={itemVariants}>
                 <PaymentInfo paymentReference={booking.paymentReference} />
               </motion.div>
               
-              {/* Outbound Journey - Changed to Your Trip */}
               <motion.div variants={itemVariants}>
                 <TripDetails
                   title={t("confirmation.yourTrip")}
@@ -174,10 +192,13 @@ const Confirmation = () => {
                   time={booking.time}
                   date={booking.date}
                   isOutbound={isReturnTrip}
+                  speedboatName={outboundRouteDetails?.speedboat_name}
+                  speedboatImageUrl={outboundRouteDetails?.speedboat_image_url}
+                  pickupLocation={outboundRouteDetails?.pickup_location}
+                  pickupMapUrl={outboundRouteDetails?.pickup_map_url}
                 />
               </motion.div>
               
-              {/* Return Journey (if applicable) */}
               {isReturnTrip && booking.returnTripDetails && (
                 <motion.div variants={itemVariants}>
                   <TripDetails
@@ -187,11 +208,14 @@ const Confirmation = () => {
                     time={booking.returnTripDetails.time}
                     date={booking.returnTripDetails.date}
                     isReturn
+                    speedboatName={returnRouteDetails?.speedboat_name}
+                    speedboatImageUrl={returnRouteDetails?.speedboat_image_url}
+                    pickupLocation={returnRouteDetails?.pickup_location}
+                    pickupMapUrl={returnRouteDetails?.pickup_map_url}
                   />
                 </motion.div>
               )}
               
-              {/* Passenger Information */}
               <motion.div variants={itemVariants}>
                 <PassengerInfo 
                   seats={booking.seats}

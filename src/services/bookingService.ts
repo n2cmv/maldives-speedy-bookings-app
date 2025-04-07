@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -42,7 +41,10 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
   }
 }
 
-export async function sendBookingConfirmationEmail(booking: BookingInfo): Promise<{ success: boolean; error?: any; emailSentTo?: string }> {
+export async function sendBookingConfirmationEmail(booking: BookingInfo & { 
+  outboundSpeedboatDetails?: RouteData | null; 
+  returnSpeedboatDetails?: RouteData | null;
+}): Promise<{ success: boolean; error?: any; emailSentTo?: string }> {
   try {
     if (!booking.passengers || booking.passengers.length === 0) {
       console.error("No passenger information provided for email");
@@ -64,6 +66,10 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
     // Get current domain from window for QR code generation
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     
+    // Extract speedboat details for email
+    const outboundSpeedboat = booking.outboundSpeedboatDetails || {};
+    const returnSpeedboat = booking.returnSpeedboatDetails || {};
+    
     const emailData = {
       email: primaryPassenger.email.trim().toLowerCase(),
       name: primaryPassenger.name,
@@ -77,7 +83,16 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo): Promis
         returnTime: booking.returnTripDetails?.time,
         passengerCount: booking.seats,
         paymentReference: booking.paymentReference || "Unknown",
-        origin: origin // Add origin for QR code generation
+        origin: origin, // Add origin for QR code generation
+        // Add speedboat details
+        outboundSpeedboatName: outboundSpeedboat.speedboat_name,
+        outboundSpeedboatImage: outboundSpeedboat.speedboat_image_url,
+        outboundPickupLocation: outboundSpeedboat.pickup_location,
+        outboundPickupMapUrl: outboundSpeedboat.pickup_map_url,
+        returnSpeedboatName: returnSpeedboat.speedboat_name,
+        returnSpeedboatImage: returnSpeedboat.speedboat_image_url,
+        returnPickupLocation: returnSpeedboat.pickup_location,
+        returnPickupMapUrl: returnSpeedboat.pickup_map_url
       }
     };
     

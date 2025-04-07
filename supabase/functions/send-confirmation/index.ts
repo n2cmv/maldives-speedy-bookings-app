@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -31,6 +30,14 @@ interface BookingEmailRequest {
     paymentReference?: string;
     otpCode?: string;
     isOtpEmail?: boolean;
+    outboundSpeedboatName?: string | null;
+    outboundSpeedboatImage?: string | null;
+    outboundPickupLocation?: string | null;
+    outboundPickupMapUrl?: string | null;
+    returnSpeedboatName?: string | null;
+    returnSpeedboatImage?: string | null;
+    returnPickupLocation?: string | null;
+    returnPickupMapUrl?: string | null;
   };
 }
 
@@ -168,6 +175,43 @@ const handler = async (req: Request): Promise<Response> => {
       const bookingLookupUrl = `${req.headers.get('origin') || 'https://your-site.lovable.app'}/booking-lookup?ref=${bookingDetails.paymentReference}`;
       const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(bookingLookupUrl)}`;
 
+      // Generate speedboat details HTML
+      const outboundSpeedboatHtml = bookingDetails.outboundSpeedboatName || bookingDetails.outboundPickupLocation
+        ? `<div style="margin-top: 15px; padding: 12px; background-color: #f0f7ff; border-radius: 5px;">
+            <h3 style="color: #0AB3B8; margin-top: 0; font-size: 16px;">Speedboat Details</h3>
+            ${bookingDetails.outboundSpeedboatName 
+              ? `<p><strong>Vessel:</strong> ${bookingDetails.outboundSpeedboatName}</p>` 
+              : ''}
+            ${bookingDetails.outboundPickupLocation 
+              ? `<p><strong>Pickup Location:</strong> ${bookingDetails.outboundPickupLocation}</p>` 
+              : ''}
+            ${bookingDetails.outboundPickupMapUrl 
+              ? `<p><a href="${bookingDetails.outboundPickupMapUrl}" target="_blank" style="color: #0AB3B8; font-size: 12px;">View Pickup Location Map</a></p>` 
+              : ''}
+            ${bookingDetails.outboundSpeedboatImage 
+              ? `<img src="${bookingDetails.outboundSpeedboatImage}" alt="Speedboat" style="width: 100%; height: auto; max-height: 120px; object-fit: cover; border-radius: 4px; margin-top: 10px;">` 
+              : ''}
+          </div>`
+        : '';
+
+      const returnSpeedboatHtml = bookingDetails.returnTrip && (bookingDetails.returnSpeedboatName || bookingDetails.returnPickupLocation)
+        ? `<div style="margin-top: 15px; padding: 12px; background-color: #f0fff4; border-radius: 5px;">
+            <h3 style="color: #0AB3B8; margin-top: 0; font-size: 16px;">Return Speedboat Details</h3>
+            ${bookingDetails.returnSpeedboatName 
+              ? `<p><strong>Vessel:</strong> ${bookingDetails.returnSpeedboatName}</p>` 
+              : ''}
+            ${bookingDetails.returnPickupLocation 
+              ? `<p><strong>Pickup Location:</strong> ${bookingDetails.returnPickupLocation}</p>` 
+              : ''}
+            ${bookingDetails.returnPickupMapUrl 
+              ? `<p><a href="${bookingDetails.returnPickupMapUrl}" target="_blank" style="color: #0AB3B8; font-size: 12px;">View Pickup Location Map</a></p>` 
+              : ''}
+            ${bookingDetails.returnSpeedboatImage 
+              ? `<img src="${bookingDetails.returnSpeedboatImage}" alt="Return Speedboat" style="width: 100%; height: auto; max-height: 120px; object-fit: cover; border-radius: 4px; margin-top: 10px;">` 
+              : ''}
+          </div>`
+        : '';
+
       console.log("[send-confirmation] Preparing to send booking confirmation email to:", email);
       console.log("[send-confirmation] QR Code URL:", qrCodeUrl);
       
@@ -196,6 +240,9 @@ const handler = async (req: Request): Promise<Response> => {
                   <p><strong>Trip:</strong> ${tripInfo}</p>
                   ${returnInfo}
                   <p><strong>Passengers:</strong> ${bookingDetails.passengerCount}</p>
+                  
+                  ${outboundSpeedboatHtml}
+                  ${returnSpeedboatHtml}
                 </div>
 
                 <div style="text-align: center; margin: 30px 0;">
