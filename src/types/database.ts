@@ -9,6 +9,10 @@ export interface RouteData {
   created_at: string;
   updated_at: string;
   display_order?: number;
+  speedboat_name?: string | null;
+  speedboat_image_url?: string | null;
+  pickup_location?: string | null;
+  pickup_map_url?: string | null;
 }
 
 export interface BookingData {

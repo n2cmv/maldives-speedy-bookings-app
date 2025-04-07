@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ArrowRight, MapPin, Boat } from "lucide-react";
+import { ArrowRight, MapPin, Ship } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SpeedboatInfoProps {
@@ -36,7 +36,7 @@ const SpeedboatInfo: React.FC<SpeedboatInfoProps> = ({
       <div className="bg-blue-50 rounded-md p-3">
         {speedboatName && (
           <div className="flex items-start mb-2">
-            <Boat className="h-5 w-5 text-ocean mr-3 mt-0.5" />
+            <Ship className="h-5 w-5 text-ocean mr-3 mt-0.5" />
             <div>
               <p className="text-sm text-gray-500">{t("confirmation.vessel", "Vessel")}</p>
               <p className="font-medium text-gray-900">{speedboatName}</p>
