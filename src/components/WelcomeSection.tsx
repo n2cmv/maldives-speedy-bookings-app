@@ -23,16 +23,16 @@ const WelcomeSection = () => {
             frameBorder="0"
             style={{ 
               pointerEvents: 'none',
-              width: '120vw',
-              height: isMobile ? '140%' : '120%',
+              width: '150vw',
+              height: isMobile ? '160%' : '150%',
               objectFit: 'cover',
               objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%) scale(1.2)',
-              minWidth: '120%',
-              minHeight: isMobile ? '140%' : '120%',
+              transform: 'translate(-50%, -50%) scale(1.5)',
+              minWidth: '150%',
+              minHeight: isMobile ? '160%' : '150%',
             }}
           ></iframe>
         </div>
