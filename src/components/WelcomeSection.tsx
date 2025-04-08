@@ -11,7 +11,7 @@ const WelcomeSection = () => {
   const isMobile = useIsMobile();
   
   return (
-    <div className="min-h-[80vh] px-4 font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
+    <div className="min-h-[80vh] font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
       <div className="relative w-full h-[80vh] overflow-hidden mb-16">
         <div className="absolute inset-0 w-full h-full">
           <iframe 
@@ -39,7 +39,7 @@ const WelcomeSection = () => {
         
         <div className="absolute inset-0 bg-black/30"></div>
         
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
             <span className="text-[#0AB3B8]">Easy Speedboat</span><br />
             Transfers & Trips!
