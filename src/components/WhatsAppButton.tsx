@@ -20,7 +20,12 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(welcomeMessage);
-    window.open(`https://wa.me/${formattedPhone}?text=${encodedMessage}`, '_blank');
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+    
+    // Open a small popup window instead of a new tab
+    const windowFeatures = 'width=600,height=600,resizable=yes,scrollbars=yes,status=yes';
+    window.open(whatsappUrl, 'WhatsAppChat', windowFeatures);
+    
     setIsOpen(false);
   };
 
