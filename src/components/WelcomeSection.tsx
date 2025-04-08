@@ -1,5 +1,5 @@
 
-import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils, Play } from "lucide-react";
+import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -23,16 +23,16 @@ const WelcomeSection = () => {
             frameBorder="0"
             style={{ 
               pointerEvents: 'none',
-              width: '150vw',
-              height: isMobile ? '160%' : '150%',
+              width: '200vw',
+              height: '200vh',
               objectFit: 'cover',
               objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%) scale(1.5)',
-              minWidth: '150%',
-              minHeight: isMobile ? '160%' : '150%',
+              transform: 'translate(-50%, -50%) scale(1.8)',
+              minWidth: '200%',
+              minHeight: '200%',
             }}
           ></iframe>
         </div>
