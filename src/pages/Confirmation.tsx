@@ -1,11 +1,9 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
-import PaymentInfo from "@/components/confirmation/PaymentInfo";
 import TripDetails from "@/components/confirmation/TripDetails";
 import PassengerInfo from "@/components/confirmation/PassengerInfo";
 import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
@@ -182,9 +180,6 @@ const Confirmation = () => {
             </motion.div>
             
             <div className="space-y-6 mb-8">
-              <motion.div variants={itemVariants}>
-                <PaymentInfo paymentReference={booking.paymentReference} />
-              </motion.div>
               
               <motion.div variants={itemVariants}>
                 <TripDetails
