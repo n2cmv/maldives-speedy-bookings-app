@@ -25,9 +25,9 @@ const Index = () => {
         <p>© 2025 Retour Maldives - Premium Speedboat Transfers</p>
       </div>
       
-      {/* WhatsApp Button - Replace the phone number with your actual WhatsApp number */}
+      {/* WhatsApp Button with the updated phone number */}
       <WhatsAppButton 
-        phoneNumber="9601234567" 
+        phoneNumber="+960 7443777" 
         welcomeMessage="Hello! I'm interested in booking a speedboat transfer with Retour Maldives."
       />
     </div>
