@@ -105,18 +105,27 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '50%': { transform: 'translateX(-10px)' },
           '100%': { transform: 'translateX(0)' }
+        },
+        'gradient-x': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'wave': 'wave 3s ease-in-out infinite'
+        'wave': 'wave 3s ease-in-out infinite',
+        'gradient-x': 'gradient-x 15s ease infinite'
       },
       backgroundImage: {
         'maldives-pattern': "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjMEFCM0I4Ij48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiMwMDVDOTkiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')",
         'ocean-gradient': "linear-gradient(to bottom right, #0AB3B8, #005C99)",
         'sunset-gradient': "linear-gradient(45deg, #F2E3C9, #FF9F80)",
-      }
+      },
+      backgroundSize: {
+        '200%': '200% 200%',
+      },
     }
   },
   plugins: [require("tailwindcss-animate")],

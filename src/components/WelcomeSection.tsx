@@ -37,7 +37,11 @@ const WelcomeSection = () => {
           ></iframe>
         </div>
         
+        {/* Static dark overlay */}
         <div className="absolute inset-0 bg-black/30"></div>
+        
+        {/* Moving gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/20 via-[#005C99]/20 to-[#0AB3B8]/20 animate-gradient-x"></div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
