@@ -1,5 +1,5 @@
 
-import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils } from "lucide-react";
+import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,22 @@ const WelcomeSection = () => {
             Simplified
           </h1>
           
-          <p className="text-xl md:text-2xl text-[#86868B] mb-12 max-w-2xl leading-relaxed">
+          <p className="text-xl md:text-2xl text-[#86868B] mb-8 max-w-2xl leading-relaxed">
             Seamless speedboat transfers between Maldivian islands.
             Efficient, reliable, and designed with you in mind.
           </p>
+          
+          {/* Video Section */}
+          <div className="w-full max-w-3xl aspect-video bg-[#0AB3B8]/10 rounded-xl mb-10 overflow-hidden relative group cursor-pointer">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-white/80 backdrop-blur-sm rounded-full p-4 shadow-lg transition-transform transform group-hover:scale-110">
+                <Play className="h-8 w-8 text-[#0AB3B8] fill-[#0AB3B8]" />
+              </div>
+            </div>
+            <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-lg text-white text-sm">
+              Experience the Maldives
+            </div>
+          </div>
           
           <div className="flex flex-wrap gap-6 justify-center mb-16">
             <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-4 px-8 rounded-xl shadow-lg transition-all duration-300 text-lg">
