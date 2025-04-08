@@ -1,4 +1,3 @@
-
 import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -21,18 +20,17 @@ const WelcomeSection = () => {
             frameBorder="0"
             style={{ 
               pointerEvents: 'none',
-              width: '100vw',
-              height: '100%',
+              width: '110vw',
+              height: '120%',
               objectFit: 'cover',
               objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%)',
-              minWidth: '100%',
-              minHeight: '100%',
-              aspectRatio: '16/9',
-              transform: 'translate(-50%, -50%) scale(1.1)'
+              transform: 'translate(-50%, -50%) scale(1.1)',
+              minWidth: '110%',
+              minHeight: '120%',
+              aspectRatio: '16/9'
             }}
           ></iframe>
         </div>
