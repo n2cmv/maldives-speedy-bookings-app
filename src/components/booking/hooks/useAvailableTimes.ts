@@ -15,7 +15,36 @@ export const useAvailableTimes = (
       console.log(`useAvailableTimes - Found timings for ${from} to ${to}:`, timings);
       
       if (timings && timings.length > 0) {
-        return timings;
+        // Convert any 24-hour format times to the format used in the Time enum
+        const formattedTimings = timings.map(time => {
+          // If time already has AM/PM, assume it's already in correct format
+          if (time.includes('AM') || time.includes('PM')) {
+            return time as Time;
+          }
+          
+          // Convert 24-hour format to Time enum format
+          try {
+            const [hoursStr, minutesStr] = time.split(':');
+            const hours = parseInt(hoursStr, 10);
+            const minutes = parseInt(minutesStr, 10);
+            
+            if (isNaN(hours) || isNaN(minutes)) {
+              console.warn(`Invalid time format: ${time}`);
+              return null;
+            }
+            
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+            const formattedTime = `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+            
+            return formattedTime as Time;
+          } catch (e) {
+            console.error(`Error converting time ${time}:`, e);
+            return null;
+          }
+        }).filter(Boolean) as Time[];
+        
+        return formattedTimings;
       }
     }
     
