@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship } from "lucide-react";
+import SpeedboatRoutes from "@/components/SpeedboatRoutes";
 
 const Index = () => {
   return (
@@ -14,6 +15,7 @@ const Index = () => {
         <Header />
         <main className="pt-16">
           <WelcomeSection />
+          <SpeedboatRoutes />
         </main>
       </div>
 
