@@ -17,22 +17,22 @@ const WelcomeSection = () => {
           <iframe 
             src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
             title="Experience the Maldives" 
-            className="w-full h-full object-cover"
+            className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
             frameBorder="0"
             style={{ 
               pointerEvents: 'none',
-              width: '200vw',
-              height: '200vh',
+              width: '300vw',
+              height: '300vh',
               objectFit: 'cover',
               objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%) scale(1.8)',
-              minWidth: '200%',
-              minHeight: '200%',
+              transform: 'translate(-50%, -50%) scale(2)',
+              minWidth: '300%',
+              minHeight: '300%',
             }}
           ></iframe>
         </div>
