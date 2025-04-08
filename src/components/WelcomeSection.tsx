@@ -1,11 +1,14 @@
+
 import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const WelcomeSection = () => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   
   return (
     <div className="min-h-[80vh] px-4 font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
@@ -20,17 +23,16 @@ const WelcomeSection = () => {
             frameBorder="0"
             style={{ 
               pointerEvents: 'none',
-              width: '110vw',
-              height: '120%',
+              width: '120vw',
+              height: isMobile ? '140%' : '120%',
               objectFit: 'cover',
               objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%) scale(1.1)',
-              minWidth: '110%',
-              minHeight: '120%',
-              aspectRatio: '16/9'
+              transform: 'translate(-50%, -50%) scale(1.2)',
+              minWidth: '120%',
+              minHeight: isMobile ? '140%' : '120%',
             }}
           ></iframe>
         </div>
