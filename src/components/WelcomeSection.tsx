@@ -3,6 +3,7 @@ import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Ute
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const WelcomeSection = () => {
   const { t } = useTranslation();
@@ -22,16 +23,18 @@ const WelcomeSection = () => {
             Efficient, reliable, and designed with you in mind.
           </p>
           
-          {/* Video Section */}
-          <div className="w-full max-w-3xl aspect-video bg-[#0AB3B8]/10 rounded-xl mb-10 overflow-hidden relative group cursor-pointer">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-white/80 backdrop-blur-sm rounded-full p-4 shadow-lg transition-transform transform group-hover:scale-110">
-                <Play className="h-8 w-8 text-[#0AB3B8] fill-[#0AB3B8]" />
-              </div>
-            </div>
-            <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-lg text-white text-sm">
-              Experience the Maldives
-            </div>
+          {/* Video Section - YouTube Embed */}
+          <div className="w-full max-w-3xl mb-10 rounded-xl overflow-hidden relative">
+            <AspectRatio ratio={16/9} className="bg-black">
+              <iframe 
+                src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc" 
+                title="Experience the Maldives" 
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+                frameBorder="0"
+              ></iframe>
+            </AspectRatio>
           </div>
           
           <div className="flex flex-wrap gap-6 justify-center mb-16">
