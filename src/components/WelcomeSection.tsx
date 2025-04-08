@@ -1,4 +1,3 @@
-
 import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -10,42 +9,40 @@ const WelcomeSection = () => {
   
   return (
     <div className="min-h-[80vh] px-4 font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
-      <div className="max-w-5xl mx-auto">
-        {/* Hero Section with Apple-inspired design */}
-        <div className="flex flex-col items-center text-center py-24">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-[#1D1D1F] tracking-tight mb-6">
-            <span className="text-[#0AB3B8]">Island</span> Travel <br />
-            Simplified
+      <div className="relative w-full h-[80vh] overflow-hidden mb-16">
+        <div className="absolute inset-0 w-full h-full">
+          <iframe 
+            src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
+            title="Experience the Maldives" 
+            className="w-full h-full object-cover"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+            frameBorder="0"
+            style={{ pointerEvents: 'none' }}
+          ></iframe>
+        </div>
+        
+        <div className="absolute inset-0 bg-black/30"></div>
+        
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
+            <span className="text-[#0AB3B8]">Easy Speedboat</span><br />
+            Transfers & Trips!
           </h1>
           
-          <p className="text-xl md:text-2xl text-[#86868B] mb-8 max-w-2xl leading-relaxed">
+          <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl leading-relaxed drop-shadow-md">
             Seamless speedboat transfers between Maldivian islands.
             Efficient, reliable, and designed with you in mind.
           </p>
           
-          {/* Video Section - YouTube Embed */}
-          <div className="w-full max-w-3xl mb-10 rounded-xl overflow-hidden relative">
-            <AspectRatio ratio={16/9} className="bg-black">
-              <iframe 
-                src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc" 
-                title="Experience the Maldives" 
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-                frameBorder="0"
-              ></iframe>
-            </AspectRatio>
-          </div>
-          
-          <div className="flex flex-wrap gap-6 justify-center mb-16">
-            <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-4 px-8 rounded-xl shadow-lg transition-all duration-300 text-lg">
-              {t('common.bookNow')}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
+          <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0AB3B8]/80 text-white font-medium py-4 px-10 rounded-xl shadow-lg transition-all duration-300 text-xl">
+            {t('common.bookNow')}
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </div>
-        
-        {/* Tours & Activities Section */}
+      </div>
+      
+      <div className="max-w-5xl mx-auto">
         <div className="py-16">
           <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-6 text-center">Exciting Tours & Activities</h2>
           <p className="text-center text-[#86868B] mb-12 max-w-2xl mx-auto">
@@ -134,7 +131,6 @@ const WelcomeSection = () => {
           </div>
         </div>
         
-        {/* Features Section - Apple-inspired cards */}
         <div className="py-16">
           <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">Why Choose Us</h2>
           
@@ -165,7 +161,6 @@ const WelcomeSection = () => {
           </div>
         </div>
         
-        {/* How It Works - Simplified steps */}
         <div className="py-16">
           <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How It Works</h2>
           
@@ -197,7 +192,6 @@ const WelcomeSection = () => {
           </div>
         </div>
         
-        {/* Testimonials - Simplified */}
         <div className="py-16">
           <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">Customer Experiences</h2>
           
