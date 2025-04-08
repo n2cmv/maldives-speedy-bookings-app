@@ -5,36 +5,83 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const WelcomeSection = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchVideo = async () => {
+      // For now, we'll use a default video URL since no video has been uploaded yet
+      // Once a video is uploaded to Supabase, you can replace this with the actual path
+      const { data } = await supabase.storage
+        .from('videos')
+        .getPublicUrl('maldives-background.mp4');
+        
+      if (data?.publicUrl) {
+        setVideoUrl(data.publicUrl);
+      }
+      setIsLoading(false);
+    };
+    
+    fetchVideo();
+  }, []);
   
   return (
     <div className="min-h-[80vh] font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
       <div className="relative w-full h-[80vh] overflow-hidden mb-16">
         <div className="absolute inset-0 w-full h-full">
-          <iframe 
-            src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
-            title="Experience the Maldives" 
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-            frameBorder="0"
-            style={{ 
-              pointerEvents: 'none',
-              width: '300vw',
-              height: '300vh',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%) scale(2)',
-              minWidth: '300%',
-              minHeight: '300%',
-            }}
-          ></iframe>
+          {isLoading ? (
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+              <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : videoUrl ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                minWidth: '100%',
+                minHeight: '100%'
+              }}
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            // Fallback to the previous YouTube iframe if no video is available
+            <iframe 
+              src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
+              title="Experience the Maldives" 
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              frameBorder="0"
+              style={{ 
+                pointerEvents: 'none',
+                width: '300vw',
+                height: '300vh',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%) scale(2)',
+                minWidth: '300%',
+                minHeight: '300%',
+              }}
+            ></iframe>
+          )}
         </div>
         
         {/* Static dark overlay - adjusted opacity to 50% to make video darker */}
