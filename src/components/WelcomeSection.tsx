@@ -24,12 +24,15 @@ const WelcomeSection = () => {
               width: '100vw',
               height: '100%',
               objectFit: 'cover',
+              objectPosition: 'center',
               position: 'absolute',
               left: '50%',
               top: '50%',
               transform: 'translate(-50%, -50%)',
               minWidth: '100%',
-              minHeight: '100%'
+              minHeight: '100%',
+              aspectRatio: '16/9',
+              transform: 'translate(-50%, -50%) scale(1.1)'
             }}
           ></iframe>
         </div>
