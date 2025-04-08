@@ -12,64 +12,24 @@ const WelcomeSection = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [lowQualityVideoUrl, setLowQualityVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [useHighQuality, setUseHighQuality] = useState(true);
-  
-  // Function to estimate connection speed
-  const estimateConnectionSpeed = async () => {
-    try {
-      // Simple connection test - download a small file and measure time
-      const startTime = Date.now();
-      await fetch('/placeholder.svg'); // Using existing asset
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-      
-      // If download took more than 500ms, we consider it a slow connection
-      return duration < 500;
-    } catch (error) {
-      console.error("Connection speed test failed:", error);
-      return false; // Assume slow connection if test fails
-    }
-  };
   
   useEffect(() => {
-    const fetchVideos = async () => {
-      setIsLoading(true);
-      try {
-        // Test connection speed
-        const isHighSpeed = await estimateConnectionSpeed();
-        setUseHighQuality(isHighSpeed);
+    const fetchVideo = async () => {
+      // For now, we'll use a default video URL since no video has been uploaded yet
+      // Once a video is uploaded to Supabase, you can replace this with the actual path
+      const { data } = await supabase.storage
+        .from('videos')
+        .getPublicUrl('maldives-background.mp4');
         
-        // Get high quality video URL
-        const { data: highQualityData } = await supabase.storage
-          .from('videos')
-          .getPublicUrl('maldives-background.mp4');
-        
-        // Get low quality video URL
-        const { data: lowQualityData } = await supabase.storage
-          .from('videos')
-          .getPublicUrl('maldives-background-low.mp4');
-        
-        if (highQualityData?.publicUrl) {
-          setVideoUrl(highQualityData.publicUrl);
-        }
-        
-        if (lowQualityData?.publicUrl) {
-          setLowQualityVideoUrl(lowQualityData.publicUrl);
-        }
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      } finally {
-        setIsLoading(false);
+      if (data?.publicUrl) {
+        setVideoUrl(data.publicUrl);
       }
+      setIsLoading(false);
     };
     
-    fetchVideos();
+    fetchVideo();
   }, []);
-  
-  // Determine which video URL to use
-  const activeVideoUrl = !useHighQuality && lowQualityVideoUrl ? lowQualityVideoUrl : videoUrl;
   
   return (
     <div className="min-h-[80vh] font-[SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif]">
@@ -79,7 +39,7 @@ const WelcomeSection = () => {
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
               <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : activeVideoUrl ? (
+          ) : videoUrl ? (
             <video
               autoPlay
               muted
@@ -95,7 +55,7 @@ const WelcomeSection = () => {
                 minHeight: '100%'
               }}
             >
-              <source src={activeVideoUrl} type="video/mp4" />
+              <source src={videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           ) : (
@@ -127,8 +87,8 @@ const WelcomeSection = () => {
         {/* Static dark overlay - adjusted opacity to 50% to make video darker */}
         <div className="absolute inset-0 bg-black/50"></div>
         
-        {/* Moving gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/50 via-[#005C99]/50 to-[#0AB3B8]/50 animate-gradient-x"></div>
+        {/* Moving gradient overlay - reduced opacity to 30% */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/30 via-[#005C99]/30 to-[#0AB3B8]/30 animate-gradient-x"></div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
@@ -145,14 +105,6 @@ const WelcomeSection = () => {
             {t('common.bookNow')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-          
-          {/* Quality toggle button for testing */}
-          <button 
-            onClick={() => setUseHighQuality(!useHighQuality)} 
-            className="mt-4 px-4 py-2 bg-white/10 text-white text-sm rounded-md hover:bg-white/20"
-          >
-            {useHighQuality ? "Switch to Low Quality" : "Switch to High Quality"}
-          </button>
         </div>
       </div>
       
