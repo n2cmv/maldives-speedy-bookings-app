@@ -1,6 +1,7 @@
 
 import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship } from "lucide-react";
 
 const Index = () => {
@@ -23,6 +24,12 @@ const Index = () => {
         </div>
         <p>© 2025 Retour Maldives - Premium Speedboat Transfers</p>
       </div>
+      
+      {/* WhatsApp Button - Replace the phone number with your actual WhatsApp number */}
+      <WhatsAppButton 
+        phoneNumber="9601234567" 
+        welcomeMessage="Hello! I'm interested in booking a speedboat transfer with Retour Maldives."
+      />
     </div>
   );
 };
