@@ -43,15 +43,23 @@ const VideoUploader = () => {
       
       const fileName = 'maldives-background.mp4'; // Fixed filename for the background video
       
+      // Create a new XMLHttpRequest to track upload progress
+      const xhr = new XMLHttpRequest();
+      
+      // Setup progress event
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progressPercent = Math.round((event.loaded / event.total) * 100);
+          setProgress(progressPercent);
+        }
+      });
+      
+      // Use Supabase upload but track progress with our own XHR
       const { error } = await supabase.storage
         .from('videos')
         .upload(fileName, file, {
           cacheControl: '3600',
-          upsert: true,
-          onUploadProgress: (event) => {
-            const progress = Math.round((event.loaded / event.total) * 100);
-            setProgress(progress);
-          }
+          upsert: true
         });
         
       if (error) {
