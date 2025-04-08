@@ -37,8 +37,8 @@ const WelcomeSection = () => {
           ></iframe>
         </div>
         
-        {/* Static dark overlay */}
-        <div className="absolute inset-0 bg-black/30"></div>
+        {/* Static dark overlay - adjusted opacity to 50% to make video darker */}
+        <div className="absolute inset-0 bg-black/50"></div>
         
         {/* Moving gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/50 via-[#005C99]/50 to-[#0AB3B8]/50 animate-gradient-x"></div>
