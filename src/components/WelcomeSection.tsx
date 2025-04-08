@@ -87,8 +87,8 @@ const WelcomeSection = () => {
         {/* Static dark overlay - adjusted opacity to 50% to make video darker */}
         <div className="absolute inset-0 bg-black/50"></div>
         
-        {/* Moving gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/50 via-[#005C99]/50 to-[#0AB3B8]/50 animate-gradient-x"></div>
+        {/* Moving gradient overlay - reduced opacity to 30% */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/30 via-[#005C99]/30 to-[#0AB3B8]/30 animate-gradient-x"></div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
