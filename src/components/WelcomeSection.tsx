@@ -45,7 +45,7 @@ const WelcomeSection = () => {
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
-            <span className="text-[#0AB3B8]">Easy Speedboat</span><br />
+            <span className="text-white">Easy Speedboat</span><br />
             Transfers & Trips!
           </h1>
           
