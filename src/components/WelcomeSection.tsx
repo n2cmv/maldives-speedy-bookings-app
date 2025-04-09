@@ -103,91 +103,104 @@ const WelcomeSection = () => {
       </div>
       
       <div className="max-w-5xl mx-auto">
-        <div className="py-16">
-          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-6 text-center">Exciting Tours & Activities</h2>
-          <p className="text-center text-[#86868B] mb-12 max-w-2xl mx-auto">
-            Discover the beauty of Maldives with our curated experiences and guided tours
-          </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Fish className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Manta Ray Experience</h3>
-              <p className="text-[#86868B] mb-4">Get up close with these majestic creatures in their natural habitat.</p>
-              <p className="text-[#0AB3B8] font-bold">$70 per person</p>
+        <div className="py-16 px-4">
+          <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16">
+            <div className="mb-10">
+              <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
+              <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Beyond the Island</h2>
+              <p className="text-[#505056] max-w-md text-lg">
+                Explore marine life up close like never before.
+                Set off from your island for a true secluded
+                experience in the heart of the sea.
+              </p>
             </div>
             
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Fish className="h-8 w-8 text-[#0AB3B8]" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1513316564811-ee3c49558c8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                    alt="Manta Ray Experience" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Manta Ray Experience</h3>
+                <p className="text-[#505056]">Get up close with these majestic creatures in their natural habitat.</p>
+                <p className="font-medium text-[#0AB3B8]">$70 per person</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Whale Shark Adventure</h3>
-              <p className="text-[#86868B] mb-4">Swim alongside the gentle giants of the ocean in crystal clear waters.</p>
-              <p className="text-[#0AB3B8] font-bold">$80 per person</p>
+              
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2574&q=80" 
+                    alt="Whale Shark Adventure" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Whale Shark Adventure</h3>
+                <p className="text-[#505056]">Encounter gentle whale sharks in Maldives' Baa and Ari Atolls year-round.</p>
+                <p className="font-medium text-[#0AB3B8]">$80 per person</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                    alt="Turtle Expedition" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Shark Encounters</h3>
+                <p className="text-[#505056]">Spot various sharks in Maldives—from docile nurse to thrilling tiger sharks.</p>
+                <p className="font-medium text-[#0AB3B8]">$50 per person</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80" 
+                    alt="Sunset Fishing" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Sunset Fishing</h3>
+                <p className="text-[#505056]">Cast your lines from island piers or venture out to the sea for fishing.</p>
+                <p className="font-medium text-[#0AB3B8]">$55 per person</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1544551763-92ab472cad5d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                    alt="Sand Bank Escape" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Sand Bank Escape</h3>
+                <p className="text-[#505056]">Visit a secluded sandbank for a private beach day away from everyone.</p>
+                <p className="font-medium text-[#0AB3B8]">$120 per trip</p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="overflow-hidden rounded-2xl h-64">
+                  <img 
+                    src="https://images.unsplash.com/photo-1602002418816-5c0aeef426aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" 
+                    alt="Resort Day Trip" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#1D1D1F]">Resort Day Trip</h3>
+                <p className="text-[#505056]">Enjoy a full day of luxury amenities at one of our partner resorts.</p>
+                <p className="font-medium text-[#0AB3B8]">$75 per person</p>
+              </div>
             </div>
             
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Turtle className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Turtle Expedition</h3>
-              <p className="text-[#86868B] mb-4">Meet sea turtles in their natural environment with expert guides.</p>
-              <p className="text-[#0AB3B8] font-bold">$50 per person</p>
+            <div className="flex justify-center mt-12">
+              <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
+                Book an Activity
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Sun className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Sand Bank Escape</h3>
-              <p className="text-[#86868B] mb-4">Visit a secluded sandbank near Machafushi Resort for a private beach day.</p>
-              <p className="text-[#0AB3B8] font-bold">$120 per trip</p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <MapPin className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Resort Day Trip</h3>
-              <p className="text-[#86868B] mb-4">Enjoy a full day of luxury amenities at one of our partner resorts.</p>
-              <p className="text-[#0AB3B8] font-bold">$75 per person</p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Ship className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Resort Transfer</h3>
-              <p className="text-[#86868B] mb-4">Comfortable and swift boat transfers to and from your resort of choice.</p>
-              <p className="text-[#0AB3B8] font-bold">$45 per way</p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Beach Dinner</h3>
-              <p className="text-[#86868B] mb-4">Romantic dining experience on the beach with à la carte menu options.</p>
-              <p className="text-[#0AB3B8] font-bold">$40 per person</p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 text-center">
-              <div className="w-16 h-16 bg-[#0AB3B8]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Fish className="h-8 w-8 text-[#0AB3B8]" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-[#1D1D1F]">Sunset Fishing</h3>
-              <p className="text-[#86868B] mb-4">Traditional Maldivian line fishing during a breathtaking sunset.</p>
-              <p className="text-[#0AB3B8] font-bold">$55 per person</p>
-            </div>
-          </div>
-          
-          <div className="flex justify-center mt-12">
-            <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
-              Book an Activity
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
           </div>
         </div>
         
