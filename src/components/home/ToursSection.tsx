@@ -1,6 +1,13 @@
 
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious 
+} from "@/components/ui/carousel";
 
 // Define a type for activity card props
 type ActivityCardProps = {
@@ -44,6 +51,11 @@ const ToursSection = () => {
       imageSrc: "https://images.unsplash.com/photo-1513316564811-ee3c49558c8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
       title: "Manta Rays",
       description: "Visit a secluded atoll for a chance to swim with these majestic creatures."
+    },
+    {
+      imageSrc: "https://images.unsplash.com/photo-1582160540665-34914319be0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      title: "Turtles",
+      description: "Swim alongside gentle sea turtles in their natural habitat in crystal clear waters."
     }
   ];
 
@@ -60,15 +72,30 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {activities.map((activity, index) => (
-            <ActivityCard 
-              key={index}
-              imageSrc={activity.imageSrc}
-              title={activity.title}
-              description={activity.description}
-            />
-          ))}
+        <div className="relative">
+          <Carousel
+            opts={{
+              align: "start",
+              dragFree: true
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4">
+              {activities.map((activity, index) => (
+                <CarouselItem key={index} className="pl-4 sm:basis-1/2 lg:basis-1/4">
+                  <ActivityCard 
+                    imageSrc={activity.imageSrc}
+                    title={activity.title}
+                    description={activity.description}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="hidden md:block">
+              <CarouselPrevious className="absolute left-0 top-1/2" />
+              <CarouselNext className="absolute right-0 top-1/2" />
+            </div>
+          </Carousel>
         </div>
         
         <div className="flex justify-center mt-12">
