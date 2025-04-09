@@ -60,7 +60,7 @@ const ToursSection = () => {
   ];
 
   return (
-    <div className="py-16 px-5">
+    <div className="py-16">
       <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16">
         <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
@@ -72,7 +72,7 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="relative mx-[-20px] sm:mx-[-20px]">
+        <div className="relative -mx-4 md:-mx-16 lg:-mx-20">
           <Carousel
             opts={{
               align: "start",
@@ -80,9 +80,9 @@ const ToursSection = () => {
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-4">
+            <CarouselContent className="-ml-2 md:-ml-4">
               {activities.map((activity, index) => (
-                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className="pl-2 md:pl-4 basis-4/5 sm:basis-2/3 md:basis-1/2 lg:basis-2/5">
                   <ActivityCard 
                     imageSrc={activity.imageSrc}
                     title={activity.title}
@@ -92,8 +92,8 @@ const ToursSection = () => {
               ))}
             </CarouselContent>
             <div className="hidden md:block">
-              <CarouselPrevious className="absolute left-0 top-1/2" />
-              <CarouselNext className="absolute right-0 top-1/2" />
+              <CarouselPrevious className="absolute left-4 top-1/3 -translate-y-1/2" />
+              <CarouselNext className="absolute right-4 top-1/3 -translate-y-1/2" />
             </div>
           </Carousel>
         </div>
