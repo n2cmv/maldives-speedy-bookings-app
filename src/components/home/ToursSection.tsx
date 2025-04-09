@@ -8,8 +8,6 @@ import {
   CarouselNext,
   CarouselPrevious 
 } from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 // Define a type for activity card props
 type ActivityCardProps = {
@@ -19,21 +17,17 @@ type ActivityCardProps = {
 };
 
 const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => (
-  <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 h-full">
-    <div className="overflow-hidden">
-      <AspectRatio ratio={4/3} className="bg-muted">
-        <img 
-          src={imageSrc} 
-          alt={title} 
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </AspectRatio>
+  <div className="space-y-3">
+    <div className="overflow-hidden rounded-3xl h-72">
+      <img 
+        src={imageSrc} 
+        alt={title} 
+        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+      />
     </div>
-    <CardContent className="p-5">
-      <h3 className="text-xl font-semibold text-[#1D1D1F] mb-2">{title}</h3>
-      <p className="text-[#505056] text-sm leading-relaxed">{description}</p>
-    </CardContent>
-  </Card>
+    <h3 className="text-2xl font-semibold text-[#1D1D1F] mt-4">{title}</h3>
+    <p className="text-[#505056] leading-relaxed">{description}</p>
+  </div>
 );
 
 const ToursSection = () => {
@@ -66,33 +60,29 @@ const ToursSection = () => {
   ];
 
   return (
-    <div className="py-16 px-4 sm:px-0">
-      <div className="bg-white rounded-3xl p-8 md:p-12 lg:p-16 shadow-sm">
-        <div className="mb-10 lg:mb-12 max-w-lg">
+    <div className="py-16">
+      <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16">
+        <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-4">Things To Do</h2>
-          <p className="text-[#505056] text-base md:text-lg leading-relaxed">
+          <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Beyond the Island</h2>
+          <p className="text-[#505056] text-lg leading-relaxed">
             Explore marine life up close like never before.
             Set off from your island for a true secluded
             experience in the heart of the sea.
           </p>
         </div>
         
-        <div className="relative">
+        <div className="relative -mx-4 md:-mx-16 lg:-mx-20">
           <Carousel
             opts={{
               align: "start",
-              loop: true,
               dragFree: true
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-4">
+            <CarouselContent className="-ml-2 md:-ml-4">
               {activities.map((activity, index) => (
-                <CarouselItem 
-                  key={index} 
-                  className="pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5"
-                >
+                <CarouselItem key={index} className="pl-2 md:pl-4 basis-4/5 sm:basis-2/3 md:basis-1/2 lg:basis-2/5">
                   <ActivityCard 
                     imageSrc={activity.imageSrc}
                     title={activity.title}
@@ -101,21 +91,16 @@ const ToursSection = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            
             <div className="hidden md:block">
-              <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white shadow-lg border-none hover:bg-[#0AB3B8] hover:text-white" />
-              <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white shadow-lg border-none hover:bg-[#0AB3B8] hover:text-white" />
+              <CarouselPrevious className="absolute left-4 top-1/3 -translate-y-1/2" />
+              <CarouselNext className="absolute right-4 top-1/3 -translate-y-1/2" />
             </div>
           </Carousel>
         </div>
         
-        <div className="mt-10 md:mt-12 flex justify-center">
-          <Link 
-            to="/booking" 
-            className="inline-flex items-center bg-[#0AB3B8] text-white font-medium py-3 px-6 rounded-xl 
-            transition-all duration-300 hover:bg-[#0897a4] shadow-sm hover:shadow-md"
-          >
-            Explore More Activities
+        <div className="flex justify-center mt-12">
+          <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
+            Book an Activity
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>
