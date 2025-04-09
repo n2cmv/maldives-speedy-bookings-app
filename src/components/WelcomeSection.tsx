@@ -222,7 +222,7 @@ const WelcomeSection = () => {
         </div>
         
         <div className="py-16">
-          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How Speedbooking Works?</h2>
+          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How to book a Speedboat?</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-2xl shadow-sm relative">
