@@ -1,4 +1,3 @@
-
 import { ArrowRight, Ship, MapPin, Calendar, Users, Star, Fish, Turtle, Sun, Utensils } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -16,8 +15,6 @@ const WelcomeSection = () => {
   
   useEffect(() => {
     const fetchVideo = async () => {
-      // For now, we'll use a default video URL since no video has been uploaded yet
-      // Once a video is uploaded to Supabase, you can replace this with the actual path
       const { data } = await supabase.storage
         .from('videos')
         .getPublicUrl('maldives-background.mp4');
@@ -59,7 +56,6 @@ const WelcomeSection = () => {
               Your browser does not support the video tag.
             </video>
           ) : (
-            // Fallback to the previous YouTube iframe if no video is available
             <iframe 
               src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
               title="Experience the Maldives" 
@@ -84,10 +80,8 @@ const WelcomeSection = () => {
           )}
         </div>
         
-        {/* Static dark overlay - adjusted opacity to 50% to make video darker */}
         <div className="absolute inset-0 bg-black/50"></div>
         
-        {/* Moving gradient overlay - reduced opacity to 30% */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/30 via-[#005C99]/30 to-[#0AB3B8]/30 animate-gradient-x"></div>
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
@@ -228,7 +222,7 @@ const WelcomeSection = () => {
         </div>
         
         <div className="py-16">
-          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How It Works</h2>
+          <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How Speedbooking Works?</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-2xl shadow-sm relative">
