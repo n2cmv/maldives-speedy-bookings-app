@@ -72,7 +72,7 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="relative -mx-8 md:-mx-16">
+        <div className="relative mx-[-20px] sm:mx-[-20px]">
           <Carousel
             opts={{
               align: "start",
@@ -82,7 +82,7 @@ const ToursSection = () => {
           >
             <CarouselContent className="-ml-4">
               {activities.map((activity, index) => (
-                <CarouselItem key={index} className="pl-4 sm:basis-1/2 lg:basis-1/4">
+                <CarouselItem key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
                   <ActivityCard 
                     imageSrc={activity.imageSrc}
                     title={activity.title}
