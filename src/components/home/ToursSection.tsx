@@ -60,7 +60,7 @@ const ToursSection = () => {
   ];
 
   return (
-    <div className="py-16 px-4">
+    <div className="py-16 px-5">
       <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16">
         <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
@@ -72,7 +72,7 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="relative">
+        <div className="relative -mx-8 md:-mx-16">
           <Carousel
             opts={{
               align: "start",
