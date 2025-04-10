@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-// Define a type for activity card props
 type ActivityCardProps = {
   imageSrc: string;
   title: string;
@@ -29,21 +27,16 @@ const ActivityCard = ({ imageSrc, title, description, isFirst = false }: Activit
     const card = cardRef.current;
     const rect = card.getBoundingClientRect();
     
-    // Calculate mouse position relative to card
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Calculate rotation based on mouse position
-    // Reduced maximum rotation to 5 degrees to prevent overflow
     const rotateX = -1 * ((y / rect.height - 0.5) * 5);
     const rotateY = (x / rect.width - 0.5) * 5;
     
-    // Apply transform
     setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
   };
 
   const handleMouseLeave = () => {
-    // Reset transform when mouse leaves
     setTransform('');
   };
 
@@ -105,7 +98,6 @@ const ToursSection = () => {
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   useEffect(() => {
-    // Hide the scroll indicator after 5 seconds on mobile
     if (isMobile) {
       const timer = setTimeout(() => {
         setShowScrollIndicator(false);
@@ -124,7 +116,7 @@ const ToursSection = () => {
   };
 
   return (
-    <div className="py-16">
+    <div className="py-12 -mt-10">
       <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
         <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
@@ -137,7 +129,6 @@ const ToursSection = () => {
         </div>
         
         <div className="relative overflow-hidden"> 
-          {/* Mobile scroll indicators that match desktop styling */}
           {isMobile && (
             <>
               <button 
