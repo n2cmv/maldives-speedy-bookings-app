@@ -105,7 +105,7 @@ const HeroSection = () => {
         
         <button 
           onClick={scrollToContent}
-          className="mt-12 text-white flex flex-col items-center cursor-pointer group"
+          className="mt-24 text-white flex flex-col items-center cursor-pointer group"
           aria-label="Scroll down for more content"
         >
           <span className="text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
