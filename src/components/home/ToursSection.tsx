@@ -46,10 +46,10 @@ const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
   };
 
   return (
-    <div className="p-2"> {/* Added padding to prevent overflow */}
+    <div className="p-2"> 
       <div 
         ref={cardRef}
-        className="space-y-3 transition-all duration-200 ease-out transform-gpu" /* Added transform-gpu for smoother animations */
+        className="space-y-3 transition-all duration-200 ease-out transform-gpu max-w-[280px] mx-auto" /* Added max-width to make images narrower */
         style={{ transform }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -99,7 +99,7 @@ const ToursSection = () => {
 
   return (
     <div className="py-16">
-      <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> {/* Added overflow-hidden to container */}
+      <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
         <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
           <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Beyond the Island</h2>
@@ -110,7 +110,7 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="relative -mx-4 md:-mx-16 lg:-mx-20 overflow-hidden"> {/* Added overflow-hidden */}
+        <div className="relative -mx-4 md:-mx-16 lg:-mx-20 overflow-hidden"> 
           <Carousel
             opts={{
               align: "start",
@@ -120,7 +120,7 @@ const ToursSection = () => {
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {activities.map((activity, index) => (
-                <CarouselItem key={index} className="pl-2 md:pl-4 basis-4/5 sm:basis-2/3 md:basis-1/2 lg:basis-2/5">
+                <CarouselItem key={index} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4">
                   <ActivityCard 
                     imageSrc={activity.imageSrc}
                     title={activity.title}
