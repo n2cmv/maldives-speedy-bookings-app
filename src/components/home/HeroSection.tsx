@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,13 @@ const HeroSection = () => {
     
     fetchVideo();
   }, []);
+
+  const scrollToContent = () => {
+    window.scrollBy({
+      top: window.innerHeight * 0.7,
+      behavior: 'smooth'
+    });
+  };
   
   return (
     <div className="relative w-full h-[80vh] overflow-hidden mb-16">
@@ -95,6 +102,19 @@ const HeroSection = () => {
           {t('common.bookNow')}
           <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
+        
+        <button 
+          onClick={scrollToContent}
+          className="mt-12 text-white flex flex-col items-center cursor-pointer group"
+          aria-label="Scroll down for more content"
+        >
+          <span className="text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
+            Explore More
+          </span>
+          <ChevronDown 
+            className="h-8 w-8 animate-bounce opacity-80 group-hover:opacity-100 transition-opacity" 
+          />
+        </button>
       </div>
     </div>
   );
