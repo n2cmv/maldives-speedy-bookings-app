@@ -9,6 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious 
 } from "@/components/ui/carousel";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Define a type for activity card props
 type ActivityCardProps = {
@@ -98,6 +99,20 @@ const ToursSection = () => {
     }
   ];
 
+  const isMobile = useIsMobile();
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
+  useEffect(() => {
+    // Hide the scroll indicator after 5 seconds on mobile
+    if (isMobile) {
+      const timer = setTimeout(() => {
+        setShowScrollIndicator(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
+
   return (
     <div className="py-16">
       <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
@@ -112,6 +127,15 @@ const ToursSection = () => {
         </div>
         
         <div className="relative overflow-hidden"> 
+          {/* Mobile scroll indicators */}
+          {isMobile && showScrollIndicator && (
+            <div className="absolute inset-y-0 right-0 z-10 flex items-center pointer-events-none animate-pulse">
+              <div className="bg-white/80 p-2 rounded-l-full shadow-md">
+                <ArrowRight className="h-6 w-6 text-[#0AB3B8]" />
+              </div>
+            </div>
+          )}
+
           <Carousel
             opts={{
               align: "start",
