@@ -105,7 +105,7 @@ const HeroSection = () => {
         
         <button 
           onClick={handleScrollDown}
-          className="flex flex-col items-center mt-8 text-white hover:text-[#0AB3B8] transition-colors duration-300 cursor-pointer"
+          className="flex flex-col items-center mt-16 text-white hover:text-[#0AB3B8] transition-colors duration-300 cursor-pointer"
           aria-label="Explore more"
         >
           <span className="text-sm font-medium mb-2">Explore more</span>
