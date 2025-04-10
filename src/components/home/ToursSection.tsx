@@ -47,7 +47,7 @@ const ActivityCard = ({ imageSrc, title, description, isFirst = false }: Activit
   };
 
   return (
-    <div className={`p-4 ${isFirst ? 'pl-0' : ''}`}>
+    <div className={`p-6 ${isFirst ? 'pl-0' : 'pl-10'}`}>
       <div 
         ref={cardRef}
         className="space-y-3 transition-all duration-200 ease-out transform-gpu"
@@ -119,7 +119,7 @@ const ToursSection = () => {
             }}
             className="w-full"
           >
-            <CarouselContent>
+            <CarouselContent className="-ml-0">
               {activities.map((activity, index) => (
                 <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4">
                   <ActivityCard 
