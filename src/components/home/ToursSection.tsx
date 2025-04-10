@@ -15,9 +15,10 @@ type ActivityCardProps = {
   imageSrc: string;
   title: string;
   description: string;
+  isFirst?: boolean;
 };
 
-const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
+const ActivityCard = ({ imageSrc, title, description, isFirst = false }: ActivityCardProps) => {
   const [transform, setTransform] = useState('');
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -49,7 +50,7 @@ const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
     <div className="p-2"> 
       <div 
         ref={cardRef}
-        className="space-y-3 transition-all duration-200 ease-out transform-gpu max-w-[280px] mx-auto" /* Added max-width to make images narrower */
+        className={`space-y-3 transition-all duration-200 ease-out transform-gpu max-w-[280px] ${isFirst ? 'ml-0' : 'mx-auto'}`}
         style={{ transform }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -125,6 +126,7 @@ const ToursSection = () => {
                     imageSrc={activity.imageSrc}
                     title={activity.title}
                     description={activity.description}
+                    isFirst={index === 0}
                   />
                 </CarouselItem>
               ))}
