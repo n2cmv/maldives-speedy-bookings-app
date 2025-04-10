@@ -50,12 +50,12 @@ const ActivityCard = ({ imageSrc, title, description, isFirst = false }: Activit
     <div className={`p-2 ${isFirst ? 'pl-0' : ''}`}> 
       <div 
         ref={cardRef}
-        className={`space-y-3 transition-all duration-200 ease-out transform-gpu max-w-[280px] ${isFirst ? 'ml-0' : 'mx-auto'}`}
+        className={`space-y-3 transition-all duration-200 ease-out transform-gpu ${isFirst ? 'ml-0' : 'mx-auto'}`}
         style={{ transform }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="overflow-hidden rounded-3xl h-72 shadow-md">
+        <div className="overflow-hidden rounded-3xl h-72 shadow-md w-[300px]">
           <img 
             src={imageSrc} 
             alt={title} 
