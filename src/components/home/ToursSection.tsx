@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Carousel, 
   CarouselContent, 
@@ -16,19 +17,54 @@ type ActivityCardProps = {
   description: string;
 };
 
-const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => (
-  <div className="space-y-3">
-    <div className="overflow-hidden rounded-3xl h-72">
-      <img 
-        src={imageSrc} 
-        alt={title} 
-        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-      />
+const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
+  const [transform, setTransform] = useState('');
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    
+    // Calculate mouse position relative to card
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Calculate rotation based on mouse position
+    // Maximum rotation is 8 degrees
+    const rotateX = -1 * ((y / rect.height - 0.5) * 8);
+    const rotateY = (x / rect.width - 0.5) * 8;
+    
+    // Apply transform
+    setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+  };
+
+  const handleMouseLeave = () => {
+    // Reset transform when mouse leaves
+    setTransform('');
+  };
+
+  return (
+    <div 
+      ref={cardRef}
+      className="space-y-3 transition-all duration-200 ease-out"
+      style={{ transform }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="overflow-hidden rounded-3xl h-72 shadow-md">
+        <img 
+          src={imageSrc} 
+          alt={title} 
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <h3 className="text-2xl font-semibold text-[#1D1D1F] mt-4">{title}</h3>
+      <p className="text-[#505056] leading-relaxed">{description}</p>
     </div>
-    <h3 className="text-2xl font-semibold text-[#1D1D1F] mt-4">{title}</h3>
-    <p className="text-[#505056] leading-relaxed">{description}</p>
-  </div>
-);
+  );
+};
 
 const ToursSection = () => {
   const activities = [
