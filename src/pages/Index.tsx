@@ -1,10 +1,8 @@
 
 import Header from "@/components/Header";
-import { Ship } from "lucide-react";
-import HeroSection from "@/components/home/HeroSection";
-import ToursSection from "@/components/home/ToursSection";
-import { WhyChooseUsSection, HowToBookSection, TestimonialsSection } from "@/components/home";
+import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { Ship } from "lucide-react";
 
 const Index = () => {
   return (
@@ -14,15 +12,8 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main>
-          <HeroSection />
-          
-          <div className="max-w-5xl mx-auto">
-            <ToursSection />
-            <WhyChooseUsSection />
-            <HowToBookSection />
-            <TestimonialsSection />
-          </div>
+        <main className="pt-16">
+          <WelcomeSection />
         </main>
       </div>
 
