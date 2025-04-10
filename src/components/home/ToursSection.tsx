@@ -116,7 +116,8 @@ const ToursSection = () => {
             opts={{
               align: "start",
               dragFree: true,
-              spacing: 16
+              // Use slidesToScroll instead of spacing to create gaps
+              slidesToScroll: 1
             }}
             className="w-full"
           >
