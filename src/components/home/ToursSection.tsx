@@ -100,6 +100,8 @@ const ToursSection = () => {
   ];
 
   const isMobile = useIsMobile();
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const [api, setApi] = useState<any>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   useEffect(() => {
@@ -112,6 +114,14 @@ const ToursSection = () => {
       return () => clearTimeout(timer);
     }
   }, [isMobile]);
+
+  const scrollPrev = () => {
+    api?.scrollPrev();
+  };
+
+  const scrollNext = () => {
+    api?.scrollNext();
+  };
 
   return (
     <div className="py-16">
@@ -127,16 +137,29 @@ const ToursSection = () => {
         </div>
         
         <div className="relative overflow-hidden"> 
-          {/* Mobile scroll indicators */}
-          {isMobile && showScrollIndicator && (
-            <div className="absolute inset-y-0 right-0 z-10 flex items-center pointer-events-none animate-pulse">
-              <div className="bg-white/80 p-2 rounded-l-full shadow-md">
-                <ArrowRight className="h-6 w-6 text-[#0AB3B8]" />
-              </div>
-            </div>
+          {/* Mobile scroll indicators that match desktop styling */}
+          {isMobile && (
+            <>
+              <button 
+                onClick={scrollPrev}
+                className="absolute left-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
+                aria-label="Previous slide"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button 
+                onClick={scrollNext}
+                className="absolute right-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
+                aria-label="Next slide"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </>
           )}
 
           <Carousel
+            ref={carouselRef}
+            setApi={setApi}
             opts={{
               align: "start",
               dragFree: true
