@@ -47,10 +47,10 @@ const ActivityCard = ({ imageSrc, title, description, isFirst = false }: Activit
   };
 
   return (
-    <div className={`p-2 ${isFirst ? 'pl-0' : ''} mx-2`}> 
+    <div className="p-4">
       <div 
         ref={cardRef}
-        className={`space-y-3 transition-all duration-200 ease-out transform-gpu ${isFirst ? 'ml-0' : 'mx-auto'}`}
+        className="space-y-3 transition-all duration-200 ease-out transform-gpu"
         style={{ transform }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -116,19 +116,16 @@ const ToursSection = () => {
             opts={{
               align: "start",
               dragFree: true,
-              // Use slidesToScroll instead of spacing to create gaps
-              slidesToScroll: 1
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-2 md:-ml-4">
+            <CarouselContent>
               {activities.map((activity, index) => (
-                <CarouselItem key={index} className={index === 0 ? 'basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4' : 'basis-full pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4'}>
+                <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4">
                   <ActivityCard 
                     imageSrc={activity.imageSrc}
                     title={activity.title}
                     description={activity.description}
-                    isFirst={index === 0}
                   />
                 </CarouselItem>
               ))}
