@@ -47,7 +47,7 @@ const ActivityCard = ({ imageSrc, title, description, isFirst = false }: Activit
   };
 
   return (
-    <div className="p-4">
+    <div className={`p-4 ${isFirst ? 'pl-0' : ''}`}>
       <div 
         ref={cardRef}
         className="space-y-3 transition-all duration-200 ease-out transform-gpu"
@@ -126,6 +126,7 @@ const ToursSection = () => {
                     imageSrc={activity.imageSrc}
                     title={activity.title}
                     description={activity.description}
+                    isFirst={index === 0}
                   />
                 </CarouselItem>
               ))}
