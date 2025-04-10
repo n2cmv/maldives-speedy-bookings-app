@@ -32,9 +32,9 @@ const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
     const y = e.clientY - rect.top;
     
     // Calculate rotation based on mouse position
-    // Maximum rotation is 8 degrees
-    const rotateX = -1 * ((y / rect.height - 0.5) * 8);
-    const rotateY = (x / rect.width - 0.5) * 8;
+    // Reduced maximum rotation to 5 degrees to prevent overflow
+    const rotateX = -1 * ((y / rect.height - 0.5) * 5);
+    const rotateY = (x / rect.width - 0.5) * 5;
     
     // Apply transform
     setTransform(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
@@ -46,22 +46,24 @@ const ActivityCard = ({ imageSrc, title, description }: ActivityCardProps) => {
   };
 
   return (
-    <div 
-      ref={cardRef}
-      className="space-y-3 transition-all duration-200 ease-out"
-      style={{ transform }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className="overflow-hidden rounded-3xl h-72 shadow-md">
-        <img 
-          src={imageSrc} 
-          alt={title} 
-          className="w-full h-full object-cover"
-        />
+    <div className="p-2"> {/* Added padding to prevent overflow */}
+      <div 
+        ref={cardRef}
+        className="space-y-3 transition-all duration-200 ease-out transform-gpu" /* Added transform-gpu for smoother animations */
+        style={{ transform }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="overflow-hidden rounded-3xl h-72 shadow-md">
+          <img 
+            src={imageSrc} 
+            alt={title} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <h3 className="text-2xl font-semibold text-[#1D1D1F] mt-4">{title}</h3>
+        <p className="text-[#505056] leading-relaxed">{description}</p>
       </div>
-      <h3 className="text-2xl font-semibold text-[#1D1D1F] mt-4">{title}</h3>
-      <p className="text-[#505056] leading-relaxed">{description}</p>
     </div>
   );
 };
@@ -97,7 +99,7 @@ const ToursSection = () => {
 
   return (
     <div className="py-16">
-      <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16">
+      <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> {/* Added overflow-hidden to container */}
         <div className="mb-12 max-w-md">
           <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">EXCURSIONS</span>
           <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Beyond the Island</h2>
@@ -108,7 +110,7 @@ const ToursSection = () => {
           </p>
         </div>
         
-        <div className="relative -mx-4 md:-mx-16 lg:-mx-20">
+        <div className="relative -mx-4 md:-mx-16 lg:-mx-20 overflow-hidden"> {/* Added overflow-hidden */}
           <Carousel
             opts={{
               align: "start",
