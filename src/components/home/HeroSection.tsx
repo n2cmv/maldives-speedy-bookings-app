@@ -102,10 +102,12 @@ const HeroSection = () => {
           {t('common.bookNow')}
           <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
-        
+      </div>
+      
+      <div className="absolute bottom-12 left-0 right-0 flex justify-center">
         <button 
           onClick={handleScrollDown}
-          className="flex flex-col items-center mt-16 text-white hover:text-[#0AB3B8] transition-colors duration-300 cursor-pointer"
+          className="flex flex-col items-center text-white hover:text-[#0AB3B8] transition-colors duration-300 cursor-pointer"
           aria-label="Explore more"
         >
           <span className="text-sm font-medium mb-2">Explore more</span>
