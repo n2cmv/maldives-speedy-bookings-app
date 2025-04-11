@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -26,8 +25,10 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       booking.paymentReference = generatePaymentReference();
     }
 
-    // Explicitly determine if this is an activity booking - improved detection
-    const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
+    // Enhanced activity booking detection
+    const isActivityBooking = 
+      booking.isActivityBooking === true || 
+      (booking.activity !== undefined && booking.activity !== null && booking.activity !== "");
     
     console.log("Saving booking to database:", {
       isActivityBooking,
@@ -50,7 +51,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
-      // Ensure activity information is properly stored
+      // Enhanced activity information storage
       activity: booking.activity || null,
       is_activity_booking: isActivityBooking
     };
@@ -198,22 +199,6 @@ function isValidEmail(email: string): boolean {
 export async function getBookingsByEmail(email: string): Promise<{ data: any[]; error: any }> {
   try {
     console.log("Fetching bookings for email:", email);
-    
-    // Debug query to check for activity bookings first
-    const { data: activityCheck, error: activityCheckError } = await supabase
-      .from('bookings')
-      .select('id, activity, is_activity_booking')
-      .eq('user_email', email.toLowerCase().trim());
-      
-    if (activityCheck && activityCheck.length > 0) {
-      console.log("Activity check results:", activityCheck);
-      
-      const activityBookingsCheck = activityCheck.filter(booking => 
-        booking.is_activity_booking === true || booking.activity !== null
-      );
-      
-      console.log("Found activity bookings in check:", activityBookingsCheck.length);
-    }
     
     // Main query to get all bookings
     const { data, error } = await supabase

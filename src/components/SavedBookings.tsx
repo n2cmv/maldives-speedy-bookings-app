@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,21 +73,17 @@ const SavedBookings = () => {
     });
   };
   
-  // Enhanced isActivityBooking function with detailed logging
+  // Enhanced isActivityBooking function with improved detection logic
   const isActivityBooking = (booking: BookingInfo): boolean => {
-    // Check for activity property first
-    if (booking.activity && booking.activity.trim() !== '') {
-      console.log(`Saved booking ${booking.id} is an activity booking with activity: ${booking.activity}`);
+    // Check both properties for maximum compatibility
+    const hasActivityFlag = booking.isActivityBooking === true;
+    const hasActivityValue = booking.activity && booking.activity.trim() !== '';
+    
+    if (hasActivityFlag || hasActivityValue) {
+      console.log(`Saved booking ${booking.id} is an activity booking`);
       return true;
     }
     
-    // Then check for the explicit flag
-    if (booking.isActivityBooking === true) {
-      console.log(`Saved booking ${booking.id} is marked as activity booking with flag`);
-      return true;
-    }
-    
-    console.log(`Saved booking ${booking.id} is NOT an activity booking`);
     return false;
   };
   
