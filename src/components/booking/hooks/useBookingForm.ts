@@ -21,6 +21,7 @@ export const useBookingForm = ({
     from: '',
     island: preSelectedIsland || '',
     time: '',
+    date: new Date(),
     seats: 1,
     passengerCounts: {
       adults: 1,

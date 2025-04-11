@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 interface TimeSelectorProps {
   label: string;
-  selectedTime: string;
+  selectedTime: string | Time;
   availableTimes: Time[];
   onTimeChange: (time: Time) => void;
   id?: string;
@@ -42,9 +42,10 @@ const TimeSelector = ({
           <ChevronDown className="h-5 w-5 text-ocean/70" />
         </div>
         <Select
-          value={selectedTime}
+          value={selectedTime as string}
           onValueChange={(value) => {
             console.log(`TimeSelector - Time selected: ${value}`);
+            // Convert string value back to Time enum
             onTimeChange(value as Time);
           }}
         >
@@ -57,11 +58,11 @@ const TimeSelector = ({
             {availableTimes && availableTimes.length > 0 ? (
               availableTimes.map((time) => (
                 <SelectItem 
-                  key={time} 
-                  value={time}
+                  key={String(time)} 
+                  value={String(time)}
                   className="select-item"
                 >
-                  {time}
+                  {String(time)}
                 </SelectItem>
               ))
             ) : (

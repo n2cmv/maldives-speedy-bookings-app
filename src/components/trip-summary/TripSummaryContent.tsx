@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookingInfo } from '@/types/booking';
+import { BookingInfo, Time } from '@/types/booking';
 import JourneyInfo from './JourneyInfo';
 import JourneySeparator from './JourneySeparator';
 import PriceSummary from './PriceSummary';
@@ -52,7 +52,7 @@ const TripSummaryContent = ({
               <h3 className="text-lg font-bold text-ocean mb-2">{bookingInfo.activity}</h3>
             </div>
             <p className="text-sm text-gray-500">
-              {bookingInfo.date && formatDate(bookingInfo.date)} • {bookingInfo.time}
+              {bookingInfo.date && formatDate(bookingInfo.date)} • {String(bookingInfo.time)}
             </p>
           </div>
         </>
@@ -62,7 +62,7 @@ const TripSummaryContent = ({
           <JourneyInfo
             from={bookingInfo.from}
             to={bookingInfo.island}
-            time={bookingInfo.time}
+            time={String(bookingInfo.time)}
             date={bookingInfo.date ? formatDate(bookingInfo.date) : ''}
             isReturnTrip={!!isReturnTrip}
           />
@@ -73,7 +73,7 @@ const TripSummaryContent = ({
               <JourneyInfo
                 from={bookingInfo.returnTripDetails.from || bookingInfo.island}
                 to={bookingInfo.returnTripDetails.island || bookingInfo.from}
-                time={bookingInfo.returnTripDetails.time}
+                time={String(bookingInfo.returnTripDetails.time)}
                 date={bookingInfo.returnTripDetails.date ? formatDate(bookingInfo.returnTripDetails.date) : ''}
                 isReturn={true}
                 isReturnTrip={!!isReturnTrip}
