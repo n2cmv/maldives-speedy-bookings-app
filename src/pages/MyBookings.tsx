@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -47,26 +48,32 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      const response = await supabase.functions.invoke("process-booking-otp", {
+      // Make sure we're using the correct URL format for the function invocation
+      const { data, error } = await supabase.functions.invoke("process-booking-otp", {
         body: { email }
       });
       
-      console.log("OTP response:", response);
+      console.log("OTP response:", data, error);
       
-      if (response.error) {
-        console.error("Error from process-booking-otp function:", response.error);
-        const errorMsg = typeof response.error === 'object' ? 
-          JSON.stringify(response.error) : String(response.error);
+      if (error) {
+        console.error("Error from process-booking-otp function:", error);
+        let errorMsg = "Please try again later";
+        if (typeof error === 'object') {
+          errorMsg = JSON.stringify(error);
+        } else if (typeof error === 'string') {
+          errorMsg = error;
+        }
+        
         toast.error("Error sending verification code", {
           description: `API error: ${errorMsg}`
         });
         return;
       }
       
-      if (!response.data?.success) {
-        const errorMsg = response.data?.error || "Please try again later";
+      if (!data?.success) {
+        const errorMsg = data?.error || "Please try again later";
         console.error("Error response from process-booking-otp:", errorMsg, 
-          response.data?.details ? `Details: ${response.data.details}` : '');
+          data?.details ? `Details: ${data.details}` : '');
         toast.error("Error sending verification code", {
           description: errorMsg
         });

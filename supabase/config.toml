@@ -6,4 +6,3 @@ verify_jwt = false
 
 [functions.validate-booking-otp]
 verify_jwt = false
-
