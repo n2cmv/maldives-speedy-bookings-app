@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -260,7 +259,7 @@ const MyBookings = () => {
                     {isActivityBooking(selectedBooking) ? "Activity" : "Ferry"}
                   </Badge>
                   {selectedBooking.payment_complete ? (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900">Confirmed</Badge>
+                    <Badge variant="success">Confirmed</Badge>
                   ) : (
                     <Badge variant="destructive">Pending</Badge>
                   )}
@@ -389,7 +388,7 @@ const MyBookings = () => {
                                 
                                 <div className="mt-3 flex items-center gap-2">
                                   {booking.payment_complete && (
-                                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 hover:bg-green-200">
+                                    <Badge variant="success" className="text-xs">
                                       Confirmed
                                     </Badge>
                                   )}
@@ -419,4 +418,3 @@ const MyBookings = () => {
 };
 
 export default MyBookings;
-
