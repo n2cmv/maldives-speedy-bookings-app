@@ -81,14 +81,15 @@ const ActivityBookingsManager = () => {
       
       if (flaggedData && flaggedData.length > 0) {
         console.log(`Found ${flaggedData.length} bookings with is_activity_booking=true`);
-        combinedData = [...flaggedData];
+        // Type assertion to tell TypeScript that flaggedData is compatible with BookingData[]
+        combinedData = [...flaggedData as unknown as BookingData[]];
       }
       
       if (activityData && activityData.length > 0) {
         console.log(`Found ${activityData.length} bookings with activity field not null`);
         
         // Add only unique entries from activityData
-        activityData.forEach(booking => {
+        (activityData as unknown as BookingData[]).forEach(booking => {
           if (!combinedData.some(b => b.id === booking.id)) {
             combinedData.push(booking);
           }

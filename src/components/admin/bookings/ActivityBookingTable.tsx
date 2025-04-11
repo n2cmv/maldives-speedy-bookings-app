@@ -39,6 +39,7 @@ const ActivityBookingTable = ({
       to: booking.to_location,
       date: booking.departure_date,
       passenger_count: booking.passenger_count,
+      passenger_info: booking.passenger_info,
       full_object: booking
     });
   };
