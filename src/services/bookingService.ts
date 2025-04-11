@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -27,6 +28,12 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
 
     // Explicitly determine if this is an activity booking
     const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
+    
+    console.log("Saving booking to database:", {
+      isActivityBooking,
+      activity: booking.activity,
+      isActivityBookingFlag: booking.isActivityBooking
+    });
 
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
@@ -48,6 +55,8 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       is_activity_booking: isActivityBooking
     };
 
+    console.log("Final booking data to be inserted:", bookingData);
+
     const { data, error } = await supabase
       .from('bookings')
       .insert(bookingData)
@@ -59,6 +68,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       return { data: null, error };
     }
 
+    console.log("Booking successfully saved:", data);
     return { data, error: null };
   } catch (error) {
     console.error("Exception saving booking:", error);

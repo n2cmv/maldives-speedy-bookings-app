@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -153,6 +152,7 @@ const MyBookings = () => {
           return;
         }
         
+        console.log("Retrieved bookings data:", bookingsData);
         setBookings(bookingsData || []);
         
         if (bookingsData && bookingsData.length === 0) {
@@ -184,6 +184,46 @@ const MyBookings = () => {
     setQrDialogOpen(true);
   };
 
+  const isActivityBooking = (booking: any): boolean => {
+    if (booking.is_activity_booking === true) {
+      console.log(`Booking ${booking.id} is marked as activity booking with flag`);
+      return true;
+    }
+    
+    if (booking.activity && booking.activity.trim() !== '') {
+      console.log(`Booking ${booking.id} is activity booking with activity: ${booking.activity}`);
+      return true;
+    }
+    
+    if (booking.passenger_info && Array.isArray(booking.passenger_info)) {
+      for (const passenger of booking.passenger_info) {
+        if (passenger.activity && passenger.activity.trim() !== '') {
+          console.log(`Booking ${booking.id} has passenger with activity: ${passenger.activity}`);
+          return true;
+        }
+      }
+    }
+    
+    console.log(`Booking ${booking.id} is NOT an activity booking`);
+    return false;
+  };
+
+  const getActivityName = (booking: any): string => {
+    if (booking.activity && booking.activity.trim() !== '') {
+      return booking.activity;
+    }
+    
+    if (booking.passenger_info && Array.isArray(booking.passenger_info)) {
+      for (const passenger of booking.passenger_info) {
+        if (passenger.activity && passenger.activity.trim() !== '') {
+          return passenger.activity;
+        }
+      }
+    }
+    
+    return "Activity";
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -198,52 +238,6 @@ const MyBookings = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
-
-  const isActivityBooking = (booking: any): boolean => {
-    try {
-      // First, check if the booking has an explicit is_activity_booking flag
-      if (booking.is_activity_booking === true) {
-        return true;
-      }
-      
-      // Then check if the booking has an activity property directly
-      if (booking.activity) {
-        return true;
-      }
-      
-      // Finally check if any passenger has an activity
-      const passengerInfo = booking.passenger_info;
-      if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
-        if (passengerInfo.some(p => p.activity)) {
-          return true;
-        }
-      }
-    } catch (error) {
-      console.error("Error checking booking type:", error);
-    }
-    return false;
-  };
-
-  const getActivityName = (booking: any): string => {
-    try {
-      // Try to get activity directly from booking first
-      if (booking.activity) {
-        return booking.activity;
-      }
-      
-      // Then look in passenger info
-      const passengerInfo = booking.passenger_info;
-      if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
-        const activityInfo = passengerInfo.find(p => p.activity);
-        if (activityInfo && activityInfo.activity) {
-          return activityInfo.activity;
-        }
-      }
-    } catch (error) {
-      console.error("Error getting activity name:", error);
-    }
-    return "Activity";
   };
 
   return (
