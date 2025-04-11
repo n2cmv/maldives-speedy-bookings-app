@@ -9,10 +9,25 @@ import { BookingInfo } from "@/types/booking";
 const BmlPaymentHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isVerifying, setIsVerifying] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [hasAttemptedVerification, setHasAttemptedVerification] = useState(false);
   
   useEffect(() => {
     const handlePaymentVerification = async () => {
+      // Skip verification if we've already attempted it once
+      if (hasAttemptedVerification) {
+        return;
+      }
+      
+      // Only verify if we have search params in the URL
+      const searchParams = new URLSearchParams(location.search);
+      if (!searchParams.has('status')) {
+        return;
+      }
+      
+      setIsVerifying(true);
+      setHasAttemptedVerification(true);
+      
       try {
         // Check for pending booking in localStorage
         const pendingBookingJson = localStorage.getItem('pendingBooking');
@@ -83,11 +98,11 @@ const BmlPaymentHandler = () => {
       }
     };
     
-    // Check if we're returning from BML payment
-    if (location.pathname === "/confirmation" && location.search.includes("status=")) {
+    // Check if we're returning from BML payment - only on the index page
+    if (location.pathname === "/" && location.search.includes("status=")) {
       handlePaymentVerification();
     }
-  }, [navigate, location]);
+  }, [navigate, location, hasAttemptedVerification]);
   
   if (!isVerifying) return null;
   
