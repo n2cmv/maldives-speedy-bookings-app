@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -200,39 +199,36 @@ const MyBookings = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
-  // Function to determine if a booking is an activity booking
   const isActivityBooking = (booking: any): boolean => {
     try {
-      // Try to parse the passenger_info JSON to check for activity
+      if (booking.isActivityBooking === true) {
+        return true;
+      }
+      
+      if (booking.activity) {
+        return true;
+      }
+      
       const passengerInfo = booking.passenger_info;
       if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
-        // Check if this is marked as an activity booking in any way
         if (passengerInfo.some(p => p.activity)) {
           return true;
         }
-      }
-      // Check if the booking itself has an activity field
-      if (booking.activity) {
-        return true;
       }
     } catch (error) {
       console.error("Error checking booking type:", error);
     }
     return false;
   };
-  
-  // Function to get activity name from booking
+
   const getActivityName = (booking: any): string => {
     try {
-      // Try to get the activity name from the booking
       if (booking.activity) {
         return booking.activity;
       }
       
-      // Try to parse the passenger_info JSON to get activity
       const passengerInfo = booking.passenger_info;
       if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
-        // Look for any activity information
         const activityInfo = passengerInfo.find(p => p.activity);
         if (activityInfo && activityInfo.activity) {
           return activityInfo.activity;
