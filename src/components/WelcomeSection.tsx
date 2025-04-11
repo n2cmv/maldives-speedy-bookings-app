@@ -4,8 +4,7 @@ import {
   HeroSection, 
   ToursSection, 
   WhyChooseUsSection, 
-  HowToBookSection,
-  TestimonialsSection
+  HowToBookSection
 } from "./home";
 
 const WelcomeSection = () => {
@@ -19,7 +18,6 @@ const WelcomeSection = () => {
         <ToursSection />
         <WhyChooseUsSection />
         <HowToBookSection />
-        <TestimonialsSection />
       </div>
     </div>
   );
