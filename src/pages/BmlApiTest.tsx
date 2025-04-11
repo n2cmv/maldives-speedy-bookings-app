@@ -124,7 +124,7 @@ const BmlApiTest = () => {
                   <div>
                     <h3 className="font-medium">Check Your Environment:</h3>
                     <p className="text-gray-600">
-                      The application is currently using the BML UAT (test) environment. 
+                      The application is currently using the BML <span className="font-semibold text-green-600">PRODUCTION</span> environment. 
                       The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">{API_BASE_URL}</code>
                     </p>
                   </div>

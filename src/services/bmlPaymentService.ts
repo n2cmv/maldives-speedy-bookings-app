@@ -1,4 +1,3 @@
-
 import { BookingInfo } from "@/types/booking";
 
 interface BMLPaymentResponse {
@@ -21,8 +20,8 @@ export const BML_CONFIG: BMLPaymentConfig = {
   apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImI4M2M4YzZiLTEyYmMtNGIyZS04NjQwLTVkOWU2Njc4NmFkYyIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NDM4MzkzNiwiZXhwIjo0OTAwMDU3NTM2fQ._09EMmA2kYHhHd1ytmBIEv0oAgn_8pakQkviFino9Vo"
 };
 
-// BML API endpoints - using UAT (test) endpoints
-export const API_BASE_URL = "https://api.uat.merchants.bankofmaldives.com.mv";
+// BML API endpoints - updated to use production API instead of UAT
+export const API_BASE_URL = "https://api.merchants.bankofmaldives.com.mv";
 const CREATE_PAYMENT_ENDPOINT = "/public/v1/payments";
 
 // Helper function to ensure we have the full URL for API endpoints
@@ -137,7 +136,7 @@ export async function createBmlPaymentSession(
     console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
 
     // Make API request to BML to create a payment session
-    const response = await fetch(`${API_BASE_URL}${CREATE_PAYMENT_ENDPOINT}`, {
+    const response = await fetch(getApiUrl(CREATE_PAYMENT_ENDPOINT), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -160,7 +159,7 @@ export async function createBmlPaymentSession(
       };
     }
 
-    // In test mode, if using the UAT endpoint, you'll get a test payment URL
+    // Now using production endpoint, which should return the proper payment URL
     return {
       success: true,
       paymentUrl: data.redirectUrl || data.checkoutUrl,
@@ -189,7 +188,7 @@ export async function verifyBmlPayment(transactionId: string): Promise<{
   console.log("BML Service: Verifying payment with transaction ID:", transactionId);
   
   try {
-    const verifyUrl = `${API_BASE_URL}/public/v1/payments/${transactionId}/status`;
+    const verifyUrl = getApiUrl(`/public/v1/payments/${transactionId}/status`);
     console.log("BML Service: Verification URL:", verifyUrl);
     
     const response = await fetch(verifyUrl, {
@@ -244,5 +243,6 @@ export async function verifyBmlPayment(transactionId: string): Promise<{
  * Navigate to a payment test page for debugging BML integration
  */
 export function openBmlTestPage(): void {
-  window.open("https://uat.merchants.bankofmaldives.com.mv/test-payment-page", "_blank");
+  // Update to open production test page instead of UAT
+  window.open("https://merchants.bankofmaldives.com.mv/test-payment-page", "_blank");
 }
