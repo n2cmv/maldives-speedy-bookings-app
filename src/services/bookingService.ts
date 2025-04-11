@@ -199,6 +199,23 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
   try {
     console.log("Fetching bookings for email:", email);
     
+    // Debug query to check for activity bookings first
+    const { data: activityCheck, error: activityCheckError } = await supabase
+      .from('bookings')
+      .select('id, activity, is_activity_booking')
+      .eq('user_email', email.toLowerCase().trim());
+      
+    if (activityCheck && activityCheck.length > 0) {
+      console.log("Activity check results:", activityCheck);
+      
+      const activityBookingsCheck = activityCheck.filter(booking => 
+        booking.is_activity_booking === true || booking.activity !== null
+      );
+      
+      console.log("Found activity bookings in check:", activityBookingsCheck.length);
+    }
+    
+    // Main query to get all bookings
     const { data, error } = await supabase
       .from('bookings')
       .select('*')

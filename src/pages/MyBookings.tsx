@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -205,12 +206,16 @@ const MyBookings = () => {
   };
 
   const isActivityBooking = (booking: any): boolean => {
-    console.log(`Booking ${booking.id} activity flags:`, {
-      is_activity_booking: booking.is_activity_booking,
-      activity: booking.activity,
-      has_activity: booking.activity !== null && booking.activity !== ''
-    });
+    // Detailed logging for troubleshooting
+    if (booking && booking.id) {
+      console.log(`Booking ${booking.id} activity flags:`, {
+        is_activity_booking: booking.is_activity_booking,
+        activity: booking.activity,
+        has_activity: booking.activity !== null && booking.activity !== ''
+      });
+    }
     
+    // Check both the is_activity_booking flag AND the activity field
     if (booking.is_activity_booking === true) {
       console.log(`Booking ${booking.id} is marked as activity booking with flag`);
       return true;
