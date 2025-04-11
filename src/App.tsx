@@ -1,4 +1,3 @@
-
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 import Activities from "./pages/Activities";
+import BmlApiTest from "./pages/BmlApiTest";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -69,6 +69,7 @@ const App = () => {
                 <Route path="/activities" element={<Activities />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/bml-test" element={<BmlApiTest />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

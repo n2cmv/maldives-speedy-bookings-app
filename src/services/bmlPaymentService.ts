@@ -26,6 +26,58 @@ const API_BASE_URL = "https://api.uat.merchants.bankofmaldives.com.mv";
 const CREATE_PAYMENT_ENDPOINT = "/public/v1/payments";
 
 /**
+ * Tests the BML API connection
+ * @returns Promise with the connection status
+ */
+export async function testBmlApiConnection(): Promise<{
+  success: boolean;
+  message: string;
+  details?: any;
+}> {
+  try {
+    console.log("BML Service: Testing API connection");
+    // Send a simple HEAD request to check if API is reachable
+    const response = await fetch(`${API_BASE_URL}/public/v1/health`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`BML Service: API health check response status: ${response.status}`);
+    let responseBody = null;
+    try {
+      responseBody = await response.json();
+      console.log("BML Service: API health response:", responseBody);
+    } catch (e) {
+      console.log("BML Service: No JSON response from health endpoint");
+    }
+    
+    if (response.ok) {
+      return {
+        success: true,
+        message: "Successfully connected to BML API",
+        details: responseBody
+      };
+    } else {
+      return {
+        success: false,
+        message: `Failed to connect to BML API: Status ${response.status}`,
+        details: responseBody
+      };
+    }
+  } catch (error) {
+    console.error("BML Service: Error testing API connection:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown connection error",
+      details: error
+    };
+  }
+}
+
+/**
  * Initiates a payment request to Bank of Maldives payment gateway
  * @param booking The booking information to be paid for
  * @param amount The payment amount in USD
@@ -38,6 +90,8 @@ export async function createBmlPaymentSession(
   returnUrl: string,
   cancelUrl: string
 ): Promise<BMLPaymentResponse> {
+  console.log("BML Service: Creating payment session with amount:", amount);
+  
   try {
     // Generate a unique transaction ID for this payment
     const txnId = `RTM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -75,7 +129,7 @@ export async function createBmlPaymentSession(
       cancelUrl
     };
 
-    console.log("Initiating BML payment request:", paymentData);
+    console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
 
     // Make API request to BML to create a payment session
     const response = await fetch(`${API_BASE_URL}${CREATE_PAYMENT_ENDPOINT}`, {
@@ -87,14 +141,17 @@ export async function createBmlPaymentSession(
       body: JSON.stringify(paymentData)
     });
 
+    const responseStatus = response.status;
+    console.log("BML Service: Payment request status:", responseStatus);
+    
     const data = await response.json();
-    console.log("BML payment response:", data);
+    console.log("BML Service: Payment request response:", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
-      console.error("BML payment error:", data);
+      console.error("BML Service: Payment request error:", data);
       return {
         success: false,
-        error: data.message || "Failed to initialize payment"
+        error: data.message || `Failed to initialize payment (Status ${responseStatus})`
       };
     }
 
@@ -105,7 +162,7 @@ export async function createBmlPaymentSession(
       reference: txnId
     };
   } catch (error) {
-    console.error("Error creating BML payment:", error);
+    console.error("BML Service: Error creating payment:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred"
@@ -122,37 +179,65 @@ export async function verifyBmlPayment(transactionId: string): Promise<{
   verified: boolean;
   status?: string;
   error?: string;
+  rawResponse?: any;
 }> {
+  console.log("BML Service: Verifying payment with transaction ID:", transactionId);
+  
   try {
-    const response = await fetch(`${API_BASE_URL}/public/v1/payments/${transactionId}/status`, {
+    const verifyUrl = `${API_BASE_URL}/public/v1/payments/${transactionId}/status`;
+    console.log("BML Service: Verification URL:", verifyUrl);
+    
+    const response = await fetch(verifyUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${BML_CONFIG.apiKey}`
       }
     });
 
-    const data = await response.json();
-    console.log("BML payment verification response:", data);
+    const responseStatus = response.status;
+    console.log("BML Service: Verification status code:", responseStatus);
+    
+    let data: any;
+    try {
+      data = await response.json();
+      console.log("BML Service: Verification response:", JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.error("BML Service: Failed to parse verification response:", e);
+      return {
+        success: false,
+        verified: false,
+        error: "Invalid response from payment gateway"
+      };
+    }
 
     if (!response.ok) {
       return {
         success: false,
         verified: false,
-        error: data.message || "Failed to verify payment"
+        error: data.message || `Failed to verify payment (Status ${responseStatus})`,
+        rawResponse: data
       };
     }
 
     return {
       success: true,
       verified: data.status === "COMPLETED" || data.status === "AUTHORIZED",
-      status: data.status
+      status: data.status,
+      rawResponse: data
     };
   } catch (error) {
-    console.error("Error verifying BML payment:", error);
+    console.error("BML Service: Error verifying payment:", error);
     return {
       success: false,
       verified: false,
       error: error instanceof Error ? error.message : "Unknown error occurred"
     };
   }
+}
+
+/**
+ * Navigate to a payment test page for debugging BML integration
+ */
+export function openBmlTestPage(): void {
+  window.open("https://uat.merchants.bankofmaldives.com.mv/test-payment-page", "_blank");
 }
