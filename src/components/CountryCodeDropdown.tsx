@@ -33,13 +33,16 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-20 px-2 flex justify-between items-center"
+          className="w-full h-12 px-2 flex justify-between items-center bg-white"
         >
-          {value || "+1"}
-          <ChevronDown className="h-4 w-4 ml-1" />
+          <span className="text-base">{value || "+1"}</span>
+          <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent
+        align="start"
+        className="w-full bg-white border border-gray-200 shadow-md z-50"
+      >
         {COMMON_COUNTRY_CODES.map((item) => (
           <DropdownMenuItem
             key={item.code}
@@ -47,9 +50,9 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
               onChange(item.code);
               setIsOpen(false);
             }}
-            className="cursor-pointer"
+            className="cursor-pointer py-2.5 hover:bg-gray-50"
           >
-            <span>
+            <span className="text-sm">
               {item.code} ({item.country})
             </span>
           </DropdownMenuItem>

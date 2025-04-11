@@ -1,13 +1,11 @@
 
-import React, { useState, useEffect } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -96,76 +94,102 @@ const PassengerForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 md:space-y-8">
         {fields.map((item, index) => (
-          <div key={item.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name={`passengers.${index}.name`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`passengers.${index}.email`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Email address" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`passengers.${index}.phone`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <div className="flex">
-                      <CountryCodeDropdown
-                        value={form.watch(`passengers.${index}.countryCode`)}
-                        onChange={(value) => {
-                          form.setValue(`passengers.${index}.countryCode`, value);
-                        }}
+          <div key={item.id} className="p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-100">
+            <h3 className="font-medium text-lg mb-4 text-ocean-dark">
+              {index === 0 ? "Primary Passenger" : `Passenger ${index + 1}`}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name={`passengers.${index}.name`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Full Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Full name" 
+                        className="h-12" 
+                        {...field} 
                       />
-                      <Input
-                        placeholder="Phone number"
-                        className="ml-2"
-                        {...field}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`passengers.${index}.email`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Email</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Email address" 
+                        className="h-12" 
+                        {...field} 
                       />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`passengers.${index}.passport`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Passport</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Passport number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`passengers.${index}.phone`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Phone Number</FormLabel>
+                    <FormControl>
+                      <div className="flex space-x-2">
+                        <div className="w-1/3 sm:w-1/4">
+                          <CountryCodeDropdown
+                            value={form.watch(`passengers.${index}.countryCode`)}
+                            onChange={(value) => {
+                              form.setValue(`passengers.${index}.countryCode`, value);
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <Input
+                            placeholder="Phone number"
+                            className="h-12"
+                            {...field}
+                          />
+                        </div>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`passengers.${index}.passport`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Passport/ID</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Passport or ID number" 
+                        className="h-12" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
         ))}
-        <Button type="submit" disabled={!form.formState.isValid}>
+        <Button 
+          type="submit" 
+          disabled={!form.formState.isValid}
+          className="w-full md:w-auto h-12 px-6 text-base font-medium bg-ocean hover:bg-ocean-dark"
+        >
           {submitButtonContent || "Submit"}
         </Button>
       </form>

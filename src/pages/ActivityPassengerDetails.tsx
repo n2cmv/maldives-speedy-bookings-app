@@ -10,11 +10,14 @@ import { ChevronLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import PassengerForm from "@/components/PassengerForm";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Passenger } from "@/types/booking";
 
 const ActivityPassengerDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [bookingInfo, setBookingInfo] = useState<any>(null);
   const [passengers, setPassengers] = useState<any[]>([]);
   const [isValid, setIsValid] = useState(false);
@@ -80,7 +83,7 @@ const ActivityPassengerDetails = () => {
       <Header />
       
       <motion.div
-        className="max-w-4xl mx-auto pt-28 px-4 mb-6"
+        className="max-w-4xl mx-auto pt-20 sm:pt-28 px-4 mb-6"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -98,13 +101,24 @@ const ActivityPassengerDetails = () => {
           Back to Activity Selection
         </Button>
         
-        <h1 className="text-3xl font-bold text-ocean-dark mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-ocean-dark mb-6 md:mb-8">
           Participant Details
         </h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* On mobile, show the summary card first */}
+          {isMobile && (
+            <div className="lg:col-span-1 mb-4">
+              <TripSummaryCard 
+                isActivityBooking={true}
+                heading="Activity Summary"
+                booking={bookingInfo}
+              />
+            </div>
+          )}
+          
           <div className="lg:col-span-2">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
               <PassengerForm
                 passengers={passengers}
                 onFormValidityChange={setIsValid}
@@ -119,13 +133,16 @@ const ActivityPassengerDetails = () => {
             </div>
           </div>
           
-          <div>
-            <TripSummaryCard 
-              isActivityBooking={true}
-              heading="Activity Summary"
-              booking={bookingInfo}
-            />
-          </div>
+          {/* On desktop, show the summary card on the right */}
+          {!isMobile && (
+            <div className="lg:col-span-1">
+              <TripSummaryCard 
+                isActivityBooking={true}
+                heading="Activity Summary"
+                booking={bookingInfo}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
