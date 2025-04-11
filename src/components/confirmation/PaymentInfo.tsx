@@ -1,9 +1,11 @@
 
 import { CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { BookingInfo } from "@/types/booking";
 
-interface PaymentInfoProps {
-  paymentReference?: string;
+export interface PaymentInfoProps {
+  paymentReference: string;
+  booking?: BookingInfo;
 }
 
 const PaymentInfo = ({ paymentReference }: PaymentInfoProps) => {

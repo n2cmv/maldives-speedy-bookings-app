@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -34,7 +33,6 @@ const Confirmation = () => {
   
   useEffect(() => {
     if (location.state?.isActivityBooking) {
-      // Process activity booking
       const activityData = location.state;
       if (!activityData) {
         navigate("/");
@@ -42,28 +40,22 @@ const Confirmation = () => {
       }
       setActivityBooking(activityData);
       
-      // Store booking in database and send confirmation email
       if (activityData.paymentComplete && activityData.paymentReference && !isEmailSent) {
         saveActivityBookingAndSendConfirmation(activityData);
       }
     } else {
-      // Process regular booking
       const booking = location.state as BookingInfo | null;
       if (!booking || !booking.paymentComplete) {
         navigate("/");
         return;
       }
       
-      // Store booking info in state
       setBookingInfo(booking);
       
-      // Save booking to local storage
       saveBookingToLocalStorage(booking);
       
-      // Fetch additional route details for the confirmation
       fetchRouteDetails(booking);
       
-      // Save booking to database and send confirmation email
       if (booking.paymentComplete && booking.paymentReference && !isEmailSent) {
         saveBookingAndSendConfirmation(booking);
       }
@@ -72,7 +64,6 @@ const Confirmation = () => {
   
   const saveActivityBookingAndSendConfirmation = async (booking: any) => {
     try {
-      // Save activity booking to database
       const { data, error } = await saveActivityBookingToDatabase(booking);
       
       if (error) {
@@ -83,7 +74,6 @@ const Confirmation = () => {
         return;
       }
       
-      // Send confirmation email
       const emailResult = await sendActivityConfirmationEmail(booking);
       
       if (emailResult.success) {
@@ -107,7 +97,6 @@ const Confirmation = () => {
   
   const saveBookingAndSendConfirmation = async (booking: BookingInfo) => {
     try {
-      // Save booking to database
       const { data, error } = await saveBookingToDatabase(booking);
       
       if (error) {
@@ -118,7 +107,6 @@ const Confirmation = () => {
         return;
       }
       
-      // Send confirmation email with speedboat details
       const enrichedBooking = {
         ...booking,
         outboundSpeedboatDetails,
@@ -150,13 +138,11 @@ const Confirmation = () => {
     if (!booking) return;
     
     try {
-      // Fetch outbound route details
       const { data: outboundData } = await getRouteDetails(booking.from, booking.island);
       if (outboundData) {
         setOutboundSpeedboatDetails(outboundData);
       }
       
-      // Fetch return route details if it's a return trip
       if (booking.returnTrip && booking.returnTripDetails) {
         const { data: returnData } = await getRouteDetails(
           booking.returnTripDetails.from, 
@@ -197,11 +183,20 @@ const Confirmation = () => {
               <>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
                   <div className="space-y-6">
-                    <TripDetails 
-                      booking={bookingInfo} 
-                      outboundSpeedboatDetails={outboundSpeedboatDetails}
-                      returnSpeedboatDetails={returnSpeedboatDetails}
-                    />
+                    {bookingInfo.from && bookingInfo.island && (
+                      <TripDetails 
+                        title="Outbound Journey"
+                        from={bookingInfo.from}
+                        to={bookingInfo.island}
+                        time={bookingInfo.time}
+                        date={bookingInfo.date}
+                        isOutbound={true}
+                        speedboatName={outboundSpeedboatDetails?.speedboat_name || null}
+                        speedboatImageUrl={outboundSpeedboatDetails?.speedboat_image_url || null}
+                        pickupLocation={outboundSpeedboatDetails?.pickup_location || null}
+                        pickupMapUrl={outboundSpeedboatDetails?.pickup_map_url || null}
+                      />
+                    )}
                     
                     <QrCodeDisplay 
                       bookingReference={bookingInfo.paymentReference || ""}
@@ -209,24 +204,43 @@ const Confirmation = () => {
                     
                     <div className="hidden lg:block">
                       <PaymentInfo 
-                        booking={bookingInfo} 
                         paymentReference={bookingInfo.paymentReference || ""}
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-6">
-                    <SpeedboatInfo 
-                      outboundSpeedboatDetails={outboundSpeedboatDetails}
-                      returnSpeedboatDetails={returnSpeedboatDetails}
-                      bookingInfo={bookingInfo}
-                    />
+                    {(outboundSpeedboatDetails || returnSpeedboatDetails) && (
+                      <div>
+                        <h3 className="font-medium mb-4">Speedboat Information</h3>
+                        {outboundSpeedboatDetails && (
+                          <SpeedboatInfo 
+                            speedboatName={outboundSpeedboatDetails.speedboat_name || null}
+                            speedboatImageUrl={outboundSpeedboatDetails.speedboat_image_url || null}
+                            pickupLocation={outboundSpeedboatDetails.pickup_location || null}
+                            pickupMapUrl={outboundSpeedboatDetails.pickup_map_url || null}
+                          />
+                        )}
+                        
+                        {returnSpeedboatDetails && (
+                          <SpeedboatInfo 
+                            speedboatName={returnSpeedboatDetails.speedboat_name || null}
+                            speedboatImageUrl={returnSpeedboatDetails.speedboat_image_url || null}
+                            pickupLocation={returnSpeedboatDetails.pickup_location || null}
+                            pickupMapUrl={returnSpeedboatDetails.pickup_map_url || null}
+                            isReturn={true}
+                          />
+                        )}
+                      </div>
+                    )}
                     
-                    <PassengerInfo booking={bookingInfo} />
+                    <PassengerInfo 
+                      seats={bookingInfo.seats} 
+                      passengers={bookingInfo.passengers}
+                    />
                     
                     <div className="lg:hidden">
                       <PaymentInfo 
-                        booking={bookingInfo} 
                         paymentReference={bookingInfo.paymentReference || ""}
                       />
                     </div>
@@ -234,9 +248,8 @@ const Confirmation = () => {
                 </div>
                 
                 <ConfirmationFooter 
-                  booking={bookingInfo}
-                  isEmailSent={isEmailSent}
-                  emailError={emailError}
+                  island={bookingInfo.island || "your destination"}
+                  isReturnTrip={Boolean(bookingInfo.returnTrip)}
                   onFinish={handleFinish}
                 />
               </>

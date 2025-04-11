@@ -1,16 +1,14 @@
-
 import { useState } from "react";
 import { Activity } from "./ActivityForm";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { 
   Fish, 
-  Whale, 
+  Sailboat, 
   Turtle, 
   Umbrella, 
   Building, 
   Sunset, 
-  Sailboat, 
   ChevronRight
 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -85,7 +83,7 @@ const getActivityIcon = (id: string) => {
     case "manta":
       return <Fish className="h-5 w-5 text-blue-600" />;
     case "whaleshark":
-      return <Whale className="h-5 w-5 text-blue-800" />;
+      return <Sailboat className="h-5 w-5 text-blue-800" />;
     case "turtle":
       return <Turtle className="h-5 w-5 text-green-600" />;
     case "sandbank_trip":

@@ -2,13 +2,18 @@
 import React from "react";
 import { ArrowRight, MapPin, Ship } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { BookingInfo } from "@/types/booking";
+import { RouteData } from "@/types/database";
 
-interface SpeedboatInfoProps {
+export interface SpeedboatInfoProps {
   speedboatName: string | null;
   speedboatImageUrl: string | null;
   pickupLocation: string | null;
   pickupMapUrl: string | null;
   isReturn?: boolean;
+  outboundSpeedboatDetails?: RouteData;
+  returnSpeedboatDetails?: RouteData;
+  bookingInfo?: BookingInfo;
 }
 
 const SpeedboatInfo: React.FC<SpeedboatInfoProps> = ({

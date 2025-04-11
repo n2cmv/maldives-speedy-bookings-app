@@ -1,11 +1,12 @@
 
 import { MapPin, Clock, Calendar, ArrowRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
-import { TripDetails as TripDetailsType } from "@/types/booking";
+import { TripDetails as TripDetailsType, BookingInfo } from "@/types/booking";
 import { useTranslation } from "react-i18next";
 import SpeedboatInfo from "./SpeedboatInfo";
+import { RouteData } from "@/types/database";
 
-interface TripDetailsProps {
+export interface TripDetailsProps {
   title: string;
   from: string;
   to: string;
@@ -17,6 +18,9 @@ interface TripDetailsProps {
   speedboatImageUrl?: string | null;
   pickupLocation?: string | null;
   pickupMapUrl?: string | null;
+  booking?: BookingInfo;
+  outboundSpeedboatDetails?: RouteData;
+  returnSpeedboatDetails?: RouteData;
 }
 
 const TripDetails = ({ 
