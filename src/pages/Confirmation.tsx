@@ -1,234 +1,248 @@
+
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
-import Header from "@/components/Header";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Header from "@/components/Header";
 import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
 import TripDetails from "@/components/confirmation/TripDetails";
 import PassengerInfo from "@/components/confirmation/PassengerInfo";
+import SpeedboatInfo from "@/components/confirmation/SpeedboatInfo";
+import PaymentInfo from "@/components/confirmation/PaymentInfo";
 import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
-import { saveBookingToLocalStorage } from "@/services/bookingStorage";
-import { useTranslation } from "react-i18next";
-import HeaderExtras from "@/components/HeaderExtras";
-import { motion } from "framer-motion";
-import { saveBookingToDatabase, sendBookingConfirmationEmail, getRouteDetails } from "@/services/bookingService";
 import QrCodeDisplay from "@/components/confirmation/QrCodeDisplay";
+import HeaderExtras from "@/components/HeaderExtras";
+import { saveBookingToLocalStorage } from "@/services/bookingStorage";
+import { 
+  saveBookingToDatabase, 
+  sendBookingConfirmationEmail, 
+  getRouteDetails 
+} from "@/services/bookingService";
 import { RouteData } from "@/types/database";
+import ActivityConfirmation from "@/components/activities/ActivityConfirmation";
+import { saveActivityBookingToDatabase, sendActivityConfirmationEmail } from "@/services/activityService";
 
 const Confirmation = () => {
-  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const booking = location.state as BookingInfo & { paymentComplete?: boolean; paymentReference?: string };
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [outboundRouteDetails, setOutboundRouteDetails] = useState<RouteData | null>(null);
-  const [returnRouteDetails, setReturnRouteDetails] = useState<RouteData | null>(null);
+  const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
+  const [activityBooking, setActivityBooking] = useState<any>(null);
+  const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
+  const [outboundSpeedboatDetails, setOutboundSpeedboatDetails] = useState<RouteData | null>(null);
+  const [returnSpeedboatDetails, setReturnSpeedboatDetails] = useState<RouteData | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (booking?.from && booking?.island) {
-      getRouteDetails(booking.from, booking.island)
-        .then(({ data }) => {
-          setOutboundRouteDetails(data);
-        })
-        .catch(error => {
-          console.error("Error fetching outbound route details:", error);
-        });
-      
-      if (booking.returnTrip && booking.returnTripDetails) {
-        getRouteDetails(booking.returnTripDetails.from || booking.island, booking.returnTripDetails.island || booking.from)
-          .then(({ data }) => {
-            setReturnRouteDetails(data);
-          })
-          .catch(error => {
-            console.error("Error fetching return route details:", error);
-          });
+    if (location.state?.isActivityBooking) {
+      // Process activity booking
+      const activityData = location.state;
+      if (!activityData) {
+        navigate("/");
+        return;
       }
-    }
-  }, [booking]);
-  
-  useEffect(() => {
-    if (!booking?.island || !booking?.passengers) {
-      navigate("/booking");
-      return;
-    }
-    
-    if (!booking.paymentComplete) {
-      navigate("/passenger-details");
-      return;
-    }
-    
-    if (booking.paymentComplete && booking.paymentReference && !isSaved) {
-      setIsProcessing(true);
+      setActivityBooking(activityData);
+      
+      // Store booking in database and send confirmation email
+      if (activityData.paymentComplete && activityData.paymentReference && !isEmailSent) {
+        saveActivityBookingAndSendConfirmation(activityData);
+      }
+    } else {
+      // Process regular booking
+      const booking = location.state as BookingInfo | null;
+      if (!booking || !booking.paymentComplete) {
+        navigate("/");
+        return;
+      }
+      
+      // Store booking info in state
+      setBookingInfo(booking);
+      
+      // Save booking to local storage
       saveBookingToLocalStorage(booking);
       
-      saveBookingToDatabase(booking).then(({ error }) => {
-        if (error) {
-          console.error("Error saving booking to database:", error);
-          toast.error(t("error.savingBooking", "Error saving booking"), {
-            description: t("error.tryAgainLater", "Please try again later")
-          });
-          setIsProcessing(false);
-        } else {
-          // Only send email after we have route details
-          if (!emailSent && outboundRouteDetails) {
-            const enhancedBooking = {
-              ...booking,
-              outboundSpeedboatDetails: outboundRouteDetails,
-              returnSpeedboatDetails: returnRouteDetails
-            };
-            
-            sendBookingConfirmationEmail(enhancedBooking).then(({ success, error }) => {
-              if (!success) {
-                console.error("Error sending confirmation email:", error);
-                toast.error(t("error.emailSending", "Error sending confirmation email"), {
-                  description: t("error.tryAgainLater", "Please try again later")
-                });
-              } else {
-                setEmailSent(true);
-                toast.success(t("email.sent", "Confirmation email sent!"), {
-                  description: t("email.check", "Please check your inbox")
-                });
-              }
-              
-              setIsProcessing(false);
-              setIsSaved(true);
-              
-              toast.success(t("payment.success", "Payment Successful!"), {
-                description: t("payment.description", "Your booking has been confirmed.")
-              });
-            });
-          } else {
-            setIsProcessing(false);
-            setIsSaved(true);
-            
-            toast.success(t("payment.success", "Payment Successful!"), {
-              description: t("payment.description", "Your booking has been confirmed.")
-            });
-          }
-        }
+      // Fetch additional route details for the confirmation
+      fetchRouteDetails(booking);
+      
+      // Save booking to database and send confirmation email
+      if (booking.paymentComplete && booking.paymentReference && !isEmailSent) {
+        saveBookingAndSendConfirmation(booking);
+      }
+    }
+  }, [location.state, navigate, isEmailSent]);
+  
+  const saveActivityBookingAndSendConfirmation = async (booking: any) => {
+    try {
+      // Save activity booking to database
+      const { data, error } = await saveActivityBookingToDatabase(booking);
+      
+      if (error) {
+        console.error("Error saving activity booking:", error);
+        toast.error("Error processing your booking", { 
+          description: "Please contact support with your booking reference." 
+        });
+        return;
+      }
+      
+      // Send confirmation email
+      const emailResult = await sendActivityConfirmationEmail(booking);
+      
+      if (emailResult.success) {
+        setIsEmailSent(true);
+        toast.success("Booking confirmation sent", {
+          description: `We've sent a confirmation email to ${emailResult.emailSentTo}`
+        });
+      } else if (emailResult.error) {
+        setEmailError(emailResult.error);
+        toast.error("Could not send confirmation email", {
+          description: "Please check your email address or try again later."
+        });
+      }
+    } catch (error) {
+      console.error("Error processing activity booking confirmation:", error);
+      toast.error("Error processing your booking", { 
+        description: "Please contact support with your booking reference." 
       });
     }
-  }, [booking, navigate, t, isSaved, emailSent, outboundRouteDetails, returnRouteDetails]);
+  };
   
-  if (!booking?.paymentComplete || isProcessing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white p-4">
-        <div className="text-center">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
-            <h2 className="text-2xl font-bold text-gray-800">{t("confirmation.processing", "Processing Your Booking")}</h2>
-            <p className="text-gray-600">
-              {t("confirmation.wait", "Please wait while we confirm your booking...")}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  const isReturnTrip = Boolean(booking.returnTrip && booking.returnTripDetails);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+  const saveBookingAndSendConfirmation = async (booking: BookingInfo) => {
+    try {
+      // Save booking to database
+      const { data, error } = await saveBookingToDatabase(booking);
+      
+      if (error) {
+        console.error("Error saving booking:", error);
+        toast.error("Error processing your booking", { 
+          description: "Please contact support with your booking reference." 
+        });
+        return;
       }
+      
+      // Send confirmation email with speedboat details
+      const enrichedBooking = {
+        ...booking,
+        outboundSpeedboatDetails,
+        returnSpeedboatDetails
+      };
+      
+      const emailResult = await sendBookingConfirmationEmail(enrichedBooking);
+      
+      if (emailResult.success) {
+        setIsEmailSent(true);
+        toast.success("Booking confirmation sent", {
+          description: `We've sent a confirmation email to ${emailResult.emailSentTo}`
+        });
+      } else if (emailResult.error) {
+        setEmailError(emailResult.error);
+        toast.error("Could not send confirmation email", {
+          description: "Please check your email address or try again later."
+        });
+      }
+    } catch (error) {
+      console.error("Error processing booking confirmation:", error);
+      toast.error("Error processing your booking", { 
+        description: "Please contact support with your booking reference." 
+      });
+    }
+  };
+  
+  const fetchRouteDetails = async (booking: BookingInfo) => {
+    if (!booking) return;
+    
+    try {
+      // Fetch outbound route details
+      const { data: outboundData } = await getRouteDetails(booking.from, booking.island);
+      if (outboundData) {
+        setOutboundSpeedboatDetails(outboundData);
+      }
+      
+      // Fetch return route details if it's a return trip
+      if (booking.returnTrip && booking.returnTripDetails) {
+        const { data: returnData } = await getRouteDetails(
+          booking.returnTripDetails.from, 
+          booking.returnTripDetails.island
+        );
+        if (returnData) {
+          setReturnSpeedboatDetails(returnData);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching route details:", error);
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  const handleFinish = () => {
+    navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 overflow-hidden relative">
-      <div
-        className="absolute inset-0 z-0 opacity-10"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230AB3B8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <div className="absolute top-4 right-4 z-20">
+        <HeaderExtras />
+      </div>
       
-      <div className="relative z-10">
-        <div className="absolute top-4 right-4 z-20">
-          <HeaderExtras />
+      <Header />
+      
+      <div className="pt-24 pb-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <ConfirmationHeader />
+          
+          <div className="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100 mt-8">
+            {activityBooking ? (
+              <ActivityConfirmation 
+                booking={activityBooking}
+                emailError={emailError}
+              />
+            ) : bookingInfo && (
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+                  <div className="space-y-6">
+                    <TripDetails 
+                      booking={bookingInfo} 
+                      outboundSpeedboatDetails={outboundSpeedboatDetails}
+                      returnSpeedboatDetails={returnSpeedboatDetails}
+                    />
+                    
+                    <QrCodeDisplay 
+                      bookingReference={bookingInfo.paymentReference || ""}
+                    />
+                    
+                    <div className="hidden lg:block">
+                      <PaymentInfo 
+                        booking={bookingInfo} 
+                        paymentReference={bookingInfo.paymentReference || ""}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <SpeedboatInfo 
+                      outboundSpeedboatDetails={outboundSpeedboatDetails}
+                      returnSpeedboatDetails={returnSpeedboatDetails}
+                      bookingInfo={bookingInfo}
+                    />
+                    
+                    <PassengerInfo booking={bookingInfo} />
+                    
+                    <div className="lg:hidden">
+                      <PaymentInfo 
+                        booking={bookingInfo} 
+                        paymentReference={bookingInfo.paymentReference || ""}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <ConfirmationFooter 
+                  booking={bookingInfo}
+                  isEmailSent={isEmailSent}
+                  emailError={emailError}
+                  onFinish={handleFinish}
+                />
+              </>
+            )}
+          </div>
         </div>
-        
-        <Header />
-        <main className="pt-20 pb-12 px-4">
-          <motion.div 
-            className="max-w-md mx-auto booking-card mt-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div variants={itemVariants}>
-              <ConfirmationHeader />
-            </motion.div>
-            
-            <motion.div variants={itemVariants}>
-              <QrCodeDisplay 
-                booking={booking} 
-                paymentReference={booking.paymentReference} 
-              />
-            </motion.div>
-            
-            <div className="space-y-6 mb-8">
-              
-              <motion.div variants={itemVariants}>
-                <TripDetails
-                  title={t("confirmation.yourTrip")}
-                  from={booking.from}
-                  to={booking.island}
-                  time={booking.time}
-                  date={booking.date}
-                  isOutbound={isReturnTrip}
-                  speedboatName={outboundRouteDetails?.speedboat_name}
-                  speedboatImageUrl={outboundRouteDetails?.speedboat_image_url}
-                  pickupLocation={outboundRouteDetails?.pickup_location}
-                  pickupMapUrl={outboundRouteDetails?.pickup_map_url}
-                />
-              </motion.div>
-              
-              {isReturnTrip && booking.returnTripDetails && (
-                <motion.div variants={itemVariants}>
-                  <TripDetails
-                    title={t("confirmation.returnTrip")}
-                    from={booking.returnTripDetails.from}
-                    to={booking.returnTripDetails.island}
-                    time={booking.returnTripDetails.time}
-                    date={booking.returnTripDetails.date}
-                    isReturn
-                    speedboatName={returnRouteDetails?.speedboat_name}
-                    speedboatImageUrl={returnRouteDetails?.speedboat_image_url}
-                    pickupLocation={returnRouteDetails?.pickup_location}
-                    pickupMapUrl={returnRouteDetails?.pickup_map_url}
-                  />
-                </motion.div>
-              )}
-              
-              <motion.div variants={itemVariants}>
-                <PassengerInfo 
-                  seats={booking.seats}
-                  passengers={booking.passengers}
-                />
-              </motion.div>
-            </div>
-            
-            <motion.div variants={itemVariants}>
-              <ConfirmationFooter 
-                island={booking.island}
-                isReturnTrip={!!isReturnTrip}
-              />
-            </motion.div>
-          </motion.div>
-        </main>
       </div>
     </div>
   );

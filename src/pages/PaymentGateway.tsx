@@ -21,24 +21,43 @@ const PaymentGateway = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
+  const [activityBooking, setActivityBooking] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
 
   useEffect(() => {
-    const booking = location.state as BookingInfo | null;
-    if (!booking) {
-      navigate("/booking");
-      return;
+    // Handle regular booking
+    if (!location.state?.isActivityBooking) {
+      const booking = location.state as BookingInfo | null;
+      if (!booking) {
+        navigate("/booking");
+        return;
+      }
+      
+      setBookingInfo(booking);
+    } 
+    // Handle activity booking
+    else {
+      const activityData = location.state;
+      if (!activityData) {
+        navigate("/activities");
+        return;
+      }
+      
+      setActivityBooking(activityData);
     }
     
-    setBookingInfo(booking);
     // Generate a consistent reference number for this booking session using our standardized function
     setBookingReference(generatePaymentReference());
   }, [location.state, navigate]);
 
   const handleGoBack = () => {
-    navigate("/passenger-details", { state: bookingInfo });
+    if (activityBooking) {
+      navigate("/activities");
+    } else {
+      navigate("/passenger-details", { state: bookingInfo });
+    }
   };
 
   const handlePayment = () => {
@@ -63,14 +82,27 @@ const PaymentGateway = () => {
   };
 
   const handlePaymentCompletion = (success: boolean) => {
-    if (success && bookingInfo) {
-      navigate("/confirmation", { 
-        state: {
-          ...bookingInfo,
-          paymentComplete: true,
-          paymentReference: bookingReference
-        }
-      });
+    if (success) {
+      if (activityBooking) {
+        // For activity bookings
+        navigate("/confirmation", { 
+          state: {
+            ...activityBooking,
+            paymentComplete: true,
+            paymentReference: bookingReference,
+            isActivityBooking: true
+          }
+        });
+      } else if (bookingInfo) {
+        // For regular speedboat bookings
+        navigate("/confirmation", { 
+          state: {
+            ...bookingInfo,
+            paymentComplete: true,
+            paymentReference: bookingReference
+          }
+        });
+      }
     } else {
       setIsRedirecting(false);
       toast.error("Payment failed", {
@@ -80,6 +112,10 @@ const PaymentGateway = () => {
   };
 
   const calculateTotal = () => {
+    if (activityBooking) {
+      return activityBooking.totalPrice || 0;
+    }
+    
     if (!bookingInfo?.passengers) return 0;
     
     const totalPassengers = bookingInfo.passengers.length || 0;
@@ -89,7 +125,7 @@ const PaymentGateway = () => {
     return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
   };
 
-  if (!bookingInfo) {
+  if (!bookingInfo && !activityBooking) {
     return null;
   }
 
@@ -107,14 +143,16 @@ const PaymentGateway = () => {
       
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="max-w-4xl mx-auto mb-6"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <StepIndicator />
-          </motion.div>
+          {!activityBooking && (
+            <motion.div
+              className="max-w-4xl mx-auto mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <StepIndicator />
+            </motion.div>
+          )}
 
           <div className="max-w-lg mx-auto">
             <Button 
@@ -124,7 +162,7 @@ const PaymentGateway = () => {
               disabled={isProcessing}
             >
               <ChevronLeft className="h-4 w-4" />
-              Back to Passenger Details
+              Back to {activityBooking ? "Activity Details" : "Passenger Details"}
             </Button>
             
             <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">

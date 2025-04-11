@@ -16,6 +16,7 @@ import MyBookings from "./pages/MyBookings";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
+import Activities from "./pages/Activities";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -65,6 +66,7 @@ const App = () => {
                 <Route path="/confirmation" element={<Confirmation />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/booking-lookup" element={<BookingLookup />} />
+                <Route path="/activities" element={<Activities />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="*" element={<NotFound />} />
