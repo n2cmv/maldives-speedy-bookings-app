@@ -38,6 +38,7 @@ const ActivityBookingTable = ({
       from: booking.from_location,
       to: booking.to_location,
       date: booking.departure_date,
+      payment_reference: booking.payment_reference,
       passenger_count: booking.passenger_count,
       passenger_info: booking.passenger_info,
       full_object: booking

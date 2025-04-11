@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -25,7 +24,6 @@ const ActivityPassengerDetails = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Wrap in setTimeout to prevent blocking the main thread
     const timer = setTimeout(() => {
       try {
         const booking = location.state;
@@ -34,19 +32,17 @@ const ActivityPassengerDetails = () => {
           return;
         }
         
-        // Ensure we mark this as an activity booking
         const updatedBooking = {
           ...booking,
           isActivityBooking: true,
-          // Explicitly set these fields to ensure proper storage in Supabase
-          activity: booking.activity || "Unknown Activity", // Ensure activity has a value
-          is_activity_booking: true // Add snake_case version for direct database mapping
+          activity: booking.activity || "Unknown Activity",
+          is_activity_booking: true,
+          paymentReference: booking.paymentReference || generatePaymentReference()
         };
         
         console.log("Activity booking prepared:", updatedBooking);
         setBookingInfo(updatedBooking);
         
-        // Initialize passenger forms based on counts
         const initialPassengers = [];
         if (booking.passengerCounts) {
           for (let i = 0; i < (booking.passengerCounts.adults || 0); i++) {
@@ -59,7 +55,6 @@ const ActivityPassengerDetails = () => {
             initialPassengers.push({ type: 'senior', id: `senior-${i+1}` });
           }
         } else {
-          // Fallback if no passenger counts are provided
           initialPassengers.push({ type: 'adult', id: 'adult-1' });
         }
         
@@ -83,7 +78,6 @@ const ActivityPassengerDetails = () => {
     if (!bookingInfo) return;
     
     try {
-      // Double-check that activity is properly set
       if (!bookingInfo.activity) {
         console.error("Missing activity name");
         toast({
@@ -94,23 +88,20 @@ const ActivityPassengerDetails = () => {
         return;
       }
 
-      // Generate a payment reference for this activity booking
-      const paymentReference = generatePaymentReference();
+      const paymentReference = bookingInfo.paymentReference || generatePaymentReference();
 
-      // Create the booking object with BOTH activity flags explicitly set
       const updatedBookingInfo = {
         ...bookingInfo,
         passengers: passengerDetails,
-        isActivityBooking: true, // Ensure camelCase flag is set for UI
-        is_activity_booking: true, // Ensure snake_case flag is set for database
-        activity: bookingInfo.activity || "Unknown Activity", // Ensure activity is set
-        paymentReference: paymentReference, // Add payment reference
-        paymentComplete: false // Will be set to true after payment
+        isActivityBooking: true,
+        is_activity_booking: true,
+        activity: bookingInfo.activity || "Unknown Activity",
+        paymentReference: paymentReference,
+        paymentComplete: false
       };
       
       console.log("Submitting activity booking with explicit flags and payment reference:", updatedBookingInfo);
       
-      // Save directly to database first
       const { data, error } = await saveBookingToDatabase(updatedBookingInfo);
       
       if (error) {
@@ -119,24 +110,20 @@ const ActivityPassengerDetails = () => {
       
       console.log("Activity booking saved to database:", data);
       
-      // Store the updated booking info in session storage
       sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
       
-      // Also store in localStorage for "My Bookings" feature
       const storedBookings = localStorage.getItem("savedBookings");
       const bookingsArray = storedBookings ? JSON.parse(storedBookings) : [];
       
-      // Add this booking with a unique ID
       const bookingWithId = {
         ...updatedBookingInfo,
         id: data?.id || `activity-${Date.now()}`,
-        paymentComplete: false // Will be set to true after payment
+        paymentComplete: false
       };
       
       bookingsArray.push(bookingWithId);
       localStorage.setItem("savedBookings", JSON.stringify(bookingsArray));
       
-      // Navigate to payment page with updated booking info
       navigate("/payment", { state: updatedBookingInfo });
       
       toast({
@@ -152,7 +139,7 @@ const ActivityPassengerDetails = () => {
       });
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
@@ -211,7 +198,6 @@ const ActivityPassengerDetails = () => {
         </h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* On mobile, show the summary card first */}
           {isMobile && (
             <div className="lg:col-span-1 mb-4">
               <TripSummaryCard 
@@ -244,7 +230,6 @@ const ActivityPassengerDetails = () => {
             </div>
           </div>
           
-          {/* On desktop, show the summary card on the right */}
           {!isMobile && (
             <div className="lg:col-span-1">
               <TripSummaryCard 
