@@ -58,19 +58,30 @@ export async function sendActivityConfirmationEmail(booking: any): Promise<{
     // Get current domain from window for QR code generation
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     
+    // Enhanced activity details for the email
     const emailData = {
       email: booking.email.trim().toLowerCase(),
       name: booking.fullName,
       bookingDetails: {
         activityName: booking.activity.name,
         activityPrice: booking.activity.price,
+        activityDescription: booking.activity.description || "",
+        activityDuration: booking.activity.duration || "",
+        activityLocation: booking.activity.location || "Activity Location",
         date: booking.date ? new Date(booking.date).toLocaleDateString() : "",
+        time: booking.time || "As scheduled",
         passengers: booking.passengers,
         totalPrice: booking.totalPrice,
         paymentReference: booking.paymentReference || "Unknown",
         origin: origin, // Add origin for QR code generation
+        // Passenger information
+        fullName: booking.fullName,
         passport: booking.passportNumber,
         phone: `${booking.countryCode} ${booking.phone}`,
+        email: booking.email,
+        // Special requests if available
+        specialRequests: booking.specialRequests || "",
+        // Flag to identify this as an activity booking
         isActivity: true
       }
     };

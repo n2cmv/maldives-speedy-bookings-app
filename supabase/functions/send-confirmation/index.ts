@@ -38,6 +38,17 @@ interface BookingEmailRequest {
     returnSpeedboatImage?: string | null;
     returnPickupLocation?: string | null;
     returnPickupMapUrl?: string | null;
+    isActivity?: boolean;
+    activityName?: string;
+    activityPrice?: number;
+    activityDescription?: string;
+    activityDuration?: string;
+    activityLocation?: string;
+    fullName?: string;
+    phone?: string;
+    passport?: string;
+    email?: string;
+    specialRequests?: string;
   };
 }
 
@@ -161,8 +172,107 @@ const handler = async (req: Request): Promise<Response> => {
           }
         );
       }
+    } else if (bookingDetails.isActivity) {
+      // This is an activity booking confirmation email
+      console.log("[send-confirmation] Preparing activity booking confirmation email to:", email);
+      
+      // Generate QR code URL for the booking
+      const bookingLookupUrl = `${req.headers.get('origin') || 'https://your-site.lovable.app'}/booking-lookup?ref=${bookingDetails.paymentReference}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(bookingLookupUrl)}`;
+      
+      try {
+        console.log("[send-confirmation] Sending activity booking confirmation email");
+        
+        const emailResponse = await resend.emails.send({
+          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          to: [email],
+          subject: `Your Activity Booking: ${bookingDetails.activityName} Confirmation`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+              <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                <h1 style="color: #0AB3B8;">Activity Booking Confirmation</h1>
+              </div>
+              
+              <div style="padding: 20px 0;">
+                <p>Dear ${name},</p>
+                <p>Thank you for booking with Island Ferry. Your activity booking has been confirmed!</p>
+                
+                <div style="background-color: #fff4e4; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f0a500;">
+                  <h2 style="color: #d97705; margin-top: 0; margin-bottom: 15px;">Activity Details</h2>
+                  <p><strong>Activity:</strong> ${bookingDetails.activityName}</p>
+                  <p><strong>Date:</strong> ${bookingDetails.date}</p>
+                  <p><strong>Time:</strong> ${bookingDetails.time || 'As scheduled'}</p>
+                  <p><strong>Location:</strong> ${bookingDetails.activityLocation || 'Activity Location'}</p>
+                  ${bookingDetails.activityDuration ? `<p><strong>Duration:</strong> ${bookingDetails.activityDuration}</p>` : ''}
+                  ${bookingDetails.activityDescription ? `<p><strong>Description:</strong> ${bookingDetails.activityDescription}</p>` : ''}
+                  <p><strong>Participants:</strong> ${bookingDetails.passengerCount}</p>
+                </div>
+
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <h2 style="color: #0AB3B8; margin-top: 0; margin-bottom: 15px;">Booking Information</h2>
+                  <p><strong>Booking Reference:</strong> ${bookingDetails.paymentReference}</p>
+                  <p><strong>Total Price:</strong> ${typeof bookingDetails.totalPrice === 'number' ? `$${bookingDetails.totalPrice.toFixed(2)}` : bookingDetails.totalPrice}</p>
+                  
+                  <div style="margin-top: 15px; border-top: 1px solid #eaeaea; padding-top: 15px;">
+                    <h3 style="color: #0AB3B8; margin-top: 0; font-size: 16px;">Contact Information</h3>
+                    <p><strong>Name:</strong> ${bookingDetails.fullName}</p>
+                    <p><strong>Email:</strong> ${bookingDetails.email}</p>
+                    <p><strong>Phone:</strong> ${bookingDetails.phone}</p>
+                    ${bookingDetails.passport ? `<p><strong>Passport/ID:</strong> ${bookingDetails.passport}</p>` : ''}
+                    ${bookingDetails.specialRequests ? `<p><strong>Special Requests:</strong> ${bookingDetails.specialRequests}</p>` : ''}
+                  </div>
+                </div>
+
+                <div style="text-align: center; margin: 30px 0;">
+                  <h3 style="color: #0AB3B8;">Your Booking QR Code</h3>
+                  <p>Scan this QR code to access your booking details</p>
+                  <img src="${qrCodeUrl}" alt="Booking QR Code" style="width: 150px; height: 150px; margin: 10px auto; display: block;">
+                  <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    You can also access your booking at: ${bookingLookupUrl}
+                  </p>
+                </div>
+                
+                <p><strong>Important Instructions:</strong></p>
+                <ul>
+                  <li>Please arrive at the meeting point at least 15 minutes before the scheduled activity time.</li>
+                  <li>Bring a printed copy of this confirmation or have it available on your mobile device.</li>
+                  <li>Don't forget to bring appropriate gear, such as swimwear, sunscreen, and comfortable footwear.</li>
+                </ul>
+                
+                <p>If you need to make any changes to your booking or have any questions, please contact our customer service.</p>
+              </div>
+              
+              <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+                <p>Island Ferry Services &copy; ${new Date().getFullYear()}</p>
+              </div>
+            </div>
+          `,
+        });
+
+        console.log("[send-confirmation] Activity booking email sent successfully. Resend response:", JSON.stringify(emailResponse));
+        return new Response(JSON.stringify(emailResponse), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        });
+      } catch (emailError: any) {
+        console.error("[send-confirmation] Error sending activity booking email:", emailError);
+        return new Response(
+          JSON.stringify({ 
+            error: emailError.message || "Failed to send activity booking email",
+            errorDetails: emailError,
+            emailAddress: email 
+          }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
     } else {
-      // Regular booking confirmation email
+      // Regular ferry booking confirmation email
       // Format trip details
       const tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
       
