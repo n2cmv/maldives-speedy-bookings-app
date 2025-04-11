@@ -1,10 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, AlertCircle } from "lucide-react";
+import { ChevronLeft, AlertCircle, InfoIcon } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
@@ -13,7 +14,7 @@ import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
-import { createBmlPaymentSession, BMLSettings } from "@/services/bmlPaymentService";
+import { createBmlPaymentSession, BMLSettings, testBmlApiConnection } from "@/services/bmlPaymentService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,8 @@ const PaymentGateway = () => {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
   const [forceRealMode, setForceRealMode] = useState(false);
+  const [apiStatus, setApiStatus] = useState<{ success: boolean; message: string } | null>(null);
+  const [isTestingApi, setIsTestingApi] = useState(false);
 
   useEffect(() => {
     if (!location.state?.isActivityBooking) {
@@ -68,6 +71,36 @@ const PaymentGateway = () => {
       localStorage.removeItem('pendingActivityBooking');
     } 
   }, [location.state, location.search, navigate]);
+  
+  // Test API connection on load or when force real mode changes
+  useEffect(() => {
+    const checkApiConnection = async () => {
+      if (forceRealMode) {
+        setIsTestingApi(true);
+        try {
+          const settings: BMLSettings = {
+            forceRealMode: true,
+            disableSimulation: true,
+            apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+          };
+          
+          const result = await testBmlApiConnection(settings);
+          setApiStatus(result);
+        } catch (error) {
+          setApiStatus({ 
+            success: false, 
+            message: error instanceof Error ? error.message : "Failed to test API connection" 
+          });
+        } finally {
+          setIsTestingApi(false);
+        }
+      } else {
+        setApiStatus(null);
+      }
+    };
+    
+    checkApiConnection();
+  }, [forceRealMode]);
 
   const handleGoBack = () => {
     if (activityBooking) {
@@ -113,7 +146,9 @@ const PaymentGateway = () => {
         const bmlSettings: BMLSettings = {
           forceRealMode: forceRealMode,
           disableSimulation: false,
-          apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+          apiBaseUrl: forceRealMode ? 
+            "https://api.merchants.bankofmaldives.com.mv" : 
+            "https://api.uat.merchants.bankofmaldives.com.mv"
         };
 
         console.log("Using BML settings:", bmlSettings);
@@ -297,16 +332,19 @@ const PaymentGateway = () => {
                       <div className="font-medium">Payment Error</div>
                       <div className="text-sm">{paymentError}</div>
                       {forceRealMode && paymentError.includes("Failed to fetch") && (
-                        <p className="text-sm mt-2 font-medium">
-                          You have "Force real payment mode" enabled. This is preventing simulation mode fallback.
-                          <br />
-                          <span className="underline">Turn off this option below to use simulation mode.</span>
-                        </p>
-                      )}
-                      {!forceRealMode && (
-                        <p className="text-sm mt-2">
-                          The payment gateway might be temporarily unavailable. Please try again or use simulation mode.
-                        </p>
+                        <div className="mt-2 text-sm">
+                          <p className="font-medium">
+                            You have "Force real payment mode" enabled which is preventing simulation mode.
+                          </p>
+                          <p className="mt-1">
+                            To proceed with testing, either:
+                          </p>
+                          <ul className="list-disc ml-5 mt-1 space-y-1">
+                            <li>Turn off "Force real mode" below to use simulation mode</li>
+                            <li>Check your network connection to the BML payment gateway</li>
+                            <li>Verify that your API credentials are correct</li>
+                          </ul>
+                        </div>
                       )}
                     </AlertDescription>
                   </Alert>
@@ -338,15 +376,38 @@ const PaymentGateway = () => {
                       onCheckedChange={setForceRealMode} 
                     />
                     <Label htmlFor="force-real-mode" className={`text-sm ${forceRealMode && paymentError ? 'text-red-600 font-medium' : ''}`}>
-                      Force real payment mode (disable simulation fallback)
+                      Force real payment mode (use BML production API)
                     </Label>
                   </div>
                   <p className="text-xs text-slate-500 mt-2">
-                    When enabled, the system will attempt to use the real BML payment gateway without falling back to simulation mode.
-                    {forceRealMode ? 
-                      <span className="block mt-1 text-amber-700"> This might result in errors if the gateway is not reachable.</span> : 
-                      ''}
+                    When enabled, the system will attempt to use the real BML payment gateway.
+                    {forceRealMode ? (
+                      <span className="block mt-1 font-medium text-amber-700">
+                        This might result in errors if the gateway is not reachable or your API key is not valid for production.
+                      </span>
+                    ) : (
+                      <span className="block mt-1">
+                        When disabled, the system will use the UAT (testing) endpoint, or fall back to simulation if unavailable.
+                      </span>
+                    )}
                   </p>
+                  
+                  {isTestingApi && (
+                    <div className="mt-3 flex items-center text-slate-600">
+                      <div className="w-4 h-4 border-2 border-ocean border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <span className="text-xs">Testing API connection...</span>
+                    </div>
+                  )}
+                  
+                  {apiStatus && !isTestingApi && (
+                    <div className={`mt-3 text-xs rounded-md p-2 ${apiStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                      <div className="flex items-center">
+                        <InfoIcon className="h-3 w-3 mr-1" />
+                        <span className="font-medium">API Status:</span>
+                      </div>
+                      <p className="mt-1">{apiStatus.message}</p>
+                    </div>
+                  )}
                 </div>
                 
                 <PaymentMethodSelector

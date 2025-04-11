@@ -1,5 +1,6 @@
 
 import { BookingInfo } from "@/types/booking";
+import crypto from 'crypto';
 
 interface BMLPaymentResponse {
   success: boolean;
@@ -9,15 +10,13 @@ interface BMLPaymentResponse {
 }
 
 export interface BMLPaymentConfig {
-  appId: string;
-  publicKey: string;
+  clientId: string;
   apiKey: string;
 }
 
 // BML API configuration
 export const BML_CONFIG: BMLPaymentConfig = {
-  appId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
-  publicKey: "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmJXRnNaR2wyWlhNdGMzQmxaV1I1TFdKdmIydHBibWR6TFdGd2NDNXNiM1poWW14bExtRndjQzhpTENKaElqb2lZamd6WXpoak5tSXRNVEppWXkwMFlqSmxMVGcyTkRBdE5XUTVaVFkyTnpnMllXUmpJaXdpZFhFaU9pSXpNREE1WWpSak9TMHhaV001TFRRMVlqa3RPRFprT0MxbU5qY3pZelptTlRFeFlqTWlMQ0pwWVhRaU9qRTNORFF6T0RNNU16WXNJbVY0Y0NJNk5Ea3dNREExTnpVek5uMC5LdFJJQ0pVb0VQaHY1clM4YWFoOG53U3k5WE92NHRNb1hIb0RrNzdqNlVz",
+  clientId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
   apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImI4M2M4YzZiLTEyYmMtNGIyZS04NjQwLTVkOWU2Njc4NmFkYyIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NDM4MzkzNiwiZXhwIjo0OTAwMDU3NTM2fQ._09EMmA2kYHhHd1ytmBIEv0oAgn_8pakQkviFino9Vo"
 };
 
@@ -35,14 +34,25 @@ export const defaultBmlSettings: BMLSettings = {
   apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
 };
 
-// BML API endpoints 
-export const API_BASE_URL = "https://api.merchants.bankofmaldives.com.mv";
-const CREATE_PAYMENT_ENDPOINT = "/public/v1/payments";
+// Use UAT (testing) URL for development environments
+const UAT_API_BASE_URL = "https://api.uat.merchants.bankofmaldives.com.mv";
+const PROD_API_BASE_URL = "https://api.merchants.bankofmaldives.com.mv"; 
+
+// API endpoints
+const CREATE_PAYMENT_ENDPOINT = "/public/transactions";
 
 // Helper function to ensure we have the full URL for API endpoints
 export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
-  const baseUrl = settings?.apiBaseUrl || API_BASE_URL;
+  // Use UAT for development unless forceRealMode is true
+  const baseUrl = settings?.apiBaseUrl || 
+    (settings?.forceRealMode ? PROD_API_BASE_URL : UAT_API_BASE_URL);
   return `${baseUrl}${endpoint}`;
+};
+
+// Generate signature as per BML API v2.0 specs
+const generateSignature = (amount: number, currency: string, apiKey: string): string => {
+  const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
+  return crypto.createHash('sha1').update(signString).digest('hex');
 };
 
 /**
@@ -56,12 +66,12 @@ export async function testBmlApiConnection(settings?: BMLSettings): Promise<{
 }> {
   try {
     console.log("BML Service: Testing API connection");
-    // Send a simple HEAD request to check if API is reachable
+    // Use health endpoint for checking connectivity
     const response = await fetch(getApiUrl("/public/v1/health", settings), {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
-        'Content-Type': 'application/json'
+        'Authorization': `${BML_CONFIG.apiKey}`,
+        'Accept': 'application/json'
       }
     });
     
@@ -129,41 +139,42 @@ export async function createBmlPaymentSession(
       throw new Error("No customer information available");
     }
 
-    // Prepare payment request data according to BML API specifications
+    // Convert amount to cents as per API requirements
+    const amountInCents = Math.round(amount * 100);
+    
+    // Generate signature according to BML API v2.0
+    const signature = generateSignature(amountInCents, "USD", BML_CONFIG.apiKey);
+
+    // Prepare payment request data according to BML API v2.0 specifications
     const paymentData = {
-      amount: {
-        currencyCode: "USD",
-        value: amount.toFixed(2)
-      },
-      merchantId: BML_CONFIG.appId,
-      merchantName: "Retour Maldives",
-      transactionId: txnId,
-      description: `Speedboat booking from ${booking.from} to ${booking.island}`,
-      customerReference: customer.name,
-      customerEmail: customer.email || "",
-      customerPhone: customer.phone || "",
-      billingAddress: {
-        firstName: customer.name.split(' ')[0],
-        lastName: customer.name.split(' ').slice(1).join(' '),
-        email: customer.email || "",
-        phone: customer.phone || "",
-        countryCode: customer.countryCode?.replace('+', '') || "960"
-      },
-      returnUrl,
-      cancelUrl
+      localId: txnId,
+      customerReference: `Booking for ${customer.name}`,
+      signature: signature,
+      amount: amountInCents,
+      currency: "USD",
+      provider: "bml_epos", // Using BML EPOS provider as specified in docs
+      appVersion: "RetourMaldives1.0", // App version for tracking
+      apiVersion: "2.0", // API version
+      deviceId: BML_CONFIG.clientId, // Using client ID as device ID
+      signMethod: "sha1", // Signature method
+      redirectUrl: returnUrl,
+      cancelUrl: cancelUrl
     };
 
     console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
 
     // Make API request to BML to create a payment session
     try {
-      // Attempt to connect to the real BML API
-      const response = await fetch(getApiUrl(CREATE_PAYMENT_ENDPOINT, bmlSettings), {
+      // Attempt to connect to the BML API
+      const apiUrl = getApiUrl(CREATE_PAYMENT_ENDPOINT, bmlSettings);
+      console.log("BML Service: Using API URL:", apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
-          'mode': 'cors'
+          'Authorization': BML_CONFIG.apiKey,
+          'Accept': 'application/json'
         },
         body: JSON.stringify(paymentData)
       });
@@ -182,10 +193,10 @@ export async function createBmlPaymentSession(
         };
       }
 
-      // Now using production endpoint, which should return the proper payment URL
+      // For successful responses, extract QR code URL or redirect URL
       return {
         success: true,
-        paymentUrl: data.redirectUrl || data.checkoutUrl,
+        paymentUrl: data.qrCode?.url || data.redirectUrl,
         reference: txnId
       };
     } catch (error) {
@@ -249,20 +260,20 @@ export async function verifyBmlPayment(
       return {
         success: true,
         verified: true,
-        status: "COMPLETED",
+        status: "CONFIRMED",
         error: "Using simulation mode"
       };
     }
     
     // For real verification
-    const verifyUrl = getApiUrl(`/public/v1/payments/${transactionId}/status`, bmlSettings);
+    const verifyUrl = getApiUrl(`${CREATE_PAYMENT_ENDPOINT}/${transactionId}`, bmlSettings);
     console.log("BML Service: Verification URL:", verifyUrl);
     
     const response = await fetch(verifyUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
-        'mode': 'cors'
+        'Authorization': BML_CONFIG.apiKey,
+        'Accept': 'application/json'
       }
     });
 
@@ -291,10 +302,11 @@ export async function verifyBmlPayment(
       };
     }
 
+    // Check state according to v2.0 API documentation
     return {
       success: true,
-      verified: data.status === "COMPLETED" || data.status === "AUTHORIZED",
-      status: data.status,
+      verified: data.state === "CONFIRMED",
+      status: data.state,
       rawResponse: data
     };
   } catch (error) {
@@ -310,7 +322,7 @@ export async function verifyBmlPayment(
           return {
             success: true,
             verified: true,
-            status: "COMPLETED",
+            status: "CONFIRMED",
             error: "Using simulation mode due to network issues"
           };
         }
