@@ -1,3 +1,4 @@
+
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +18,9 @@ import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 import Activities from "./pages/Activities";
 import BmlApiTest from "./pages/BmlApiTest";
+
+// Import payment handler component
+import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -58,6 +62,9 @@ const App = () => {
           <TooltipProvider>
             <Toaster position="top-center" richColors closeButton />
             <BrowserRouter>
+              {/* BML Payment Handler - will only show when needed */}
+              <BmlPaymentHandler />
+              
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/booking" element={<BookingForm />} />

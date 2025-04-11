@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import PaymentProcessingScreen from "@/components/payment/PaymentProcessingScreen";
 import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
+import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
 import { createBmlPaymentSession } from "@/services/bmlPaymentService";
 
@@ -26,7 +27,7 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
-  const [usingBmlGateway, setUsingBmlGateway] = useState(true); // Default to BML payment gateway
+  const [paymentMethod, setPaymentMethod] = useState("bml"); // Default to BML payment gateway
 
   useEffect(() => {
     // Handle regular booking
@@ -52,7 +53,21 @@ const PaymentGateway = () => {
     
     // Generate a consistent reference number for this booking session using our standardized function
     setBookingReference(generatePaymentReference());
-  }, [location.state, navigate]);
+    
+    // Check if we're returning from a cancelled payment
+    const searchParams = new URLSearchParams(location.search);
+    const canceled = searchParams.get('canceled') === 'true';
+    
+    if (canceled) {
+      toast.error("Payment canceled", {
+        description: "You canceled the payment process."
+      });
+      
+      // Clear any pending booking data
+      localStorage.removeItem('pendingBooking');
+      localStorage.removeItem('pendingActivityBooking');
+    } 
+  }, [location.state, location.search, navigate]);
 
   const handleGoBack = () => {
     if (activityBooking) {
@@ -68,18 +83,35 @@ const PaymentGateway = () => {
     const totalAmount = calculateTotal();
     
     // If using BML payment gateway
-    if (usingBmlGateway && bookingInfo) {
+    if (paymentMethod === "bml") {
       try {
         toast.info("Connecting to Bank of Maldives payment gateway", {
           description: "You will be redirected to the secure BML payment page"
         });
         
         const origin = window.location.origin;
-        const returnUrl = `${origin}/confirmation`;
+        const returnUrl = `${origin}/`;
         const cancelUrl = `${origin}/payment?canceled=true`;
         
+        // For activity booking, use a placeholder booking object for BML API
+        const bookingForBml = activityBooking ? {
+          from: "Activity Booking",
+          island: activityBooking.activity?.name || "Activity",
+          date: activityBooking.date,
+          passengers: [{ 
+            name: activityBooking.fullName,
+            email: activityBooking.email,
+            phone: activityBooking.phone,
+            countryCode: activityBooking.countryCode
+          }]
+        } as BookingInfo : bookingInfo;
+        
+        if (!bookingForBml) {
+          throw new Error("Missing booking information");
+        }
+        
         const bmlPayment = await createBmlPaymentSession(
-          bookingInfo,
+          bookingForBml,
           totalAmount,
           returnUrl,
           cancelUrl
@@ -187,22 +219,6 @@ const PaymentGateway = () => {
     return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
   };
 
-  // Check if we're returning from BML with payment status
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const canceled = searchParams.get('canceled') === 'true';
-    
-    if (canceled) {
-      toast.error("Payment canceled", {
-        description: "You canceled the payment process."
-      });
-      
-      // Clear any pending booking data
-      localStorage.removeItem('pendingBooking');
-      localStorage.removeItem('pendingActivityBooking');
-    } 
-  }, [location.search]);
-
   if (!bookingInfo && !activityBooking) {
     return null;
   }
@@ -247,7 +263,7 @@ const PaymentGateway = () => {
               <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
                 <h2 className="text-2xl font-bold text-ocean-dark">Payment</h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  Bank of Maldives Payment Gateway
+                  Complete your booking securely
                 </p>
               </div>
               
@@ -255,6 +271,11 @@ const PaymentGateway = () => {
                 <PaymentSummary 
                   bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
+                />
+                
+                <PaymentMethodSelector
+                  selectedMethod={paymentMethod}
+                  onMethodChange={setPaymentMethod}
                 />
                 
                 <PaymentForm 

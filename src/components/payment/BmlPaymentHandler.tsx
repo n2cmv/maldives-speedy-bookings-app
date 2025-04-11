@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
 import { verifyBmlPayment } from "@/services/bmlPaymentService";
 import { BookingInfo } from "@/types/booking";
 
@@ -12,6 +12,7 @@ const BmlPaymentHandler = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [hasAttemptedVerification, setHasAttemptedVerification] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
   
   useEffect(() => {
     const handlePaymentVerification = async () => {
@@ -49,7 +50,7 @@ const BmlPaymentHandler = () => {
           console.error("BML Handler Error:", errorMsg);
           setVerificationError(errorMsg);
           toast.error(errorMsg);
-          navigate("/");
+          setTimeout(() => navigate("/"), 3000);
           return;
         }
         
@@ -71,7 +72,7 @@ const BmlPaymentHandler = () => {
           console.error("BML Handler Error:", errorMsg);
           setVerificationError(errorMsg);
           toast.error(errorMsg);
-          navigate("/");
+          setTimeout(() => navigate("/"), 3000);
           return;
         }
         
@@ -83,6 +84,7 @@ const BmlPaymentHandler = () => {
         if (verification.success && verification.verified) {
           // Payment successful
           console.log("BML Handler: Payment verified successfully");
+          setVerificationSuccess(true);
           toast.success("Payment verified successfully");
           
           // Clear pending booking data
@@ -90,25 +92,27 @@ const BmlPaymentHandler = () => {
           localStorage.removeItem('pendingActivityBooking');
           
           // Navigate to confirmation page with updated booking data
-          if (isPendingActivity) {
-            console.log("BML Handler: Navigating to confirmation page for activity booking");
-            navigate("/confirmation", { 
-              state: {
-                ...pendingData,
-                paymentComplete: true,
-                isActivityBooking: true
-              }
-            });
-          } else {
-            console.log("BML Handler: Navigating to confirmation page for regular booking");
-            const bookingInfo = pendingData as BookingInfo;
-            navigate("/confirmation", { 
-              state: {
-                ...bookingInfo,
-                paymentComplete: true
-              }
-            });
-          }
+          setTimeout(() => {
+            if (isPendingActivity) {
+              console.log("BML Handler: Navigating to confirmation page for activity booking");
+              navigate("/confirmation", { 
+                state: {
+                  ...pendingData,
+                  paymentComplete: true,
+                  isActivityBooking: true
+                }
+              });
+            } else {
+              console.log("BML Handler: Navigating to confirmation page for regular booking");
+              const bookingInfo = pendingData as BookingInfo;
+              navigate("/confirmation", { 
+                state: {
+                  ...bookingInfo,
+                  paymentComplete: true
+                }
+              });
+            }
+          }, 1500);
         } else {
           // Payment failed or is still pending
           const errorMsg = verification.error || "Payment verification failed";
@@ -118,13 +122,13 @@ const BmlPaymentHandler = () => {
             errorMsg, 
             { description: "Please try again or contact customer support" }
           );
-          navigate("/");
+          setTimeout(() => navigate("/"), 3000);
         }
       } catch (error) {
         console.error("BML Handler: Error handling BML payment verification:", error);
         setVerificationError(error instanceof Error ? error.message : "Unknown error");
         toast.error("Error processing payment verification");
-        navigate("/");
+        setTimeout(() => navigate("/"), 3000);
       } finally {
         setIsVerifying(false);
       }
@@ -141,15 +145,27 @@ const BmlPaymentHandler = () => {
   
   if (!isVerifying) return null;
   
-  // Only show loading when actively verifying
+  // Show loading or success UI when verifying
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg text-center max-w-md">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-ocean" />
-        <h2 className="text-xl font-semibold mb-2">Verifying Payment</h2>
-        <p className="text-gray-600 mb-4">
-          Please wait while we verify your payment with Bank of Maldives...
-        </p>
+        {verificationSuccess ? (
+          <>
+            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Payment Successful</h2>
+            <p className="text-gray-600 mb-4">
+              Your payment has been verified. Redirecting to your booking confirmation...
+            </p>
+          </>
+        ) : (
+          <>
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-ocean" />
+            <h2 className="text-xl font-semibold mb-2">Verifying Payment</h2>
+            <p className="text-gray-600 mb-4">
+              Please wait while we verify your payment with Bank of Maldives...
+            </p>
+          </>
+        )}
         
         {verificationError && (
           <div className="bg-red-50 text-red-800 p-3 rounded-lg mt-4 flex items-start">
