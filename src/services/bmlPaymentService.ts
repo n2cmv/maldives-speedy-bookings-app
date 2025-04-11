@@ -25,6 +25,11 @@ export const BML_CONFIG: BMLPaymentConfig = {
 export const API_BASE_URL = "https://api.uat.merchants.bankofmaldives.com.mv";
 const CREATE_PAYMENT_ENDPOINT = "/public/v1/payments";
 
+// Helper function to ensure we have the full URL for API endpoints
+export const getApiUrl = (endpoint: string): string => {
+  return `${API_BASE_URL}${endpoint}`;
+};
+
 /**
  * Tests the BML API connection
  * @returns Promise with the connection status
@@ -37,7 +42,7 @@ export async function testBmlApiConnection(): Promise<{
   try {
     console.log("BML Service: Testing API connection");
     // Send a simple HEAD request to check if API is reachable
-    const response = await fetch(`${API_BASE_URL}/public/v1/health`, {
+    const response = await fetch(getApiUrl("/public/v1/health"), {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
