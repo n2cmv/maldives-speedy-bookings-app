@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus } from "lucide-react";
+import { Plus, Filter } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import { sendBookingConfirmationEmail } from "@/services/bookingService";
 import BookingForm from "@/components/admin/BookingForm";
@@ -30,6 +30,13 @@ import BookingTable from "@/components/admin/bookings/BookingTable";
 import BookingDetails from "@/components/admin/bookings/BookingDetails";
 import { BookingData } from "@/types/database";
 import { Time } from "@/types/booking";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const BookingsManager = () => {
   const { toast } = useToast();
@@ -45,6 +52,10 @@ const BookingsManager = () => {
   const [emailErrorDetails, setEmailErrorDetails] = useState<string>("");
   const [viewBookingDetails, setViewBookingDetails] = useState<BookingData | null>(null);
   const [bookingDetailsDialogOpen, setBookingDetailsDialogOpen] = useState<boolean>(false);
+  const [filters, setFilters] = useState({
+    showFerryBookings: true,
+    showActivityBookings: true,
+  });
 
   useEffect(() => {
     fetchBookings();
@@ -194,16 +205,23 @@ const BookingsManager = () => {
   };
 
   const filteredBookings = bookings.filter(booking => {
-    if (!searchQuery) return true;
+    // Apply search query filter
+    if (searchQuery && !(
+      booking.user_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.payment_reference?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.from_location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      booking.to_location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (booking.passenger_info && booking.passenger_info[0]?.email?.toLowerCase().includes(searchQuery.toLowerCase()))
+    )) {
+      return false;
+    }
     
-    const query = searchQuery.toLowerCase();
-    return (
-      booking.user_email?.toLowerCase().includes(query) ||
-      booking.payment_reference?.toLowerCase().includes(query) ||
-      booking.from_location?.toLowerCase().includes(query) ||
-      booking.to_location?.toLowerCase().includes(query) ||
-      (booking.passenger_info && booking.passenger_info[0]?.email?.toLowerCase().includes(query))
-    );
+    // Apply booking type filters
+    const isActivityBooking = booking.is_activity_booking === true;
+    if (isActivityBooking && !filters.showActivityBookings) return false;
+    if (!isActivityBooking && !filters.showFerryBookings) return false;
+    
+    return true;
   });
 
   const handleBookingSaved = () => {
@@ -212,17 +230,56 @@ const BookingsManager = () => {
     setCurrentBooking(null);
   };
 
+  const handleFilterChange = (key: keyof typeof filters) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between">
-        <SearchBar
-          placeholder="Search bookings..."
-          value={searchQuery}
-          onChange={setSearchQuery}
-        />
-        <Button onClick={() => setIsBookingFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Booking
-        </Button>
+        <div className="flex-1 mr-2">
+          <SearchBar
+            placeholder="Search bookings..."
+            value={searchQuery}
+            onChange={setSearchQuery}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" /> Filter
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-60 p-4">
+              <div className="space-y-3">
+                <h4 className="font-medium">Booking Types</h4>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="ferry-bookings" 
+                    checked={filters.showFerryBookings}
+                    onCheckedChange={() => handleFilterChange('showFerryBookings')}
+                  />
+                  <Label htmlFor="ferry-bookings">Ferry Bookings</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="activity-bookings" 
+                    checked={filters.showActivityBookings}
+                    onCheckedChange={() => handleFilterChange('showActivityBookings')}
+                  />
+                  <Label htmlFor="activity-bookings">Activity Bookings</Label>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button onClick={() => setIsBookingFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Add Booking
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

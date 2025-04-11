@@ -9,6 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Activity } from "lucide-react";
 
 interface BookingDetailsProps {
   booking: BookingData | null;
@@ -25,10 +27,20 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
     }
   };
 
+  const isActivityBooking = booking.is_activity_booking === true;
+
   return (
     <DialogContent className="sm:max-w-md md:max-w-xl p-6">
       <DialogHeader className="mb-4">
-        <DialogTitle className="text-xl">Booking Details</DialogTitle>
+        <div className="flex items-center justify-between">
+          <DialogTitle className="text-xl">Booking Details</DialogTitle>
+          {isActivityBooking && (
+            <Badge variant="secondary" className="flex items-center gap-1 bg-amber-100 text-amber-800">
+              <Activity className="h-3 w-3" />
+              Activity Booking
+            </Badge>
+          )}
+        </div>
         <DialogDescription className="mt-1">
           Reference: {booking.payment_reference || "N/A"}
         </DialogDescription>
@@ -37,8 +49,17 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
       <div className="space-y-8 py-4">
         {/* Trip Information */}
         <div className="bg-gray-50 p-5 rounded-lg">
-          <h3 className="text-lg font-medium text-ocean mb-3">Trip Information</h3>
+          <h3 className="text-lg font-medium text-ocean mb-3">
+            {isActivityBooking ? "Activity Information" : "Trip Information"}
+          </h3>
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-2">
+            {isActivityBooking && booking.activity && (
+              <>
+                <div className="text-sm font-medium">Activity:</div>
+                <div className="text-sm">{booking.activity}</div>
+              </>
+            )}
+            
             <div className="text-sm font-medium">From:</div>
             <div className="text-sm">{booking.from_location}</div>
             
@@ -56,7 +77,7 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
         <Separator className="my-2" />
         
         {/* Return Trip Information */}
-        {booking.return_trip && (
+        {booking.return_trip && !isActivityBooking && (
           <>
             <div className="bg-gray-50 p-5 rounded-lg">
               <h3 className="text-lg font-medium text-ocean mb-3">Return Trip</h3>
@@ -94,6 +115,13 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
                     
                     <div className="text-sm font-medium">Phone:</div>
                     <div className="text-sm">{passenger.phone || "N/A"}</div>
+                    
+                    {passenger.passport && (
+                      <>
+                        <div className="text-sm font-medium">Passport:</div>
+                        <div className="text-sm">{passenger.passport}</div>
+                      </>
+                    )}
                     
                     {passenger.nationality && (
                       <>

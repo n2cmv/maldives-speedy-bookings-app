@@ -9,9 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Send, AlertCircle, Eye } from "lucide-react";
+import { Edit, Trash2, Send, AlertCircle, Eye, Activity } from "lucide-react";
 import { BookingData } from "@/types/database";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 interface BookingTableProps {
   bookings: BookingData[];
@@ -59,6 +60,7 @@ const BookingTable = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Type</TableHead>
             <TableHead>Reference</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>From</TableHead>
@@ -72,10 +74,30 @@ const BookingTable = ({
           {bookings.length > 0 ? (
             bookings.map((booking) => (
               <TableRow key={booking.id}>
+                <TableCell>
+                  {booking.is_activity_booking ? (
+                    <Badge variant="secondary" className="flex items-center gap-1 bg-amber-100 text-amber-800">
+                      <Activity className="h-3 w-3" />
+                      Activity
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-800">Ferry</Badge>
+                  )}
+                </TableCell>
                 <TableCell>{booking.payment_reference || "N/A"}</TableCell>
                 <TableCell>{booking.passenger_info && booking.passenger_info[0]?.email || booking.user_email || "N/A"}</TableCell>
                 <TableCell>{booking.from_location}</TableCell>
-                <TableCell>{booking.to_location}</TableCell>
+                <TableCell>
+                  {booking.is_activity_booking ? (
+                    <span title={booking.activity}>
+                      {booking.activity?.length > 15 
+                        ? `${booking.activity.substring(0, 15)}...` 
+                        : booking.activity || booking.to_location}
+                    </span>
+                  ) : (
+                    booking.to_location
+                  )}
+                </TableCell>
                 <TableCell>
                   {new Date(booking.departure_date).toLocaleDateString()}
                 </TableCell>
@@ -135,7 +157,7 @@ const BookingTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 No bookings found
               </TableCell>
             </TableRow>

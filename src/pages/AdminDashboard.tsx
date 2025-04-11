@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Header from "@/components/Header";
 import BookingsManager from "@/components/admin/BookingsManager";
 import RoutesManager from "@/components/admin/RoutesManager";
-import { Shield } from "lucide-react";
+import { Shield, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,11 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("bookings");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [bookingSummary, setBookingSummary] = useState({
+    totalBookings: 0,
+    ferryBookings: 0,
+    activityBookings: 0
+  });
 
   useEffect(() => {
     const checkAdminAccess = async () => {
@@ -50,6 +55,9 @@ const AdminDashboard = () => {
           return;
         }
         
+        // Get booking statistics
+        await fetchBookingSummary();
+        
         console.log("Admin access verified");
         setIsLoading(false);
       } catch (error) {
@@ -65,6 +73,33 @@ const AdminDashboard = () => {
     
     checkAdminAccess();
   }, [navigate, toast]);
+
+  const fetchBookingSummary = async () => {
+    try {
+      // Get total bookings
+      const { count: totalCount, error: totalError } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get activity bookings
+      const { count: activityCount, error: activityError } = await supabase
+        .from('bookings')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_activity_booking', true);
+      
+      if (totalError || activityError) {
+        throw new Error("Error fetching booking summary");
+      }
+      
+      setBookingSummary({
+        totalBookings: totalCount || 0,
+        ferryBookings: (totalCount || 0) - (activityCount || 0),
+        activityBookings: activityCount || 0
+      });
+    } catch (error) {
+      console.error("Error fetching booking summary:", error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -82,6 +117,34 @@ const AdminDashboard = () => {
         <div className="flex items-center gap-2 mb-6">
           <Shield className="h-8 w-8 text-ocean-dark" />
           <h1 className="text-3xl font-bold text-ocean-dark">Admin Dashboard</h1>
+        </div>
+        
+        {/* Dashboard Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardHeader className="py-4">
+              <CardTitle className="text-sm font-medium text-gray-500">Total Bookings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{bookingSummary.totalBookings}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="py-4">
+              <CardTitle className="text-sm font-medium text-gray-500">Ferry Bookings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{bookingSummary.ferryBookings}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="py-4">
+              <CardTitle className="text-sm font-medium text-gray-500">Activity Bookings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{bookingSummary.activityBookings}</div>
+            </CardContent>
+          </Card>
         </div>
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
