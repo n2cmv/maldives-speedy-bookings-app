@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Anchor, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { 
   Carousel, 
@@ -9,6 +9,7 @@ import {
   CarouselPrevious 
 } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 type ActivityCardProps = {
   imageSrc: string;
@@ -177,9 +178,14 @@ const ToursSection = () => {
         </div>
         
         <div className="flex justify-center mt-12">
-          <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
-            Book an Activity
-            <ArrowRight className="ml-2 h-5 w-5" />
+          <Link to="/activities">
+            <Button 
+              className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
+            >
+              <Anchor className="w-5 h-5" />
+              Explore Activities
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
           </Link>
         </div>
       </div>

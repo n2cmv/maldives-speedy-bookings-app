@@ -2,10 +2,8 @@
 import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Ship, ChevronUp, Anchor, ChevronRight } from "lucide-react";
+import { Ship, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -39,25 +37,6 @@ const Index = () => {
         <Header />
         <main className="pt-16">
           <WelcomeSection />
-          
-          <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-ocean-dark mb-3">
-              Explore Exciting Activities
-            </h2>
-            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-              Discover the best of Maldives with our curated selection of activities. From swimming with whale sharks to sunset fishing trips, we have something for every adventurer.
-            </p>
-            
-            <Link to="/activities">
-              <Button 
-                className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
-              >
-                <Anchor className="w-5 h-5" />
-                Explore Activities
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </Link>
-          </div>
         </main>
       </div>
 
