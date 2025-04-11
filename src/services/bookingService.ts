@@ -10,6 +10,15 @@ export const generatePaymentReference = () => {
   return `RTM-${randomDigits}`;
 };
 
+// Helper function to convert Date or string to ISO date string
+const formatDateForDatabase = (dateInput: Date | string | undefined): string | null => {
+  if (!dateInput) return null;
+  if (typeof dateInput === 'string') {
+    return dateInput.includes('T') ? dateInput.split('T')[0] : dateInput;
+  }
+  return dateInput.toISOString().split('T')[0];
+};
+
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
     // Generate payment reference if not provided
@@ -22,14 +31,12 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       from_location: booking.from,
       to_location: booking.island,
       departure_time: booking.time,
-      departure_date: booking.date ? booking.date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      departure_date: formatDateForDatabase(booking.date) || new Date().toISOString().split('T')[0],
       return_trip: booking.returnTrip || false,
       return_from_location: booking.returnTripDetails?.from || null,
       return_to_location: booking.returnTripDetails?.island || null,
       return_time: booking.returnTripDetails?.time || null,
-      return_date: booking.returnTripDetails?.date 
-        ? booking.returnTripDetails.date.toISOString().split('T')[0] 
-        : null,
+      return_date: formatDateForDatabase(booking.returnTripDetails?.date),
       passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
