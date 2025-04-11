@@ -21,29 +21,41 @@ const ActivityPassengerDetails = () => {
   const [bookingInfo, setBookingInfo] = useState<any>(null);
   const [passengers, setPassengers] = useState<any[]>([]);
   const [isValid, setIsValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const booking = location.state;
-    if (!booking) {
-      navigate("/activity-booking");
-      return;
-    }
-    
-    setBookingInfo(booking);
-    
-    // Initialize passenger forms based on counts
-    const initialPassengers = [];
-    for (let i = 0; i < booking.passengerCounts.adults; i++) {
-      initialPassengers.push({ type: 'adult', id: `adult-${i+1}` });
-    }
-    for (let i = 0; i < booking.passengerCounts.children; i++) {
-      initialPassengers.push({ type: 'child', id: `child-${i+1}` });
-    }
-    for (let i = 0; i < booking.passengerCounts.seniors; i++) {
-      initialPassengers.push({ type: 'senior', id: `senior-${i+1}` });
-    }
-    
-    setPassengers(initialPassengers);
+    // Wrap in setTimeout to prevent blocking the main thread
+    const timer = setTimeout(() => {
+      try {
+        const booking = location.state;
+        if (!booking) {
+          navigate("/activity-booking");
+          return;
+        }
+        
+        setBookingInfo(booking);
+        
+        // Initialize passenger forms based on counts
+        const initialPassengers = [];
+        for (let i = 0; i < booking.passengerCounts.adults; i++) {
+          initialPassengers.push({ type: 'adult', id: `adult-${i+1}` });
+        }
+        for (let i = 0; i < booking.passengerCounts.children; i++) {
+          initialPassengers.push({ type: 'child', id: `child-${i+1}` });
+        }
+        for (let i = 0; i < booking.passengerCounts.seniors; i++) {
+          initialPassengers.push({ type: 'senior', id: `senior-${i+1}` });
+        }
+        
+        setPassengers(initialPassengers);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error initializing passenger details:", error);
+        setIsLoading(false);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [location.state, navigate]);
 
   const handleGoBack = () => {
@@ -53,22 +65,39 @@ const ActivityPassengerDetails = () => {
   const handleSubmit = (passengerDetails: any[]) => {
     if (!bookingInfo) return;
     
-    const updatedBookingInfo = {
-      ...bookingInfo,
-      passengers: passengerDetails
-    };
-    
-    // Store the updated booking info in session storage
-    sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
-    
-    // Navigate to payment page with updated booking info
-    navigate("/payment", { state: updatedBookingInfo });
-    
-    toast({
-      title: "Passenger details saved!",
-      description: "You're being redirected to payment."
-    });
+    try {
+      const updatedBookingInfo = {
+        ...bookingInfo,
+        passengers: passengerDetails
+      };
+      
+      // Store the updated booking info in session storage
+      sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
+      
+      // Navigate to payment page with updated booking info
+      navigate("/payment", { state: updatedBookingInfo });
+      
+      toast({
+        title: "Passenger details saved!",
+        description: "You're being redirected to payment."
+      });
+    } catch (error) {
+      console.error("Error submitting passenger details:", error);
+      toast({
+        title: "Error saving passenger details",
+        description: "Please try again.",
+        variant: "destructive"
+      });
+    }
   };
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
+        <div className="animate-pulse text-ocean-dark">Loading...</div>
+      </div>
+    );
+  }
   
   if (!bookingInfo) {
     return null;
@@ -82,14 +111,9 @@ const ActivityPassengerDetails = () => {
       
       <Header />
       
-      <motion.div
-        className="max-w-4xl mx-auto pt-20 sm:pt-28 px-4 mb-6"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div className="max-w-4xl mx-auto pt-20 sm:pt-28 px-4 mb-6">
         <StepIndicator currentStep={1} />
-      </motion.div>
+      </div>
       
       <div className="max-w-6xl mx-auto px-4 pb-20">
         <Button 

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ const phoneRegex = new RegExp(
   /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
 );
 
+// Define schema once to avoid unnecessary re-renders
 const formSchema = z.object({
   passengers: z.array(
     z.object({
@@ -59,17 +60,20 @@ const PassengerForm = ({
   bookingInfo,
   setPassengers: setPassengersState
 }: PassengerFormProps) => {
+  // Use memoized defaultValues to prevent unnecessary re-renders
+  const defaultValues = useMemo(() => ({
+    passengers: passengers.map(() => ({
+      name: "",
+      email: "",
+      phone: "",
+      countryCode: "+1",
+      passport: "",
+    }))
+  }), [passengers.length]); // Only depend on the length
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      passengers: passengers.map(() => ({
-        name: "",
-        email: "",
-        phone: "",
-        countryCode: "+1",
-        passport: "",
-      })),
-    },
+    defaultValues,
     mode: "onChange",
   });
 
@@ -79,9 +83,15 @@ const PassengerForm = ({
   });
 
   useEffect(() => {
-    // Trigger validation on form values change
-    form.trigger();
-  }, [form.watch(), form.trigger]);
+    const subscription = form.watch(() => {
+      // Trigger validation only when needed, not on every change
+      if (form.formState.isDirty) {
+        form.trigger();
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   useEffect(() => {
     // Call onFormValidityChange when form validity changes
@@ -89,7 +99,14 @@ const PassengerForm = ({
   }, [form.formState.isValid, onFormValidityChange]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit?.(values.passengers);
+    // Combine passenger type data with form values
+    const enrichedPassengers = values.passengers.map((passenger, index) => ({
+      ...passenger,
+      type: passengers[index]?.type || 'adult',
+      id: passengers[index]?.id || `passenger-${index + 1}`,
+    }));
+    
+    onSubmit?.(enrichedPassengers);
   };
 
   return (

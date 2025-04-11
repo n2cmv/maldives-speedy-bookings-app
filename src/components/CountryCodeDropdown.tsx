@@ -28,12 +28,18 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSelect = (code: string) => {
+    onChange(code);
+    setIsOpen(false);
+  };
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           className="w-full h-12 px-2 flex justify-between items-center bg-white"
+          onClick={(e) => e.preventDefault()} // Prevent form submission
         >
           <span className="text-base">{value || "+1"}</span>
           <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
@@ -41,15 +47,12 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="w-full bg-white border border-gray-200 shadow-md z-50"
+        className="w-full bg-white border border-gray-200 shadow-md z-50 max-h-64 overflow-y-auto"
       >
         {COMMON_COUNTRY_CODES.map((item) => (
           <DropdownMenuItem
             key={item.code}
-            onClick={() => {
-              onChange(item.code);
-              setIsOpen(false);
-            }}
+            onClick={() => handleSelect(item.code)}
             className="cursor-pointer py-2.5 hover:bg-gray-50"
           >
             <span className="text-sm">
@@ -61,3 +64,5 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
     </DropdownMenu>
   );
 };
+
+export default CountryCodeDropdown;
