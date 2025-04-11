@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { BookingData } from "@/types/database";
 import { Time } from "@/types/booking";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface BookingFormProps {
   booking?: BookingData | null;
@@ -155,11 +157,13 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
     }
   };
 
+  // Fix: Updated the event handler to properly handle different input types
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target as HTMLInputElement; // Cast to HTMLInputElement to access 'type' and 'checked'
+    
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -258,25 +262,33 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
           onChange={handleInputChange}
         />
       </div>
-      <div>
-        <Label htmlFor="payment_complete">Payment Complete</Label>
-        <Input
-          type="checkbox"
+      <div className="flex items-center space-x-2">
+        <Checkbox
           id="payment_complete"
           name="payment_complete"
           checked={formData.payment_complete || false}
-          onChange={handleInputChange}
+          onCheckedChange={(checked) => {
+            setFormData(prev => ({
+              ...prev,
+              payment_complete: !!checked
+            }));
+          }}
         />
+        <Label htmlFor="payment_complete">Payment Complete</Label>
       </div>
-      <div>
-        <Label htmlFor="return_trip">Return Trip</Label>
-        <Input
-          type="checkbox"
+      <div className="flex items-center space-x-2">
+        <Checkbox
           id="return_trip"
           name="return_trip"
           checked={formData.return_trip || false}
-          onChange={handleInputChange}
+          onCheckedChange={(checked) => {
+            setFormData(prev => ({
+              ...prev,
+              return_trip: !!checked
+            }));
+          }}
         />
+        <Label htmlFor="return_trip">Return Trip</Label>
       </div>
       {formData.return_trip && (
         <>
