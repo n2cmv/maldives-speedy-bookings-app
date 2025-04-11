@@ -26,19 +26,19 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
   };
 
   return (
-    <DialogContent className="sm:max-w-md md:max-w-xl">
-      <DialogHeader>
-        <DialogTitle>Booking Details</DialogTitle>
-        <DialogDescription>
+    <DialogContent className="sm:max-w-md md:max-w-xl p-6">
+      <DialogHeader className="mb-4">
+        <DialogTitle className="text-xl">Booking Details</DialogTitle>
+        <DialogDescription className="mt-1">
           Reference: {booking.payment_reference || "N/A"}
         </DialogDescription>
       </DialogHeader>
       
-      <div className="space-y-6 py-4">
+      <div className="space-y-8 py-4">
         {/* Trip Information */}
-        <div>
-          <h3 className="text-lg font-medium text-ocean">Trip Information</h3>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+        <div className="bg-gray-50 p-5 rounded-lg">
+          <h3 className="text-lg font-medium text-ocean mb-3">Trip Information</h3>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-2">
             <div className="text-sm font-medium">From:</div>
             <div className="text-sm">{booking.from_location}</div>
             
@@ -53,14 +53,14 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
           </div>
         </div>
         
-        <Separator />
+        <Separator className="my-2" />
         
         {/* Return Trip Information */}
         {booking.return_trip && (
           <>
-            <div>
-              <h3 className="text-lg font-medium text-ocean">Return Trip</h3>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+            <div className="bg-gray-50 p-5 rounded-lg">
+              <h3 className="text-lg font-medium text-ocean mb-3">Return Trip</h3>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-2">
                 <div className="text-sm font-medium">From:</div>
                 <div className="text-sm">{booking.return_from_location}</div>
                 
@@ -74,18 +74,18 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
                 <div className="text-sm">{booking.return_time || "N/A"}</div>
               </div>
             </div>
-            <Separator />
+            <Separator className="my-2" />
           </>
         )}
         
         {/* Passenger Information */}
         <div>
-          <h3 className="text-lg font-medium text-ocean">Passengers ({booking.passenger_count})</h3>
-          <div className="space-y-4 mt-2">
+          <h3 className="text-lg font-medium text-ocean mb-3">Passengers ({booking.passenger_count})</h3>
+          <div className="space-y-5 mt-2">
             {booking.passenger_info && booking.passenger_info.length > 0 ? (
               booking.passenger_info.map((passenger, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-md">
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                <div key={index} className="bg-gray-50 p-5 rounded-lg">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                     <div className="text-sm font-medium">Name:</div>
                     <div className="text-sm">{passenger.name || "N/A"}</div>
                     
@@ -112,17 +112,17 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
                 </div>
               ))
             ) : (
-              <div className="text-sm text-gray-500">No detailed passenger information available</div>
+              <div className="text-sm text-gray-500 p-4 bg-gray-50 rounded-lg">No detailed passenger information available</div>
             )}
           </div>
         </div>
         
-        <Separator />
+        <Separator className="my-2" />
         
         {/* Payment Information */}
-        <div>
-          <h3 className="text-lg font-medium text-ocean">Payment Information</h3>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+        <div className="bg-gray-50 p-5 rounded-lg">
+          <h3 className="text-lg font-medium text-ocean mb-3">Payment Information</h3>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-2">
             <div className="text-sm font-medium">Status:</div>
             <div className="text-sm">
               {booking.payment_complete ? (
@@ -138,7 +138,7 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
         </div>
         
         {/* Metadata */}
-        <div className="text-xs text-gray-400 pt-2">
+        <div className="text-xs text-gray-400 pt-2 px-1">
           <div>Booking ID: {booking.id}</div>
           <div>Created: {format(new Date(booking.created_at), "PPp")}</div>
           {booking.updated_at && booking.updated_at !== booking.created_at && (
