@@ -48,18 +48,25 @@ const Confirmation = () => {
     }
     
     console.log("Confirmation page received booking:", booking);
-    setBookingInfo(booking);
+    console.log("Booking payment reference:", booking.paymentReference);
+    
+    const updatedBooking = {
+      ...booking,
+      paymentReference: booking.paymentReference
+    };
+    
+    setBookingInfo(updatedBooking);
     
     if (booking.isActivityBooking) {
       setIsActivityBooking(true);
     }
     
-    saveBookingToLocalStorage(booking);
+    saveBookingToLocalStorage(updatedBooking);
     
     const sendConfirmation = async () => {
       setIsLoading(true);
       try {
-        const result = await sendBookingConfirmationEmail(booking);
+        const result = await sendBookingConfirmationEmail(updatedBooking);
         if (result.success) {
           setEmailSent(true);
           toast.success("Confirmation email sent successfully!");

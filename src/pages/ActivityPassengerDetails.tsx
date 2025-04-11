@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -32,12 +33,16 @@ const ActivityPassengerDetails = () => {
           return;
         }
         
+        // Always generate or use an existing payment reference
+        const paymentRef = booking.paymentReference || generatePaymentReference();
+        console.log("Setting up activity booking with reference:", paymentRef);
+        
         const updatedBooking = {
           ...booking,
           isActivityBooking: true,
           activity: booking.activity || "Unknown Activity",
           is_activity_booking: true,
-          paymentReference: booking.paymentReference || generatePaymentReference()
+          paymentReference: paymentRef
         };
         
         console.log("Activity booking prepared:", updatedBooking);
@@ -88,7 +93,18 @@ const ActivityPassengerDetails = () => {
         return;
       }
 
-      const paymentReference = bookingInfo.paymentReference || generatePaymentReference();
+      // Ensure we use the existing payment reference if available
+      const paymentReference = bookingInfo.paymentReference;
+      
+      if (!paymentReference) {
+        console.error("Payment reference is missing");
+        toast({
+          title: "Error with booking reference",
+          description: "Could not generate a booking reference. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       const updatedBookingInfo = {
         ...bookingInfo,
@@ -100,7 +116,7 @@ const ActivityPassengerDetails = () => {
         paymentComplete: false
       };
       
-      console.log("Submitting activity booking with explicit flags and payment reference:", updatedBookingInfo);
+      console.log("Submitting activity booking with explicit reference:", updatedBookingInfo);
       
       const { data, error } = await saveBookingToDatabase(updatedBookingInfo);
       
@@ -110,13 +126,20 @@ const ActivityPassengerDetails = () => {
       
       console.log("Activity booking saved to database:", data);
       
-      sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
+      // Make sure we have the payment reference from the database
+      const savedBooking = {
+        ...updatedBookingInfo,
+        id: data?.id || undefined,
+        paymentReference: data?.payment_reference || paymentReference
+      };
+      
+      sessionStorage.setItem("currentActivityBooking", JSON.stringify(savedBooking));
       
       const storedBookings = localStorage.getItem("savedBookings");
       const bookingsArray = storedBookings ? JSON.parse(storedBookings) : [];
       
       const bookingWithId = {
-        ...updatedBookingInfo,
+        ...savedBooking,
         id: data?.id || `activity-${Date.now()}`,
         paymentComplete: false
       };
@@ -124,7 +147,7 @@ const ActivityPassengerDetails = () => {
       bookingsArray.push(bookingWithId);
       localStorage.setItem("savedBookings", JSON.stringify(bookingsArray));
       
-      navigate("/payment", { state: updatedBookingInfo });
+      navigate("/payment", { state: savedBooking });
       
       toast({
         title: "Participant details saved!",

@@ -20,7 +20,7 @@ const QrCodeDisplay = ({ booking, paymentReference, bookingReference }: QrCodeDi
   
   // Make sure we're using the payment reference from all possible sources
   // Use the first non-null, non-undefined value in this priority order
-  const reference = booking?.paymentReference || bookingReference || paymentReference;
+  const reference = booking?.paymentReference || paymentReference || bookingReference;
   
   // Check if we have a valid reference before creating the URL
   const bookingUrl = reference 

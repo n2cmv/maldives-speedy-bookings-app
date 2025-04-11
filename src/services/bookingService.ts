@@ -22,8 +22,11 @@ const formatDateForDatabase = (dateInput: Date | string | undefined): string | n
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
     // Generate payment reference if not provided
-    if (booking.paymentComplete && !booking.paymentReference) {
+    if (!booking.paymentReference) {
       booking.paymentReference = generatePaymentReference();
+      console.log("Generated new payment reference:", booking.paymentReference);
+    } else {
+      console.log("Using existing payment reference:", booking.paymentReference);
     }
 
     // CRITICAL FIX: Explicitly check and set activity booking flags
@@ -37,6 +40,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       activity: booking.activity,
       isActivityBookingFlag: booking.isActivityBooking,
       is_activity_booking_flag: booking.is_activity_booking,
+      paymentReference: booking.paymentReference,
       booking: JSON.stringify(booking)
     });
 
@@ -82,7 +86,8 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       console.log("Activity booking verification:", {
         saved_id: data[0].id,
         saved_activity: data[0].activity,
-        saved_is_activity_booking: data[0].is_activity_booking
+        saved_is_activity_booking: data[0].is_activity_booking,
+        saved_reference: data[0].payment_reference
       });
     }
     

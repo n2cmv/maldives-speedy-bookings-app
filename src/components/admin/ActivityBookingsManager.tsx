@@ -75,6 +75,12 @@ const ActivityBookingsManager = () => {
       }
       
       console.log(`Found ${activityBookings.length} activity bookings`);
+      
+      // Log all payment references for debugging
+      activityBookings.forEach(booking => {
+        console.log(`Booking ID: ${booking.id}, Payment Reference: ${booking.payment_reference}`);
+      });
+      
       setBookings(activityBookings as unknown as BookingData[]);
       setNoDataFound(activityBookings.length === 0);
     } catch (error) {
@@ -151,7 +157,7 @@ const ActivityBookingsManager = () => {
         isActivityBooking: true
       };
 
-      console.log("Attempting to send activity booking email to:", booking.passenger_info[0].email);
+      console.log("Attempting to send activity booking email with reference:", booking.payment_reference);
       const { success, error, emailSentTo } = await sendBookingConfirmationEmail(bookingInfo);
 
       if (!success || error) {
