@@ -50,17 +50,53 @@ const ActivityBookingsManager = () => {
   const fetchActivityBookings = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      console.log("Fetching activity bookings...");
+      
+      // First try with is_activity_booking flag
+      let { data: flaggedData, error: flaggedError } = await supabase
         .from('bookings')
         .select('*')
         .eq('is_activity_booking', true)
-        .order('created_at', { ascending: false }) as unknown as { data: BookingData[], error: any };
-
-      if (error) {
-        throw error;
+        .order('created_at', { ascending: false });
+        
+      if (flaggedError) {
+        console.error("Error fetching activity bookings by flag:", flaggedError);
+        throw flaggedError;
       }
 
-      setBookings(data || []);
+      // Then try with activity field not null
+      let { data: activityData, error: activityError } = await supabase
+        .from('bookings')
+        .select('*')
+        .not('activity', 'is', null)
+        .order('created_at', { ascending: false });
+        
+      if (activityError) {
+        console.error("Error fetching activity bookings by activity field:", activityError);
+        throw activityError;
+      }
+      
+      // Combine and deduplicate results
+      let combinedData: BookingData[] = [];
+      
+      if (flaggedData && flaggedData.length > 0) {
+        console.log(`Found ${flaggedData.length} bookings with is_activity_booking=true`);
+        combinedData = [...flaggedData];
+      }
+      
+      if (activityData && activityData.length > 0) {
+        console.log(`Found ${activityData.length} bookings with activity field not null`);
+        
+        // Add only unique entries from activityData
+        activityData.forEach(booking => {
+          if (!combinedData.some(b => b.id === booking.id)) {
+            combinedData.push(booking);
+          }
+        });
+      }
+      
+      console.log(`Total unique activity bookings found: ${combinedData.length}`);
+      setBookings(combinedData || []);
     } catch (error) {
       console.error("Error fetching activity bookings:", error);
       toast({
@@ -208,7 +244,7 @@ const ActivityBookingsManager = () => {
           onChange={setSearchQuery}
         />
         <Button onClick={() => {
-          setCurrentBooking({is_activity_booking: true});  // Pre-set as activity booking
+          setCurrentBooking({is_activity_booking: true, activity: ""});  // Pre-set as activity booking
           setIsBookingFormOpen(true);
         }}>
           <Plus className="mr-2 h-4 w-4" /> Add Activity Booking

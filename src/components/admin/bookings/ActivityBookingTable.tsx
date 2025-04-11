@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Send, AlertCircle } from "lucide-react";
+import { Edit, Trash2, Send, AlertCircle, Bug } from "lucide-react";
 import { BookingData } from "@/types/database";
 
 interface ActivityBookingTableProps {
@@ -29,6 +29,20 @@ const ActivityBookingTable = ({
   emailStatus,
   onShowEmailError
 }: ActivityBookingTableProps) => {
+  // Helper function to inspect booking details in console
+  const debugBooking = (booking: BookingData) => {
+    console.log(`Debugging activity booking ${booking.id}:`, {
+      id: booking.id,
+      activity: booking.activity,
+      is_activity_booking: booking.is_activity_booking,
+      from: booking.from_location,
+      to: booking.to_location,
+      date: booking.departure_date,
+      passenger_count: booking.passenger_count,
+      full_object: booking
+    });
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -96,6 +110,15 @@ const ActivityBookingTable = ({
                         </Button>
                       )}
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => debugBooking(booking)}
+                      className="text-slate-400 hover:text-slate-600"
+                      title="Debug booking info in console"
+                    >
+                      <Bug className="h-4 w-4" />
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
