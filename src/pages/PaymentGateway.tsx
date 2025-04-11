@@ -34,17 +34,8 @@ const PaymentGateway = () => {
       return;
     }
     
-    // Enhanced activity booking detection
-    const hasActivity = booking.activity !== undefined && booking.activity !== null && booking.activity !== "";
-    setIsActivityBooking(booking.isActivityBooking === true || hasActivity);
-    
-    console.log("Payment Gateway - Booking info:", {
-      hasActivity,
-      activity: booking.activity,
-      isActivityBookingFlag: booking.isActivityBooking,
-      detectedAsActivity: booking.isActivityBooking === true || hasActivity
-    });
-    
+    // Detect if this is an activity booking
+    setIsActivityBooking(booking.activity !== undefined);
     setBookingInfo(booking);
     
     // Generate a consistent reference number for this booking session
@@ -82,25 +73,14 @@ const PaymentGateway = () => {
 
   const handlePaymentCompletion = (success: boolean) => {
     if (success && bookingInfo) {
-      // Ensure activity booking flag is properly set before confirmation
-      const finalBookingInfo = {
-        ...bookingInfo,
-        paymentComplete: true,
-        paymentReference: bookingReference,
-        isActivityBooking: isActivityBooking
-      };
-      
-      // Double check if we have an activity but the flag wasn't set
-      if (bookingInfo.activity && !finalBookingInfo.isActivityBooking) {
-        finalBookingInfo.isActivityBooking = true;
-      }
-      
-      console.log("Completing payment with booking info:", {
-        isActivityBooking: finalBookingInfo.isActivityBooking,
-        activity: finalBookingInfo.activity
+      navigate("/confirmation", { 
+        state: {
+          ...bookingInfo,
+          paymentComplete: true,
+          paymentReference: bookingReference,
+          isActivityBooking: isActivityBooking
+        }
       });
-      
-      navigate("/confirmation", { state: finalBookingInfo });
     } else {
       setIsRedirecting(false);
       toast.error("Payment failed", {
