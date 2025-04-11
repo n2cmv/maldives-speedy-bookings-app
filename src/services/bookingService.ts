@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -26,6 +25,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       booking.paymentReference = generatePaymentReference();
     }
 
+    // Explicitly determine if this is an activity booking
     const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
 
     const bookingData = {
@@ -43,15 +43,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
-      // Add activity-specific fields to passenger_info
-      ...(isActivityBooking && {
-        passenger_info: booking.passengers ? 
-          JSON.parse(JSON.stringify(booking.passengers.map(p => ({
-            ...p,
-            activity: booking.activity
-          })))) : []
-      }),
-      // Store activity-specific fields directly in the booking record
+      // Store activity information in two places for backwards compatibility
       activity: booking.activity || null,
       is_activity_booking: isActivityBooking
     };

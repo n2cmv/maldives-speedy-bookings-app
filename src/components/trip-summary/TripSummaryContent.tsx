@@ -6,6 +6,7 @@ import JourneySeparator from './JourneySeparator';
 import PriceSummary from './PriceSummary';
 import { format } from 'date-fns';
 import { CardContent } from '../ui/card';
+import { Palmtree } from 'lucide-react';
 
 interface TripSummaryContentProps {
   bookingInfo: BookingInfo;
@@ -46,7 +47,10 @@ const TripSummaryContent = ({
         // Activity Booking Summary
         <>
           <div className="mb-6">
-            <h3 className="text-lg font-bold text-ocean mb-2">{bookingInfo.activity}</h3>
+            <div className="flex items-center gap-2">
+              <Palmtree className="h-5 w-5 text-green-500" />
+              <h3 className="text-lg font-bold text-ocean mb-2">{bookingInfo.activity}</h3>
+            </div>
             <p className="text-sm text-gray-500">
               {bookingInfo.date && formatDate(bookingInfo.date)} • {bookingInfo.time}
             </p>
