@@ -53,11 +53,13 @@ export type Database = {
       }
       bookings: {
         Row: {
+          activity: string | null
           created_at: string
           departure_date: string
           departure_time: string
           from_location: string
           id: string
+          is_activity_booking: boolean | null
           passenger_count: number
           passenger_info: Json
           payment_complete: boolean | null
@@ -72,11 +74,13 @@ export type Database = {
           user_email: string
         }
         Insert: {
+          activity?: string | null
           created_at?: string
           departure_date: string
           departure_time: string
           from_location: string
           id?: string
+          is_activity_booking?: boolean | null
           passenger_count: number
           passenger_info: Json
           payment_complete?: boolean | null
@@ -91,11 +95,13 @@ export type Database = {
           user_email: string
         }
         Update: {
+          activity?: string | null
           created_at?: string
           departure_date?: string
           departure_time?: string
           from_location?: string
           id?: string
+          is_activity_booking?: boolean | null
           passenger_count?: number
           passenger_info?: Json
           payment_complete?: boolean | null
