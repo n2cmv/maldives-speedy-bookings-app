@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Ship, CalendarDays, Users } from "lucide-react";
+import { MapPin, Ship, Calendar, Users, ChevronRight } from "lucide-react";
 import { Island } from "@/types/island";
 
 interface IslandCardsProps {
@@ -125,9 +125,10 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
           <CardFooter className="pt-2">
             <Button 
               onClick={() => onSelectDestination(island.name)} 
-              className="w-full bg-ocean hover:bg-ocean-dark text-white"
+              className="w-full bg-ocean hover:bg-ocean-dark text-white flex items-center justify-center gap-2"
             >
               Book This Destination
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </CardFooter>
         </Card>

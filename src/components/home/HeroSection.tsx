@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,7 +111,7 @@ const HeroSection = () => {
           aria-label="Explore more"
         >
           <span className="text-sm font-medium mb-2">Explore more</span>
-          <ArrowDown className="h-6 w-6 animate-bounce" />
+          <ChevronDown className="h-6 w-6 animate-bounce" />
         </button>
       </div>
     </div>

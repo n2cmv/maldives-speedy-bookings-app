@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Sun, Building, Anchor, Plane } from "lucide-react";
+import { Sun, Building, Anchor, Plane, ChevronRight } from "lucide-react";
 
 interface PopularDestinationsProps {
   onSelectToIsland: (island: string) => void;
@@ -28,6 +28,7 @@ const PopularDestinations = ({ onSelectToIsland }: PopularDestinationsProps) => 
           >
             {island.icon}
             {island.name}
+            <ChevronRight className="h-3 w-3 ml-1 opacity-70" />
           </Button>
         ))}
       </div>
