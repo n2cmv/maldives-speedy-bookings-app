@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -201,14 +202,17 @@ const MyBookings = () => {
 
   const isActivityBooking = (booking: any): boolean => {
     try {
-      if (booking.isActivityBooking === true) {
+      // First, check if the booking has an explicit is_activity_booking flag
+      if (booking.is_activity_booking === true) {
         return true;
       }
       
+      // Then check if the booking has an activity property directly
       if (booking.activity) {
         return true;
       }
       
+      // Finally check if any passenger has an activity
       const passengerInfo = booking.passenger_info;
       if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
         if (passengerInfo.some(p => p.activity)) {
@@ -223,10 +227,12 @@ const MyBookings = () => {
 
   const getActivityName = (booking: any): string => {
     try {
+      // Try to get activity directly from booking first
       if (booking.activity) {
         return booking.activity;
       }
       
+      // Then look in passenger info
       const passengerInfo = booking.passenger_info;
       if (Array.isArray(passengerInfo) && passengerInfo.length > 0) {
         const activityInfo = passengerInfo.find(p => p.activity);

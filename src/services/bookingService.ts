@@ -26,6 +26,8 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       booking.paymentReference = generatePaymentReference();
     }
 
+    const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
+
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
       from_location: booking.from,
@@ -40,7 +42,18 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
-      passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : []
+      passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
+      // Add activity-specific fields to passenger_info
+      ...(isActivityBooking && {
+        passenger_info: booking.passengers ? 
+          JSON.parse(JSON.stringify(booking.passengers.map(p => ({
+            ...p,
+            activity: booking.activity
+          })))) : []
+      }),
+      // Store activity-specific fields directly in the booking record
+      activity: booking.activity || null,
+      is_activity_booking: isActivityBooking
     };
 
     const { data, error } = await supabase
