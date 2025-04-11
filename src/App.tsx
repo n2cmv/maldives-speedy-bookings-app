@@ -17,6 +17,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 
+// Import activity booking pages
+import ActivityBookingForm from "./pages/ActivityBookingForm";
+import ActivityPassengerDetails from "./pages/ActivityPassengerDetails";
+
 // Import i18n configuration
 import "./i18n/i18n";
 import { I18nextProvider } from "react-i18next";
@@ -67,6 +71,11 @@ const App = () => {
                 <Route path="/booking-lookup" element={<BookingLookup />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
+                
+                {/* Activity booking routes */}
+                <Route path="/activity-booking" element={<ActivityBookingForm />} />
+                <Route path="/activity-passenger-details" element={<ActivityPassengerDetails />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

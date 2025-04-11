@@ -15,30 +15,39 @@ import PaymentForm from "@/components/payment/PaymentForm";
 import { generatePaymentReference } from "@/services/bookingService";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
+const ACTIVITY_PRICE_PER_PERSON = 90; // USD per person for activities
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
 
 const PaymentGateway = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
+  const [bookingInfo, setBookingInfo] = useState<BookingInfo | any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
+  const [isActivityBooking, setIsActivityBooking] = useState(false);
 
   useEffect(() => {
-    const booking = location.state as BookingInfo | null;
+    const booking = location.state as BookingInfo | any;
     if (!booking) {
       navigate("/booking");
       return;
     }
     
+    // Detect if this is an activity booking
+    setIsActivityBooking(booking.activity !== undefined);
     setBookingInfo(booking);
-    // Generate a consistent reference number for this booking session using our standardized function
+    
+    // Generate a consistent reference number for this booking session
     setBookingReference(generatePaymentReference());
   }, [location.state, navigate]);
 
   const handleGoBack = () => {
-    navigate("/passenger-details", { state: bookingInfo });
+    if (isActivityBooking) {
+      navigate("/activity-passenger-details", { state: bookingInfo });
+    } else {
+      navigate("/passenger-details", { state: bookingInfo });
+    }
   };
 
   const handlePayment = () => {
@@ -68,7 +77,8 @@ const PaymentGateway = () => {
         state: {
           ...bookingInfo,
           paymentComplete: true,
-          paymentReference: bookingReference
+          paymentReference: bookingReference,
+          isActivityBooking: isActivityBooking
         }
       });
     } else {
@@ -83,10 +93,16 @@ const PaymentGateway = () => {
     if (!bookingInfo?.passengers) return 0;
     
     const totalPassengers = bookingInfo.passengers.length || 0;
-    const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
-    const journeyMultiplier = isReturnTrip ? 2 : 1; // Double the price for return trips
     
-    return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
+    if (isActivityBooking) {
+      // Activity pricing
+      return totalPassengers * ACTIVITY_PRICE_PER_PERSON;
+    } else {
+      // Regular booking pricing
+      const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
+      const journeyMultiplier = isReturnTrip ? 2 : 1;
+      return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
+    }
   };
 
   if (!bookingInfo) {
@@ -113,7 +129,7 @@ const PaymentGateway = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <StepIndicator />
+            <StepIndicator currentStep={2} />
           </motion.div>
 
           <div className="max-w-lg mx-auto">
@@ -124,7 +140,7 @@ const PaymentGateway = () => {
               disabled={isProcessing}
             >
               <ChevronLeft className="h-4 w-4" />
-              Back to Passenger Details
+              Back to {isActivityBooking ? 'Participant' : 'Passenger'} Details
             </Button>
             
             <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
@@ -139,6 +155,8 @@ const PaymentGateway = () => {
                 <PaymentSummary 
                   bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
+                  isActivityBooking={isActivityBooking}
+                  activity={isActivityBooking ? bookingInfo.activity : undefined}
                 />
                 
                 <PaymentForm 
