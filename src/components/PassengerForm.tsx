@@ -38,8 +38,10 @@ const PassengerForm = ({
   
   const handleAddPassenger = () => {
     if (passengers.length >= MAX_PASSENGERS) {
-      toast(t("booking.passenger.maxReached", "Maximum passengers reached"), {
+      toast({
+        title: t("booking.passenger.maxReached", "Maximum passengers reached"),
         description: t("booking.passenger.cannotAddMore", "You cannot add more than {{max}} passengers.", {max: MAX_PASSENGERS}),
+        variant: "destructive"
       });
       return;
     }
@@ -65,8 +67,10 @@ const PassengerForm = ({
     // Check if first passenger has all required fields
     const firstPassenger = passengers[0];
     if (!firstPassenger?.name || !firstPassenger?.email || !firstPassenger?.phone || !firstPassenger?.passport) {
-      toast(t("booking.passenger.missingInfo", "Missing information"), {
+      toast({
+        title: t("booking.passenger.missingInfo", "Missing information"),
         description: t("booking.passenger.fillPrimaryFields", "Please fill in all required fields for the primary passenger"),
+        variant: "destructive"
       });
       return;
     }
@@ -75,8 +79,10 @@ const PassengerForm = ({
     const missingRequiredInfo = passengers.some(p => !p.name || !p.passport);
     
     if (missingRequiredInfo) {
-      toast(t("booking.passenger.missingInfo", "Missing information"), {
+      toast({
+        title: t("booking.passenger.missingInfo", "Missing information"),
         description: t("booking.passenger.fillNamePassport", "Please fill in name and passport number for all passengers"),
+        variant: "destructive"
       });
       return;
     }

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash2, Send, AlertCircle } from "lucide-react";
 import { BookingData } from "@/types/database";
-import { toast } from "sonner";
 
 interface BookingTableProps {
   bookings: BookingData[];
@@ -30,34 +29,11 @@ const BookingTable = ({
   emailStatus,
   onShowEmailError
 }: BookingTableProps) => {
-  // Helper function to send email with toast notifications
-  const handleSendEmail = (booking: BookingData) => {
-    toast.promise(
-      () => new Promise((resolve, reject) => {
-        // Use the provided onSendEmail function
-        onSendEmail(booking);
-        
-        // This is just for the toast - the actual sending happens in the parent component
-        if (emailStatus[booking.id]?.error) {
-          reject(new Error(emailStatus[booking.id].error));
-        } else {
-          resolve(true);
-        }
-      }),
-      {
-        loading: 'Sending email...',
-        success: 'Email sent successfully!',
-        error: (err) => `Failed to send email: ${err.message || 'Unknown error'}`
-      }
-    );
-  };
-
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
             <TableHead>Reference</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>From</TableHead>
@@ -71,7 +47,6 @@ const BookingTable = ({
           {bookings.length > 0 ? (
             bookings.map((booking) => (
               <TableRow key={booking.id}>
-                <TableCell className="font-mono text-xs text-gray-500">{booking.id.substring(0, 8)}...</TableCell>
                 <TableCell>{booking.payment_reference || "N/A"}</TableCell>
                 <TableCell>{booking.passenger_info && booking.passenger_info[0]?.email || booking.user_email || "N/A"}</TableCell>
                 <TableCell>{booking.from_location}</TableCell>
@@ -100,7 +75,7 @@ const BookingTable = ({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => handleSendEmail(booking)}
+                        onClick={() => onSendEmail(booking)}
                         disabled={emailStatus[booking.id]?.sending}
                         className={emailStatus[booking.id]?.sending ? "opacity-50" : ""}
                       >
@@ -127,7 +102,7 @@ const BookingTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 No bookings found
               </TableCell>
             </TableRow>

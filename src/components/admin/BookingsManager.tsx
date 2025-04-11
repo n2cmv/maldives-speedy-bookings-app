@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { BookingInfo } from "@/types/booking";
 import { sendBookingConfirmationEmail } from "@/services/bookingService";
 import BookingForm from "@/components/admin/BookingForm";
@@ -29,7 +28,6 @@ import SearchBar from "@/components/admin/common/SearchBar";
 import BookingTable from "@/components/admin/bookings/BookingTable";
 import { BookingData } from "@/types/database";
 import { Time } from "@/types/booking";
-import { toast } from "sonner";
 
 const BookingsManager = () => {
   const { toast } = useToast();
@@ -43,7 +41,6 @@ const BookingsManager = () => {
   const [emailStatus, setEmailStatus] = useState<Record<string, { sending: boolean; error?: string }>>({});
   const [emailDetailsDialogOpen, setEmailDetailsDialogOpen] = useState<boolean>(false);
   const [emailErrorDetails, setEmailErrorDetails] = useState<string>("");
-  const [isDeleteAllDialogOpen, setIsDeleteAllDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     fetchBookings();
@@ -107,36 +104,6 @@ const BookingsManager = () => {
     } finally {
       setIsDeleteDialogOpen(false);
       setBookingToDelete(null);
-    }
-  };
-
-  const handleDeleteAll = async () => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .neq('id', 'placeholder'); // This condition ensures all records are deleted
-
-      if (error) {
-        throw error;
-      }
-
-      setBookings([]);
-      toast({
-        title: "Success",
-        description: "All bookings have been deleted",
-      });
-    } catch (error) {
-      console.error("Error deleting all bookings:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete all bookings",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleteAllDialogOpen(false);
-      setIsLoading(false);
     }
   };
 
@@ -244,18 +211,9 @@ const BookingsManager = () => {
           value={searchQuery}
           onChange={setSearchQuery}
         />
-        <div className="flex space-x-2">
-          <Button onClick={() => setIsBookingFormOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Add Booking
-          </Button>
-          <Button 
-            variant="destructive" 
-            onClick={() => setIsDeleteAllDialogOpen(true)}
-            disabled={bookings.length === 0}
-          >
-            <Trash className="mr-2 h-4 w-4" /> Delete All
-          </Button>
-        </div>
+        <Button onClick={() => setIsBookingFormOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add Booking
+        </Button>
       </div>
 
       {isLoading ? (
@@ -311,25 +269,6 @@ const BookingsManager = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      <AlertDialog
-        open={isDeleteAllDialogOpen}
-        onOpenChange={setIsDeleteAllDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete All Bookings</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete ALL bookings? This action cannot be
-              undone and will remove {bookings.length} booking{bookings.length !== 1 ? 's' : ''}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteAll}>Delete All</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
