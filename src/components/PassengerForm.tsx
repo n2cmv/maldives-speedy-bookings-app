@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -15,12 +16,15 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CountryCodeDropdown } from "./CountryCodeDropdown";
+import { BookingInfo } from "@/types/booking";
 
 export interface PassengerFormProps {
   passengers?: any[];
   onFormValidityChange?: (isValid: boolean) => void;
   onSubmit?: (passengerDetails: any[]) => void;
   submitButtonContent?: React.ReactNode;
+  bookingInfo?: BookingInfo;
+  setPassengers?: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const phoneRegex = new RegExp(
@@ -53,7 +57,9 @@ const PassengerForm = ({
   passengers = [],
   onFormValidityChange,
   onSubmit,
-  submitButtonContent
+  submitButtonContent,
+  bookingInfo,
+  setPassengers: setPassengersState
 }: PassengerFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

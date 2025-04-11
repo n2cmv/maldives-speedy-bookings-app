@@ -60,7 +60,7 @@ const TripSummaryContent = ({
             to={bookingInfo.island}
             time={bookingInfo.time}
             date={bookingInfo.date ? formatDate(bookingInfo.date) : ''}
-            isReturnTrip={isReturnTrip}
+            isReturnTrip={!!isReturnTrip}
           />
           
           {isReturnTrip && bookingInfo.returnTripDetails && (
@@ -72,7 +72,7 @@ const TripSummaryContent = ({
                 time={bookingInfo.returnTripDetails.time}
                 date={bookingInfo.returnTripDetails.date ? formatDate(bookingInfo.returnTripDetails.date) : ''}
                 isReturn={true}
-                isReturnTrip={true}
+                isReturnTrip={!!isReturnTrip}
               />
             </>
           )}
@@ -84,7 +84,7 @@ const TripSummaryContent = ({
           passengerPrices={passengerPrices}
           totalPrice={totalPrice}
           pricePerPerson={pricePerPerson}
-          isReturnTrip={!isActivityBooking && isReturnTrip}
+          isReturnTrip={!isActivityBooking && !!isReturnTrip}
         />
       </div>
     </CardContent>

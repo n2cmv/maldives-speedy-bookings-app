@@ -52,6 +52,7 @@ export interface BookingInfo {
   paymentComplete?: boolean;
   paymentReference?: string;
   id?: string; // For saved bookings
+  activity?: string; // Added this for activity bookings
 }
 
 export interface SavedBooking extends BookingInfo {

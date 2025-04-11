@@ -1,3 +1,4 @@
+
 import { CheckCircle2, Mail, AlertTriangle } from "lucide-react";
 
 interface ConfirmationHeaderProps {
@@ -15,7 +16,7 @@ const ConfirmationHeader = ({ booking, isEmailSent, isActivityBooking = false }:
             {isActivityBooking ? "Activity Booking Confirmed!" : "Booking Confirmed!"}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            {isActivitySent ? "Your booking has been successfully processed." : "Your booking is confirmed, and an email receipt has been sent."}
+            {isEmailSent ? "Your booking has been successfully processed." : "Your booking is confirmed, and an email receipt has been sent."}
           </p>
         </div>
         
