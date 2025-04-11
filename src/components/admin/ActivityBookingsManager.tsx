@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,10 +54,12 @@ const ActivityBookingsManager = () => {
     try {
       console.log("Fetching activity bookings...");
       
+      // Improved query to only get activity bookings
       const { data: activityBookings, error } = await supabase
         .from('bookings')
         .select('*')
-        .or('is_activity_booking.eq.true,activity.neq.null,activity.neq."",activity.not.is.null');
+        .eq('is_activity_booking', true)
+        .order('created_at', { ascending: false });
         
       if (error) {
         console.error("Error fetching activity bookings:", error);
@@ -71,10 +74,7 @@ const ActivityBookingsManager = () => {
         return;
       }
       
-      console.log(`Found ${activityBookings.length} activity bookings, raw data:`, activityBookings);
-      
-      activityBookings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-      
+      console.log(`Found ${activityBookings.length} activity bookings`);
       setBookings(activityBookings as unknown as BookingData[]);
       setNoDataFound(activityBookings.length === 0);
     } catch (error) {

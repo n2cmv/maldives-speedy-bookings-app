@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,15 +50,21 @@ const BookingsManager = () => {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
+      console.log("Fetching ferry bookings only...");
+      
+      // Updated query to exclude activity bookings
       const { data, error } = await supabase
         .from('bookings')
         .select('*')
+        .is('is_activity_booking', null)
+        .or('activity.is.null,activity.eq.')
         .order('created_at', { ascending: false }) as unknown as { data: BookingData[], error: any };
 
       if (error) {
         throw error;
       }
-
+      
+      console.log(`Retrieved ${data?.length || 0} ferry bookings`);
       setBookings(data || []);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -207,12 +214,17 @@ const BookingsManager = () => {
     <div className="space-y-4">
       <div className="flex justify-between">
         <SearchBar
-          placeholder="Search bookings..."
+          placeholder="Search ferry bookings..."
           value={searchQuery}
           onChange={setSearchQuery}
         />
-        <Button onClick={() => setIsBookingFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Booking
+        <Button onClick={() => {
+          setCurrentBooking({
+            is_activity_booking: false // Ensure new booking is a ferry booking
+          });
+          setIsBookingFormOpen(true);
+        }}>
+          <Plus className="mr-2 h-4 w-4" /> Add Ferry Booking
         </Button>
       </div>
 
@@ -238,18 +250,19 @@ const BookingsManager = () => {
         <DialogContent className="max-w-2xl bg-white p-4">
           <DialogHeader className="mb-2">
             <DialogTitle className="text-lg">
-              {currentBooking ? "Edit Booking" : "Add New Booking"}
+              {currentBooking?.id ? "Edit Ferry Booking" : "Add New Ferry Booking"}
             </DialogTitle>
             <DialogDescription className="text-sm">
-              {currentBooking
-                ? "Update booking details"
-                : "Enter booking information"}
+              {currentBooking?.id
+                ? "Update ferry booking details"
+                : "Enter ferry booking information"}
             </DialogDescription>
           </DialogHeader>
           <BookingForm
             booking={currentBooking}
             onSaved={handleBookingSaved}
             onCancel={() => setIsBookingFormOpen(false)}
+            activityBookingMode={false}
           />
         </DialogContent>
       </Dialog>
