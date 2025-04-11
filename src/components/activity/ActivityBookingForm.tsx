@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,6 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import PassengerSelection from "@/components/booking/PassengerSelection";
 import { PassengerCount } from "@/types/booking";
+import { useToast } from "@/hooks/use-toast";
 
 interface ActivityBookingFormProps {
   preSelectedActivity?: string;
@@ -29,6 +29,7 @@ const ActivityBookingForm = ({
   isLoading,
   onSubmit 
 }: ActivityBookingFormProps) => {
+  const { toast } = useToast();
   const [selectedActivity, setSelectedActivity] = useState(preSelectedActivity || "");
   const [activityDate, setActivityDate] = useState<Date | undefined>(undefined);
   const [activityTime, setActivityTime] = useState("");
@@ -58,7 +59,11 @@ const ActivityBookingForm = ({
     e.preventDefault();
     
     if (!selectedActivity || !activityDate || !activityTime) {
-      alert("Please fill all required fields.");
+      toast({
+        title: "Missing information",
+        description: "Please fill all required fields.",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -68,8 +73,11 @@ const ActivityBookingForm = ({
       time: activityTime,
       passengerCounts,
       seats: totalPassengers,
+      isActivityBooking: true,
+      is_activity_booking: true
     };
     
+    console.log("Creating new activity booking:", bookingData);
     onSubmit(bookingData);
   };
 

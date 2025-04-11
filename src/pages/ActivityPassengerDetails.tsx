@@ -37,9 +37,13 @@ const ActivityPassengerDetails = () => {
         // Ensure we mark this as an activity booking
         const updatedBooking = {
           ...booking,
-          isActivityBooking: true
+          isActivityBooking: true,
+          // Explicitly set these fields to ensure proper storage in Supabase
+          activity: booking.activity || "Unknown Activity",
+          is_activity_booking: true // Add snake_case version for direct database mapping
         };
         
+        console.log("Activity booking prepared:", updatedBooking);
         setBookingInfo(updatedBooking);
         
         // Initialize passenger forms based on counts
@@ -82,8 +86,12 @@ const ActivityPassengerDetails = () => {
       const updatedBookingInfo = {
         ...bookingInfo,
         passengers: passengerDetails,
-        isActivityBooking: true // Ensure this flag is set for confirmation page
+        isActivityBooking: true, // Ensure camelCase flag is set for UI
+        is_activity_booking: true, // Ensure snake_case flag is set for database
+        activity: bookingInfo.activity || "Unknown Activity" // Ensure activity is set
       };
+      
+      console.log("Submitting activity booking:", updatedBookingInfo);
       
       // Store the updated booking info in session storage
       sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));

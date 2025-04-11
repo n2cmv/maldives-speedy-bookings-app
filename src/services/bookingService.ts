@@ -27,26 +27,27 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
     }
 
     // Explicitly determine if this is an activity booking - improved detection
-    const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
+    const isActivityBooking = !!booking.activity || !!booking.isActivityBooking || !!booking.is_activity_booking;
     
     console.log("Saving booking to database:", {
       isActivityBooking,
       activity: booking.activity,
-      isActivityBookingFlag: booking.isActivityBooking
+      isActivityBookingFlag: booking.isActivityBooking,
+      is_activity_booking_flag: booking.is_activity_booking
     });
 
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
-      from_location: booking.from,
-      to_location: booking.island,
-      departure_time: booking.time,
+      from_location: booking.from || "",
+      to_location: booking.island || "",
+      departure_time: booking.time || "",
       departure_date: formatDateForDatabase(booking.date) || new Date().toISOString().split('T')[0],
       return_trip: booking.returnTrip || false,
       return_from_location: booking.returnTripDetails?.from || null,
       return_to_location: booking.returnTripDetails?.island || null,
       return_time: booking.returnTripDetails?.time || null,
       return_date: formatDateForDatabase(booking.returnTripDetails?.date),
-      passenger_count: booking.seats,
+      passenger_count: booking.seats || 1,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
@@ -55,7 +56,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       is_activity_booking: isActivityBooking
     };
 
-    console.log("Final booking data to be inserted:", bookingData);
+    console.log("Final booking data to be inserted:", JSON.stringify(bookingData, null, 2));
 
     const { data, error } = await supabase
       .from('bookings')
@@ -69,6 +70,16 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
     }
 
     console.log("Booking successfully saved:", data);
+    
+    // Verify that the saved booking has the correct activity booking flags
+    if (isActivityBooking) {
+      console.log("Activity booking verification:", {
+        saved_id: data.id,
+        saved_activity: data.activity,
+        saved_is_activity_booking: data.is_activity_booking
+      });
+    }
+    
     return { data, error: null };
   } catch (error) {
     console.error("Exception saving booking:", error);

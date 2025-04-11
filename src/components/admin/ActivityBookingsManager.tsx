@@ -52,52 +52,43 @@ const ActivityBookingsManager = () => {
     try {
       console.log("Fetching activity bookings...");
       
-      // First try with is_activity_booking flag
-      let { data: flaggedData, error: flaggedError } = await supabase
+      // Get all bookings first, then filter for activities
+      const { data: allBookings, error: allError } = await supabase
         .from('bookings')
         .select('*')
-        .eq('is_activity_booking', true)
         .order('created_at', { ascending: false });
         
-      if (flaggedError) {
-        console.error("Error fetching activity bookings by flag:", flaggedError);
-        throw flaggedError;
+      if (allError) {
+        console.error("Error fetching bookings:", allError);
+        throw allError;
       }
 
-      // Then try with activity field not null
-      let { data: activityData, error: activityError } = await supabase
-        .from('bookings')
-        .select('*')
-        .not('activity', 'is', null)
-        .order('created_at', { ascending: false });
-        
-      if (activityError) {
-        console.error("Error fetching activity bookings by activity field:", activityError);
-        throw activityError;
+      if (!allBookings || allBookings.length === 0) {
+        console.log("No bookings found at all");
+        setBookings([]);
+        setIsLoading(false);
+        return;
       }
       
-      // Combine and deduplicate results
-      let combinedData: BookingData[] = [];
+      console.log(`Found ${allBookings.length} total bookings`);
       
-      if (flaggedData && flaggedData.length > 0) {
-        console.log(`Found ${flaggedData.length} bookings with is_activity_booking=true`);
-        // Type assertion to tell TypeScript that flaggedData is compatible with BookingData[]
-        combinedData = [...flaggedData as unknown as BookingData[]];
-      }
+      // Filter for activity bookings
+      const activityBookings = allBookings.filter(booking => {
+        const isActivity = booking.is_activity_booking === true || (booking.activity !== null && booking.activity !== '');
+        if (isActivity) {
+          console.log("Found activity booking:", {
+            id: booking.id,
+            activity: booking.activity,
+            is_activity_booking: booking.is_activity_booking
+          });
+        }
+        return isActivity;
+      });
       
-      if (activityData && activityData.length > 0) {
-        console.log(`Found ${activityData.length} bookings with activity field not null`);
-        
-        // Add only unique entries from activityData
-        (activityData as unknown as BookingData[]).forEach(booking => {
-          if (!combinedData.some(b => b.id === booking.id)) {
-            combinedData.push(booking);
-          }
-        });
-      }
+      console.log(`Found ${activityBookings.length} activity bookings after filtering`);
       
-      console.log(`Total unique activity bookings found: ${combinedData.length}`);
-      setBookings(combinedData || []);
+      // Type assertion to tell TypeScript that activityBookings is compatible with BookingData[]
+      setBookings(activityBookings as unknown as BookingData[]);
     } catch (error) {
       console.error("Error fetching activity bookings:", error);
       toast({
@@ -245,7 +236,11 @@ const ActivityBookingsManager = () => {
           onChange={setSearchQuery}
         />
         <Button onClick={() => {
-          setCurrentBooking({is_activity_booking: true, activity: ""});  // Pre-set as activity booking
+          setCurrentBooking({
+            is_activity_booking: true, 
+            isActivityBooking: true, 
+            activity: ""
+          });  // Pre-set as activity booking
           setIsBookingFormOpen(true);
         }}>
           <Plus className="mr-2 h-4 w-4" /> Add Activity Booking
@@ -257,17 +252,25 @@ const ActivityBookingsManager = () => {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
         </div>
       ) : (
-        <ActivityBookingTable
-          bookings={filteredBookings}
-          onEdit={handleEdit}
-          onDelete={(bookingId) => {
-            setBookingToDelete(bookingId);
-            setIsDeleteDialogOpen(true);
-          }}
-          onSendEmail={handleResendEmail}
-          emailStatus={emailStatus}
-          onShowEmailError={showEmailError}
-        />
+        <>
+          {bookings.length === 0 ? (
+            <div className="bg-white rounded-md p-8 text-center border">
+              <p className="text-gray-500">No activity bookings found. Try creating a new activity booking.</p>
+            </div>
+          ) : (
+            <ActivityBookingTable
+              bookings={filteredBookings}
+              onEdit={handleEdit}
+              onDelete={(bookingId) => {
+                setBookingToDelete(bookingId);
+                setIsDeleteDialogOpen(true);
+              }}
+              onSendEmail={handleResendEmail}
+              emailStatus={emailStatus}
+              onShowEmailError={showEmailError}
+            />
+          )}
+        </>
       )}
 
       <Dialog open={isBookingFormOpen} onOpenChange={setIsBookingFormOpen}>
