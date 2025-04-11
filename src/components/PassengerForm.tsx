@@ -1,216 +1,128 @@
 
-import React, { useEffect, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { BookingInfo, Passenger } from "@/types/booking";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CountryCodeDropdown } from "./CountryCodeDropdown";
-import { BookingInfo } from "@/types/booking";
+import { toast } from "@/components/ui/use-toast";
+import PassengerFormItem from "./PassengerFormItem";
+import AddPassengerButton from "./AddPassengerButton";
+import { useTranslation } from "react-i18next";
 
-export interface PassengerFormProps {
-  passengers?: any[];
-  onFormValidityChange?: (isValid: boolean) => void;
-  onSubmit?: (passengerDetails: any[]) => void;
-  submitButtonContent?: React.ReactNode;
-  bookingInfo?: BookingInfo;
-  setPassengers?: React.Dispatch<React.SetStateAction<any[]>>;
+interface PassengerFormProps {
+  bookingInfo: BookingInfo;
+  passengers: Passenger[];
+  setPassengers: React.Dispatch<React.SetStateAction<Passenger[]>>;
 }
 
-const phoneRegex = new RegExp(
-  /^([+]?[\s0-9]+)?(\d{3}|[(]?[0-9]+[)])?([-]?[\s]?[0-9])+$/
-);
-
-// Define schema once to avoid unnecessary re-renders
-const formSchema = z.object({
-  passengers: z.array(
-    z.object({
-      name: z.string().min(2, {
-        message: "Name must be at least 2 characters.",
-      }),
-      email: z.string().email({
-        message: "Please enter a valid email address.",
-      }),
-      phone: z.string().regex(phoneRegex, {
-        message: "Please enter a valid phone number.",
-      }),
-      countryCode: z.string().min(1, {
-        message: "Please select a country code.",
-      }),
-      passport: z.string().min(5, {
-        message: "Passport must be at least 5 characters.",
-      }),
-    })
-  ),
-});
+const MAX_PASSENGERS = 15;
 
 const PassengerForm = ({ 
-  passengers = [],
-  onFormValidityChange,
-  onSubmit,
-  submitButtonContent,
-  bookingInfo,
-  setPassengers: setPassengersState
+  bookingInfo, 
+  passengers, 
+  setPassengers 
 }: PassengerFormProps) => {
-  // Use memoized defaultValues to prevent unnecessary re-renders
-  const defaultValues = useMemo(() => ({
-    passengers: passengers.map(() => ({
-      name: "",
-      email: "",
-      phone: "",
-      countryCode: "+1",
-      passport: "",
-    }))
-  }), [passengers.length]); // Only depend on the length
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-    mode: "onChange",
-  });
-
-  const { fields } = useFieldArray({
-    control: form.control,
-    name: "passengers",
-  });
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      // Trigger validation only when needed, not on every change
-      if (form.formState.isDirty) {
-        form.trigger();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  
+  const handlePassengerChange = (id: number, field: keyof Passenger, value: string) => {
+    setPassengers(prevPassengers => 
+      prevPassengers.map(passenger => 
+        passenger.id === id ? { ...passenger, [field]: value } : passenger
+      )
+    );
+  };
+  
+  const handleRemovePassenger = (id: number) => {
+    setPassengers(prevPassengers => prevPassengers.filter(passenger => passenger.id !== id));
+  };
+  
+  const handleAddPassenger = () => {
+    if (passengers.length >= MAX_PASSENGERS) {
+      toast({
+        title: t("booking.passenger.maxReached", "Maximum passengers reached"),
+        description: t("booking.passenger.cannotAddMore", "You cannot add more than {{max}} passengers.", {max: MAX_PASSENGERS}),
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newId = Math.max(...passengers.map(p => p.id), 0) + 1;
+    setPassengers(prevPassengers => [
+      ...prevPassengers, 
+      {
+        id: newId,
+        name: "",
+        email: "",
+        phone: "",
+        countryCode: "+960", // Default to Maldives country code
+        passport: "",
+        type: "adult" // Default type
       }
-    });
+    ]);
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    return () => subscription.unsubscribe();
-  }, [form]);
-
-  useEffect(() => {
-    // Call onFormValidityChange when form validity changes
-    onFormValidityChange?.(form.formState.isValid);
-  }, [form.formState.isValid, onFormValidityChange]);
-
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    // Combine passenger type data with form values
-    const enrichedPassengers = values.passengers.map((passenger, index) => ({
-      ...passenger,
-      type: passengers[index]?.type || 'adult',
-      id: passengers[index]?.id || `passenger-${index + 1}`,
-    }));
+    // Check if first passenger has all required fields
+    const firstPassenger = passengers[0];
+    if (!firstPassenger?.name || !firstPassenger?.email || !firstPassenger?.phone || !firstPassenger?.passport) {
+      toast({
+        title: t("booking.passenger.missingInfo", "Missing information"),
+        description: t("booking.passenger.fillPrimaryFields", "Please fill in all required fields for the primary passenger"),
+        variant: "destructive"
+      });
+      return;
+    }
     
-    onSubmit?.(enrichedPassengers);
+    // Check if all passengers have name and passport (only these are required for all)
+    const missingRequiredInfo = passengers.some(p => !p.name || !p.passport);
+    
+    if (missingRequiredInfo) {
+      toast({
+        title: t("booking.passenger.missingInfo", "Missing information"),
+        description: t("booking.passenger.fillNamePassport", "Please fill in name and passport number for all passengers"),
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Prepare updated booking info with passenger details
+    const updatedBookingInfo = {
+      ...bookingInfo,
+      passengers
+    };
+    
+    // Navigate to payment gateway instead of directly to confirmation
+    navigate("/payment", { state: updatedBookingInfo });
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 md:space-y-8">
-        {fields.map((item, index) => (
-          <div key={item.id} className="p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-100">
-            <h3 className="font-medium text-lg mb-4 text-ocean-dark">
-              {index === 0 ? "Primary Passenger" : `Passenger ${index + 1}`}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name={`passengers.${index}.name`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Full Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Full name" 
-                        className="h-12" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`passengers.${index}.email`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Email address" 
-                        className="h-12" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`passengers.${index}.phone`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Phone Number</FormLabel>
-                    <FormControl>
-                      <div className="flex space-x-2">
-                        <div className="w-1/3 sm:w-1/4">
-                          <CountryCodeDropdown
-                            value={form.watch(`passengers.${index}.countryCode`)}
-                            onChange={(value) => {
-                              form.setValue(`passengers.${index}.countryCode`, value);
-                            }}
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <Input
-                            placeholder="Phone number"
-                            className="h-12"
-                            {...field}
-                          />
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`passengers.${index}.passport`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700">Passport/ID</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Passport or ID number" 
-                        className="h-12" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-        ))}
-        <Button 
-          type="submit" 
-          disabled={!form.formState.isValid}
-          className="w-full md:w-auto h-12 px-6 text-base font-medium bg-ocean hover:bg-ocean-dark"
-        >
-          {submitButtonContent || "Submit"}
-        </Button>
-      </form>
-    </Form>
+    <form onSubmit={handleSubmit}>
+      {passengers.map((passenger, index) => (
+        <PassengerFormItem
+          key={passenger.id}
+          passenger={passenger}
+          index={index}
+          isRemovable={index > 0}
+          onRemove={handleRemovePassenger}
+          onChange={handlePassengerChange}
+        />
+      ))}
+      
+      <AddPassengerButton 
+        onAddPassenger={handleAddPassenger}
+        passengerCount={passengers.length}
+        maxPassengers={MAX_PASSENGERS}
+      />
+      
+      <Button 
+        type="submit" 
+        className="w-full bg-ocean hover:bg-ocean-dark text-white h-[60px] text-base font-medium"
+      >
+        {t("booking.passenger.continueToPayment", "Continue to Payment")}
+      </Button>
+    </form>
   );
 };
 

@@ -9,8 +9,8 @@ interface PassengerFormItemProps {
   passenger: Passenger;
   index: number;
   isRemovable: boolean;
-  onRemove: (id: number | string) => void;
-  onChange: (id: number | string, field: keyof Passenger, value: string) => void;
+  onRemove: (id: number) => void;
+  onChange: (id: number, field: keyof Passenger, value: string) => void;
 }
 
 const PassengerFormItem = ({

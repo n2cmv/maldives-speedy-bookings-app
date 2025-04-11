@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -116,14 +115,6 @@ const ToursSection = () => {
     api?.scrollNext();
   };
 
-  const handleBookActivity = (activity?: string) => {
-    // If activity is specified, pass it as state
-    if (activity) {
-      return { pathname: '/activity-booking', state: { activity } };
-    }
-    return '/activity-booking';
-  };
-
   return (
     <div className="py-12 -mt-10">
       <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
@@ -186,7 +177,7 @@ const ToursSection = () => {
         </div>
         
         <div className="flex justify-center mt-12">
-          <Link to="/activity-booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
+          <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0055B0] text-white font-medium py-3 px-6 rounded-xl transition-all duration-300">
             Book an Activity
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>

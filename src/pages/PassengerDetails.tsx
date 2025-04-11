@@ -34,48 +34,42 @@ const PassengerDetails = () => {
       let id = 1;
       
       // Add adults
-      for (let i = 0; i < (booking.passengerCounts.adults || 0); i++) {
+      for (let i = 0; i < booking.passengerCounts.adults; i++) {
         initialPassengers.push({
-          id: String(id),
+          id,
           name: "",
           email: "",
           phone: "",
           countryCode: "+960", // Default to Maldives country code
           passport: "",
-          birthDate: "",
-          country: "",
           type: "adult"
         });
         id++;
       }
       
       // Add children
-      for (let i = 0; i < (booking.passengerCounts.children || 0); i++) {
+      for (let i = 0; i < booking.passengerCounts.children; i++) {
         initialPassengers.push({
-          id: String(id),
+          id,
           name: "",
           email: "",
           phone: "",
           countryCode: "+960", // Default to Maldives country code
           passport: "",
-          birthDate: "",
-          country: "",
           type: "child"
         });
         id++;
       }
       
       // Add seniors
-      for (let i = 0; i < (booking.passengerCounts.seniors || 0); i++) {
+      for (let i = 0; i < booking.passengerCounts.seniors; i++) {
         initialPassengers.push({
-          id: String(id),
+          id,
           name: "",
           email: "",
           phone: "",
           countryCode: "+960", // Default to Maldives country code
           passport: "",
-          birthDate: "",
-          country: "",
           type: "senior"
         });
         id++;

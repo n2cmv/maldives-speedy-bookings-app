@@ -1,422 +1,563 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { Island, Time } from "@/types/booking";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { BookingData } from "@/types/database";
-import { Time } from "@/types/booking";
-import { Checkbox } from "@/components/ui/checkbox";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
 interface BookingFormProps {
-  booking?: BookingData | null;
+  booking?: any;
   onSaved: () => void;
   onCancel: () => void;
-  activityBookingMode?: boolean;
 }
 
-const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: BookingFormProps) => {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState<Omit<BookingData, 'created_at' | 'updated_at'>>({
-    id: '',
-    user_email: '',
-    from_location: '',
-    to_location: '',
-    departure_time: '',
-    departure_date: new Date().toISOString().split('T')[0],
-    return_trip: false,
-    return_from_location: null,
-    return_to_location: null,
-    return_time: null,
-    return_date: null,
-    passenger_count: 1,
-    payment_complete: false,
-    payment_reference: null,
-    passenger_info: [],
-    activity: null,
-    is_activity_booking: false,
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [date, setDate] = useState<Date>();
-  const [returnDate, setReturnDate] = useState<Date>();
-  const [selectedActivity, setSelectedActivity] = useState<string | null>(null);
+interface Passenger {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  countryCode: string;
+  passport: string;
+  type: 'adult' | 'child' | 'senior';
+}
 
-  useEffect(() => {
-    if (booking) {
-      console.log("Loading booking into form:", {
-        id: booking.id,
-        activity: booking.activity,
-        is_activity_booking: booking.is_activity_booking,
-        mode: activityBookingMode ? "activity mode" : "regular mode"
-      });
-      
-      setFormData({
-        id: booking.id || '',
-        user_email: booking.user_email || '',
-        from_location: booking.from_location || '',
-        to_location: booking.to_location || '',
-        departure_time: booking.departure_time || '',
-        departure_date: booking.departure_date || new Date().toISOString().split('T')[0],
-        return_trip: booking.return_trip || false,
-        return_from_location: booking.return_from_location || null,
-        return_to_location: booking.return_to_location || null,
-        return_time: booking.return_time || null,
-        return_date: booking.return_date || null,
-        passenger_count: booking.passenger_count || 1,
-        payment_complete: booking.payment_complete || false,
-        payment_reference: booking.payment_reference || null,
-        passenger_info: booking.passenger_info || [],
-        activity: booking.activity || null,
-        is_activity_booking: booking.is_activity_booking || activityBookingMode || false,
-      });
-      setDate(booking.departure_date ? new Date(booking.departure_date) : undefined);
-      setReturnDate(booking.return_date ? new Date(booking.return_date) : undefined);
-      setSelectedActivity(booking.activity || null);
-    } else {
-      const isNewActivityBooking = activityBookingMode === true;
-      
-      console.log("Creating new booking form:", {
-        mode: isNewActivityBooking ? "activity mode" : "regular mode"
-      });
-      
-      setFormData({
-        id: '',
-        user_email: '',
-        from_location: '',
-        to_location: '',
-        departure_time: '',
-        departure_date: new Date().toISOString().split('T')[0],
-        return_trip: false,
-        return_from_location: null,
-        return_to_location: null,
-        return_time: null,
-        return_date: null,
-        passenger_count: 1,
-        payment_complete: false,
-        payment_reference: null,
-        passenger_info: [],
-        activity: isNewActivityBooking ? "New Activity" : null,
-        is_activity_booking: isNewActivityBooking,
-      });
-      setDate(undefined);
-      setReturnDate(undefined);
-      setSelectedActivity(isNewActivityBooking ? "New Activity" : null);
-    }
-  }, [booking, activityBookingMode]);
+const availableTimes: Time[] = [
+  Time.AM_630, Time.AM_700, Time.AM_800, Time.AM_1000, Time.AM_1100,
+  Time.PM_1200, Time.PM_110, Time.PM_130, Time.PM_200, Time.PM_400, Time.PM_600, Time.PM_800
+];
+
+const availableIslands: Island[] = [
+  'Male', 'Hulhumale', 'Maafushi', 'Baa Atoll', 'Ari Atoll',
+  'A.Dh Dhigurah', 'A.Dh Dhangethi', 'Aa. Mathiveri', 'Male\' City', 'Male\' Airport'
+];
+
+const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [fromLocation, setFromLocation] = useState<Island | ''>(
+    booking?.from_location || ''
+  );
+  const [toLocation, setToLocation] = useState<Island | ''>(
+    booking?.to_location || ''
+  );
+  const [departureDate, setDepartureDate] = useState<Date | undefined>(
+    booking?.departure_date ? new Date(booking.departure_date) : undefined
+  );
+  const [departureTime, setDepartureTime] = useState<Time | ''>(
+    booking?.departure_time || ''
+  );
+  const [passengerCount, setPassengerCount] = useState(
+    booking?.passenger_count || 1
+  );
+  const [userEmail, setUserEmail] = useState(booking?.user_email || '');
+  const [hasReturnTrip, setHasReturnTrip] = useState(Boolean(booking?.return_trip));
+  const [returnFromLocation, setReturnFromLocation] = useState<Island | ''>(
+    booking?.return_from_location || ''
+  );
+  const [returnToLocation, setReturnToLocation] = useState<Island | ''>(
+    booking?.return_to_location || ''
+  );
+  const [returnDate, setReturnDate] = useState<Date | undefined>(
+    booking?.return_date ? new Date(booking.return_date) : undefined
+  );
+  const [returnTime, setReturnTime] = useState<Time | ''>(
+    booking?.return_time || ''
+  );
+  const [paymentReference, setPaymentReference] = useState(
+    booking?.payment_reference || ''
+  );
+  const [paymentComplete, setPaymentComplete] = useState(
+    Boolean(booking?.payment_complete)
+  );
+  const [passengers, setPassengers] = useState<Passenger[]>(
+    booking?.passenger_info || [
+      {
+        id: 1,
+        name: '',
+        email: '',
+        phone: '',
+        countryCode: '+960',
+        passport: '',
+        type: 'adult'
+      }
+    ]
+  );
+
+  const handleAddPassenger = () => {
+    const newPassenger: Passenger = {
+      id: passengers.length + 1,
+      name: '',
+      email: '',
+      phone: '',
+      countryCode: '+960',
+      passport: '',
+      type: 'adult'
+    };
+    setPassengers([...passengers, newPassenger]);
+    setPassengerCount(passengerCount + 1);
+  };
+
+  const handleRemovePassenger = (id: number) => {
+    const updatedPassengers = passengers.filter(p => p.id !== id);
+    setPassengers(updatedPassengers);
+    setPassengerCount(updatedPassengers.length);
+  };
+
+  const handlePassengerChange = (id: number, field: keyof Passenger, value: any) => {
+    setPassengers(passengers.map(p => 
+      p.id === id ? { ...p, [field]: value } : p
+    ));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
+    
+    if (!fromLocation || !toLocation || !departureDate || !departureTime || !userEmail) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (hasReturnTrip && (!returnFromLocation || !returnToLocation || !returnDate || !returnTime)) {
+      toast({
+        title: "Error",
+        description: "Please fill in all return trip fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const { id, ...rest } = formData;
-      const payload = {
-        ...rest,
-        departure_date: date ? format(date, 'yyyy-MM-dd') : null,
-        return_date: returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
+      const passengerInfoAsJson: Json = JSON.parse(JSON.stringify(passengers));
+
+      const bookingData = {
+        from_location: fromLocation as string,
+        to_location: toLocation as string,
+        departure_date: format(departureDate, 'yyyy-MM-dd'),
+        departure_time: departureTime as string,
+        passenger_count: Number(passengerCount),
+        user_email: userEmail,
+        return_trip: hasReturnTrip,
+        return_from_location: hasReturnTrip ? returnFromLocation as string : null,
+        return_to_location: hasReturnTrip ? returnToLocation as string : null,
+        return_date: hasReturnTrip && returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
+        return_time: hasReturnTrip ? returnTime as string : null,
+        payment_complete: paymentComplete,
+        payment_reference: paymentReference || null,
+        passenger_info: passengerInfoAsJson
       };
 
-      if (activityBookingMode) {
-        payload.is_activity_booking = true;
-        
-        if (!payload.activity || payload.activity.trim() === '') {
-          payload.activity = selectedActivity || "Unspecified Activity";
-        }
-        
-        console.log("Saving activity booking with payload:", payload);
-      }
-
-      let response;
-      if (id) {
-        console.log(`Updating booking ID ${id} with activity flag: ${payload.is_activity_booking}, activity: ${payload.activity}`);
-        response = await supabase
+      if (booking) {
+        const { error } = await supabase
           .from('bookings')
-          .update(payload)
-          .eq('id', id)
-          .select();
+          .update(bookingData)
+          .eq('id', booking.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Booking has been updated",
+        });
       } else {
-        console.log(`Creating new booking with activity flag: ${payload.is_activity_booking}, activity: ${payload.activity}`);
-        response = await supabase
+        const { error } = await supabase
           .from('bookings')
-          .insert([payload])
-          .select();
+          .insert(bookingData);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "New booking has been created",
+        });
       }
 
-      if (response.error) {
-        throw response.error;
-      }
-      
-      console.log("Booking saved successfully:", response.data);
-
-      toast({
-        title: "Success",
-        description: `Booking ${id ? 'updated' : 'created'} successfully`,
-      });
       onSaved();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving booking:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to save booking",
+        description: "Failed to save booking",
         variant: "destructive",
       });
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    
-    if (name === 'activity' && activityBookingMode && value) {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value,
-        is_activity_booking: true
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-      }));
-    }
-  };
-  
-  const handleActivityChange = (value: string) => {
-    setSelectedActivity(value);
-    setFormData(prev => ({
-      ...prev,
-      activity: value,
-      is_activity_booking: true
-    }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {activityBookingMode && (
-        <div>
-          <Label htmlFor="activity">Activity Name</Label>
+    <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <Label htmlFor="userEmail" className="text-sm">Customer Email</Label>
           <Input
-            type="text"
-            id="activity"
-            name="activity"
-            value={formData.activity || ''}
-            onChange={handleInputChange}
-            required={activityBookingMode}
-            placeholder="Enter activity name"
-            className="mt-1"
+            id="userEmail"
+            value={userEmail}
+            onChange={(e) => setUserEmail(e.target.value)}
+            placeholder="customer@example.com"
+            required
+            className="h-9"
           />
         </div>
-      )}
-      
-      <div>
-        <Label htmlFor="user_email">User Email</Label>
-        <Input
-          type="email"
-          id="user_email"
-          name="user_email"
-          value={formData.user_email}
-          onChange={handleInputChange}
-          required
-        />
+
+        <div className="space-y-1">
+          <Label htmlFor="paymentReference" className="text-sm">Payment Reference</Label>
+          <Input
+            id="paymentReference"
+            value={paymentReference}
+            onChange={(e) => setPaymentReference(e.target.value)}
+            placeholder="ABC123"
+            className="h-9"
+          />
+        </div>
       </div>
-      <div>
-        <Label htmlFor="from_location">From Location</Label>
-        <Input
-          type="text"
-          id="from_location"
-          name="from_location"
-          value={formData.from_location}
-          onChange={handleInputChange}
-          required
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="paymentComplete"
+          checked={paymentComplete}
+          onCheckedChange={(checked) => setPaymentComplete(checked as boolean)}
         />
+        <label
+          htmlFor="paymentComplete"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Payment Complete
+        </label>
       </div>
-      <div>
-        <Label htmlFor="to_location">To Location</Label>
-        <Input
-          type="text"
-          id="to_location"
-          name="to_location"
-          value={formData.to_location}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <Label>Departure Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
+
+      <div className="border-t pt-3">
+        <h3 className="text-sm font-medium mb-3">Outbound Trip</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label htmlFor="fromLocation" className="text-sm">From</Label>
+            <Select
+              value={fromLocation}
+              onValueChange={(value) => setFromLocation(value as Island)}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              disabled={(date) =>
-                date < new Date(new Date().setHours(0, 0, 0, 0))
-              }
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div>
-        <Label htmlFor="departure_time">Departure Time</Label>
-        <Input
-          type="text"
-          id="departure_time"
-          name="departure_time"
-          value={formData.departure_time}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="passenger_count">Participant Count</Label>
-        <Input
-          type="number"
-          id="passenger_count"
-          name="passenger_count"
-          value={formData.passenger_count}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="payment_reference">Payment Reference</Label>
-        <Input
-          type="text"
-          id="payment_reference"
-          name="payment_reference"
-          value={formData.payment_reference || ''}
-          onChange={handleInputChange}
-        />
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="payment_complete"
-          name="payment_complete"
-          checked={formData.payment_complete || false}
-          onCheckedChange={(checked) => {
-            setFormData(prev => ({
-              ...prev,
-              payment_complete: !!checked
-            }));
-          }}
-        />
-        <Label htmlFor="payment_complete">Payment Complete</Label>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="return_trip"
-          name="return_trip"
-          checked={formData.return_trip || false}
-          onCheckedChange={(checked) => {
-            setFormData(prev => ({
-              ...prev,
-              return_trip: !!checked
-            }));
-          }}
-        />
-        <Label htmlFor="return_trip">Return Trip</Label>
-      </div>
-      {formData.return_trip && (
-        <>
-          <div>
-            <Label htmlFor="return_from_location">Return From Location</Label>
-            <Input
-              type="text"
-              id="return_from_location"
-              name="return_from_location"
-              value={formData.return_from_location || ''}
-              onChange={handleInputChange}
-            />
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableIslands.map((island) => (
+                  <SelectItem key={island} value={island}>
+                    {island}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <Label htmlFor="return_to_location">Return To Location</Label>
-            <Input
-              type="text"
-              id="return_to_location"
-              name="return_to_location"
-              value={formData.return_to_location || ''}
-              onChange={handleInputChange}
-            />
+
+          <div className="space-y-1">
+            <Label htmlFor="toLocation" className="text-sm">To</Label>
+            <Select
+              value={toLocation}
+              onValueChange={(value) => setToLocation(value as Island)}
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Select destination" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableIslands.map((island) => (
+                  <SelectItem key={island} value={island}>
+                    {island}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <Label>Return Date</Label>
+
+          <div className="space-y-1">
+            <Label className="text-sm">Departure Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !returnDate && "text-muted-foreground"
-                  )}
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal h-9"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {returnDate ? format(returnDate, "PPP") : <span>Pick a date</span>}
+                  {departureDate ? (
+                    format(departureDate, "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0">
                 <Calendar
                   mode="single"
-                  selected={returnDate}
-                  onSelect={setReturnDate}
-                  disabled={(date) =>
-                    date < new Date(new Date().setHours(0, 0, 0, 0))
-                  }
+                  selected={departureDate}
+                  onSelect={setDepartureDate}
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
           </div>
-          <div>
-            <Label htmlFor="return_time">Return Time</Label>
-            <Input
-              type="text"
-              id="return_time"
-              name="return_time"
-              value={formData.return_time || ''}
-              onChange={handleInputChange}
-            />
+
+          <div className="space-y-1">
+            <Label htmlFor="departureTime" className="text-sm">Departure Time</Label>
+            <Select
+              value={departureTime}
+              onValueChange={(value) => setDepartureTime(value as Time)}
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTimes.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </>
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="hasReturnTrip"
+          checked={hasReturnTrip}
+          onCheckedChange={(checked) => setHasReturnTrip(checked as boolean)}
+        />
+        <label
+          htmlFor="hasReturnTrip"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Include Return Trip
+        </label>
+      </div>
+
+      {hasReturnTrip && (
+        <div className="border-t pt-3">
+          <h3 className="text-sm font-medium mb-3">Return Trip</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="returnFromLocation" className="text-sm">From</Label>
+              <Select
+                value={returnFromLocation}
+                onValueChange={(value) => setReturnFromLocation(value as Island)}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableIslands.map((island) => (
+                    <SelectItem key={island} value={island}>
+                      {island}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="returnToLocation" className="text-sm">To</Label>
+              <Select
+                value={returnToLocation}
+                onValueChange={(value) => setReturnToLocation(value as Island)}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Select destination" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableIslands.map((island) => (
+                    <SelectItem key={island} value={island}>
+                      {island}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-sm">Return Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal h-9"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {returnDate ? (
+                      format(returnDate, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={returnDate}
+                    onSelect={setReturnDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="returnTime" className="text-sm">Return Time</Label>
+              <Select
+                value={returnTime}
+                onValueChange={(value) => setReturnTime(value as Time)}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Select time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTimes.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
       )}
-      
-      <input 
-        type="hidden" 
-        name="is_activity_booking" 
-        value="true" 
-      />
-      
-      <div className="flex justify-end space-x-2">
-        <Button variant="ghost" onClick={onCancel}>
+
+      <div className="border-t pt-3">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-medium">Passengers</h3>
+          {passengers.length < 10 && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAddPassenger}
+              className="h-7 text-xs"
+            >
+              Add Passenger
+            </Button>
+          )}
+        </div>
+        
+        {passengers.map((passenger, index) => (
+          <div key={passenger.id} className="border p-3 rounded-md mb-3">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium text-sm">Passenger {index + 1}</h4>
+              {passengers.length > 1 && (
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleRemovePassenger(passenger.id)}
+                  className="h-7 text-xs"
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Full Name</Label>
+                <Input
+                  value={passenger.name}
+                  onChange={(e) => handlePassengerChange(passenger.id, 'name', e.target.value)}
+                  placeholder="John Doe"
+                  className="h-8 text-sm"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs">Email</Label>
+                <Input
+                  value={passenger.email}
+                  onChange={(e) => handlePassengerChange(passenger.id, 'email', e.target.value)}
+                  placeholder="john@example.com"
+                  className="h-8 text-sm"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs">Phone</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    className="w-20 h-8 text-sm"
+                    value={passenger.countryCode}
+                    onChange={(e) => handlePassengerChange(passenger.id, 'countryCode', e.target.value)}
+                    placeholder="+960"
+                  />
+                  <Input
+                    className="flex-1 h-8 text-sm"
+                    value={passenger.phone}
+                    onChange={(e) => handlePassengerChange(passenger.id, 'phone', e.target.value)}
+                    placeholder="7777777"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs">Passport</Label>
+                <Input
+                  value={passenger.passport}
+                  onChange={(e) => handlePassengerChange(passenger.id, 'passport', e.target.value)}
+                  placeholder="AB123456"
+                  className="h-8 text-sm"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label className="text-xs">Type</Label>
+                <Select
+                  value={passenger.type}
+                  onValueChange={(value) => handlePassengerChange(passenger.id, 'type', value as 'adult' | 'child' | 'senior')}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="adult">Adult</SelectItem>
+                    <SelectItem value="child">Child</SelectItem>
+                    <SelectItem value="senior">Senior</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-3 border-t">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading} size="sm">
           Cancel
         </Button>
-        <Button type="submit" disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save'}
+        <Button type="submit" disabled={isLoading} size="sm">
+          {isLoading ? (
+            <>
+              <div className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              Saving...
+            </>
+          ) : booking ? "Update Booking" : "Create Booking"}
         </Button>
       </div>
     </form>

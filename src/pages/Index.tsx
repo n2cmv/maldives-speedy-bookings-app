@@ -3,7 +3,6 @@ import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship } from "lucide-react";
-import ToursSection from "@/components/home/ToursSection";
 
 const Index = () => {
   return (
@@ -15,9 +14,6 @@ const Index = () => {
         <Header />
         <main className="pt-16">
           <WelcomeSection />
-          <div className="container mx-auto px-4">
-            <ToursSection />
-          </div>
         </main>
       </div>
 

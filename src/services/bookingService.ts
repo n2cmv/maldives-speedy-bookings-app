@@ -10,88 +10,44 @@ export const generatePaymentReference = () => {
   return `RTM-${randomDigits}`;
 };
 
-// Helper function to convert Date or string to ISO date string
-const formatDateForDatabase = (dateInput: Date | string | undefined): string | null => {
-  if (!dateInput) return null;
-  if (typeof dateInput === 'string') {
-    return dateInput.includes('T') ? dateInput.split('T')[0] : dateInput;
-  }
-  return dateInput.toISOString().split('T')[0];
-};
-
 export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ data: any; error: any }> {
   try {
     // Generate payment reference if not provided
-    if (!booking.paymentReference) {
+    if (booking.paymentComplete && !booking.paymentReference) {
       booking.paymentReference = generatePaymentReference();
-      console.log("Generated new payment reference:", booking.paymentReference);
-    } else {
-      console.log("Using existing payment reference:", booking.paymentReference);
     }
-
-    // CRITICAL FIX: Explicitly check and set activity booking flags
-    const isActivityBooking = 
-      booking.isActivityBooking === true || 
-      booking.is_activity_booking === true || 
-      (booking.activity !== undefined && booking.activity !== null && booking.activity !== "");
-    
-    console.log("Saving booking to database:", {
-      isActivityBooking,
-      activity: booking.activity,
-      isActivityBookingFlag: booking.isActivityBooking,
-      is_activity_booking_flag: booking.is_activity_booking,
-      paymentReference: booking.paymentReference,
-      booking: JSON.stringify(booking)
-    });
-
-    // Double check if it's an activity booking but activity is empty
-    const activityName = booking.activity || (isActivityBooking ? "Unspecified Activity" : null);
 
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
-      from_location: booking.from || "",
-      to_location: booking.island || "",
-      departure_time: booking.time ? String(booking.time) : "",
-      departure_date: formatDateForDatabase(booking.date) || new Date().toISOString().split('T')[0],
+      from_location: booking.from,
+      to_location: booking.island,
+      departure_time: booking.time,
+      departure_date: booking.date ? booking.date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       return_trip: booking.returnTrip || false,
       return_from_location: booking.returnTripDetails?.from || null,
       return_to_location: booking.returnTripDetails?.island || null,
-      return_time: booking.returnTripDetails?.time ? String(booking.returnTripDetails.time) : null,
-      return_date: formatDateForDatabase(booking.returnTripDetails?.date),
-      passenger_count: booking.seats || 1,
+      return_time: booking.returnTripDetails?.time || null,
+      return_date: booking.returnTripDetails?.date 
+        ? booking.returnTripDetails.date.toISOString().split('T')[0] 
+        : null,
+      passenger_count: booking.seats,
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
-      passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
-      // CRITICAL FIX: Ensure activity information is properly stored
-      activity: activityName,
-      is_activity_booking: isActivityBooking
+      passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : []
     };
-
-    console.log("Final booking data to be inserted:", JSON.stringify(bookingData, null, 2));
 
     const { data, error } = await supabase
       .from('bookings')
       .insert(bookingData)
-      .select();
+      .select()
+      .single();
 
     if (error) {
       console.error("Error saving booking:", error);
       return { data: null, error };
     }
 
-    console.log("Booking successfully saved:", data);
-    
-    // Verify that the saved booking has the correct activity booking flags
-    if (isActivityBooking && data && data[0]) {
-      console.log("Activity booking verification:", {
-        saved_id: data[0].id,
-        saved_activity: data[0].activity,
-        saved_is_activity_booking: data[0].is_activity_booking,
-        saved_reference: data[0].payment_reference
-      });
-    }
-    
-    return { data: data && data[0] ? data[0] : null, error: null };
+    return { data, error: null };
   } catch (error) {
     console.error("Exception saving booking:", error);
     return { data: null, error };
@@ -127,7 +83,6 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
     const outboundSpeedboatDetails: RouteData | null = booking.outboundSpeedboatDetails || null;
     const returnSpeedboatDetails: RouteData | null = booking.returnSpeedboatDetails || null;
     
-    // Prepare the email data, including activity information if applicable
     const emailData = {
       email: primaryPassenger.email.trim().toLowerCase(),
       name: primaryPassenger.name,
@@ -150,12 +105,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
         returnSpeedboatName: returnSpeedboatDetails?.speedboat_name || null,
         returnSpeedboatImage: returnSpeedboatDetails?.speedboat_image_url || null,
         returnPickupLocation: returnSpeedboatDetails?.pickup_location || null,
-        returnPickupMapUrl: returnSpeedboatDetails?.pickup_map_url || null,
-        // Add activity details if this is an activity booking
-        isActivityBooking: !!booking.activity,
-        activity: booking.activity || "",
-        activityDate: booking.date ? new Date(booking.date).toLocaleDateString() : "",
-        activityTime: booking.time
+        returnPickupMapUrl: returnSpeedboatDetails?.pickup_map_url || null
       }
     };
     
@@ -221,7 +171,6 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
   try {
     console.log("Fetching bookings for email:", email);
     
-    // Main query to get all bookings
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
@@ -230,36 +179,11 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
 
     if (error) {
       console.error("Error fetching bookings:", error);
-      return { data: [], error };
-    }
-    
-    console.log("Successfully retrieved bookings:", data?.length || 0);
-    
-    // Enhanced debug logging for all bookings
-    if (data && data.length > 0) {
-      // Count and log activity bookings specifically
-      const activityBookings = data.filter(booking => 
-        booking.is_activity_booking === true || 
-        (booking.activity !== null && booking.activity !== '')
-      );
-      
-      console.log("Activity bookings found:", activityBookings.length);
-      
-      // Log details about each activity booking
-      if (activityBookings.length > 0) {
-        activityBookings.forEach(booking => {
-          console.log("Activity booking details:", {
-            id: booking.id,
-            isActivityFlag: booking.is_activity_booking,
-            activityName: booking.activity,
-            date: booking.departure_date,
-            time: booking.departure_time
-          });
-        });
-      }
+    } else {
+      console.log("Successfully retrieved bookings:", data?.length || 0);
     }
 
-    return { data, error: null };
+    return { data, error };
   } catch (error) {
     console.error("Exception fetching bookings:", error);
     return { data: [], error };

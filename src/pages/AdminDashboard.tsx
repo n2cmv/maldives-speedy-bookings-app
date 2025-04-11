@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Header from "@/components/Header";
 import BookingsManager from "@/components/admin/BookingsManager";
 import RoutesManager from "@/components/admin/RoutesManager";
-import ActivityBookingsManager from "@/components/admin/ActivityBookingsManager";
-import { Shield, Ship, Palmtree } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -86,36 +85,19 @@ const AdminDashboard = () => {
         </div>
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="bookings" className="flex items-center gap-1">
-              <Ship className="h-4 w-4" /> Ferry Bookings
-            </TabsTrigger>
-            <TabsTrigger value="activities" className="flex items-center gap-1">
-              <Palmtree className="h-4 w-4" /> Activity Bookings
-            </TabsTrigger>
+          <TabsList className="grid grid-cols-2 mb-8">
+            <TabsTrigger value="bookings">Bookings Management</TabsTrigger>
             <TabsTrigger value="routes">Routes Management</TabsTrigger>
           </TabsList>
           
           <TabsContent value="bookings" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Ferry Bookings Management</CardTitle>
-                <CardDescription>View, edit, delete ferry bookings and resend confirmation emails</CardDescription>
+                <CardTitle>Bookings Management</CardTitle>
+                <CardDescription>View, edit, delete bookings and resend confirmation emails</CardDescription>
               </CardHeader>
               <CardContent>
                 <BookingsManager />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="activities" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Activity Bookings Management</CardTitle>
-                <CardDescription>Manage activity and tour bookings for customers</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ActivityBookingsManager />
               </CardContent>
             </Card>
           </TabsContent>

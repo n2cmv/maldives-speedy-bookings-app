@@ -40,11 +40,10 @@ export const useRouteTimesMap = () => {
           }
           
           // Convert string[] to Time[] with type checking
-          const validTimings: Time[] = (route.timings || []).map(timeStr => {
-            // Try to find a matching Time enum value
-            const enumValue = Object.values(Time).find(t => t === timeStr);
-            return enumValue as Time;
-          }).filter(time => time !== undefined);
+          const validTimings: Time[] = (route.timings || []).filter((time): time is Time => {
+            // Verify each timing string is a valid Time enum value
+            return Object.values<string>(Time).includes(time);
+          });
           
           // Enhanced debugging for route timings
           console.log(`useRouteTimesMap - Route timings for ${route.from_location} to ${route.to_location}:`, 

@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -39,15 +38,6 @@ interface BookingEmailRequest {
     returnSpeedboatImage?: string | null;
     returnPickupLocation?: string | null;
     returnPickupMapUrl?: string | null;
-    // Add activity fields
-    activity?: string;
-    isActivityBooking?: boolean;
-    activityDate?: string;
-    activityTime?: string;
-    activityLocation?: string;
-    activityImage?: string;
-    activityDetails?: string;
-    activityPrice?: number;
   };
 }
 
@@ -174,33 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
     } else {
       // Regular booking confirmation email
       // Format trip details
-      let tripInfo = '';
-      let bookingType = '';
-      let activitySection = '';
-      
-      // Check if this is an activity booking
-      if (bookingDetails.isActivityBooking && bookingDetails.activity) {
-        bookingType = "Activity";
-        tripInfo = `${bookingDetails.activity} on ${bookingDetails.activityDate || bookingDetails.date} at ${bookingDetails.activityTime || bookingDetails.time}`;
-        
-        // Create activity section
-        activitySection = bookingDetails.activity ? 
-        `<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <h3 style="color: #0AB3B8; margin-top: 0;">Activity Details</h3>
-          <p><strong>Activity:</strong> ${bookingDetails.activity}</p>
-          ${bookingDetails.activityLocation ? `<p><strong>Location:</strong> ${bookingDetails.activityLocation}</p>` : ''}
-          ${bookingDetails.activityDate || bookingDetails.date ? `<p><strong>Date:</strong> ${bookingDetails.activityDate || bookingDetails.date}</p>` : ''}
-          ${bookingDetails.activityTime || bookingDetails.time ? `<p><strong>Time:</strong> ${bookingDetails.activityTime || bookingDetails.time}</p>` : ''}
-          ${bookingDetails.activityDetails ? `<p><strong>Details:</strong> ${bookingDetails.activityDetails}</p>` : ''}
-          ${bookingDetails.activityImage ? 
-            `<img src="${bookingDetails.activityImage}" alt="${bookingDetails.activity}" style="width: 100%; height: auto; max-height: 200px; object-fit: cover; border-radius: 4px; margin-top: 10px;">` 
-            : ''}
-        </div>` : '';
-      } else {
-        // Ferry booking
-        bookingType = "Ferry";
-        tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
-      }
+      const tripInfo = `${bookingDetails.from} to ${bookingDetails.to} on ${bookingDetails.date} at ${bookingDetails.time}`;
       
       // Format return trip info if applicable
       const returnInfo = bookingDetails.returnTrip && bookingDetails.returnDate && bookingDetails.returnTime
@@ -259,11 +223,11 @@ const handler = async (req: Request): Promise<Response> => {
         const emailResponse = await resend.emails.send({
           from: "Island Ferry Bookings <onboarding@resend.dev>",
           to: [email],
-          subject: `Your Island ${bookingType} Booking Confirmation`,
+          subject: "Your Island Ferry Booking Confirmation",
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
               <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-                <h1 style="color: #0AB3B8;">Island ${bookingType} Booking Confirmation</h1>
+                <h1 style="color: #0AB3B8;">Island Ferry Booking Confirmation</h1>
               </div>
               
               <div style="padding: 20px 0;">
@@ -273,14 +237,12 @@ const handler = async (req: Request): Promise<Response> => {
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
                   <h2 style="color: #0AB3B8; margin-top: 0;">Booking Details</h2>
                   <p><strong>Booking Reference:</strong> ${bookingDetails.paymentReference}</p>
-                  <p><strong>Type:</strong> ${bookingType}</p>
-                  <p><strong>${bookingType} Info:</strong> ${tripInfo}</p>
+                  <p><strong>Trip:</strong> ${tripInfo}</p>
                   ${returnInfo}
-                  <p><strong>Participants:</strong> ${bookingDetails.passengerCount}</p>
+                  <p><strong>Passengers:</strong> ${bookingDetails.passengerCount}</p>
                   
-                  ${activitySection}
-                  ${bookingType === "Ferry" ? outboundSpeedboatHtml : ''}
-                  ${bookingType === "Ferry" ? returnSpeedboatHtml : ''}
+                  ${outboundSpeedboatHtml}
+                  ${returnSpeedboatHtml}
                 </div>
 
                 <div style="text-align: center; margin: 30px 0;">
@@ -292,7 +254,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </p>
                 </div>
                 
-                <p>Please arrive at the ${bookingType === "Ferry" ? "ferry terminal" : "activity location"} at least 30 minutes before your scheduled ${bookingType === "Ferry" ? "departure" : "activity"} time.</p>
+                <p>Please arrive at the ferry terminal at least 30 minutes before your scheduled departure time.</p>
                 <p>If you need to make any changes to your booking, please contact our customer service.</p>
               </div>
               

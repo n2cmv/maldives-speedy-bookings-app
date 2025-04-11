@@ -1,4 +1,3 @@
-
 import React from 'react';
 import QRCode from 'react-qr-code';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,25 +9,23 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 interface QrCodeDisplayProps {
-  booking?: BookingInfo;
+  booking: BookingInfo;
   paymentReference?: string;
-  bookingReference?: string;
 }
 
-const QrCodeDisplay = ({ booking, paymentReference, bookingReference }: QrCodeDisplayProps) => {
+const QrCodeDisplay = ({ booking, paymentReference }: QrCodeDisplayProps) => {
   const { t } = useTranslation();
   
-  // Make sure we're using the payment reference from all possible sources
-  // Use the first non-null, non-undefined value in this priority order
-  const reference = booking?.paymentReference || paymentReference || bookingReference;
+  // Make sure we're using the payment reference from the booking object if available
+  const bookingRef = paymentReference || booking.paymentReference;
   
   // Check if we have a valid reference before creating the URL
-  const bookingUrl = reference 
-    ? `${window.location.origin}/booking-lookup?ref=${encodeURIComponent(reference)}`
+  const bookingUrl = bookingRef 
+    ? `${window.location.origin}/booking-lookup?ref=${encodeURIComponent(bookingRef)}`
     : `${window.location.origin}/booking-lookup`;
   
   console.log("Generated QR code URL:", bookingUrl);
-  console.log("Using reference:", reference);
+  console.log("Using payment reference:", bookingRef);
   
   // Function to download QR code as PNG
   const downloadQrCode = () => {
@@ -47,7 +44,7 @@ const QrCodeDisplay = ({ booking, paymentReference, bookingReference }: QrCodeDi
       
       const pngFile = canvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
-      downloadLink.download = `booking-${reference || 'ticket'}.png`;
+      downloadLink.download = `booking-${bookingRef || 'ticket'}.png`;
       downloadLink.href = pngFile;
       downloadLink.click();
     };
@@ -61,7 +58,7 @@ const QrCodeDisplay = ({ booking, paymentReference, bookingReference }: QrCodeDi
       try {
         await navigator.share({
           title: t("confirmation.yourBooking", "Your Island Ferry Booking"),
-          text: t("confirmation.bookingReference", "Booking Reference: {{reference}}", { reference: reference }),
+          text: t("confirmation.bookingReference", "Booking Reference: {{reference}}", { reference: bookingRef }),
           url: bookingUrl
         });
       } catch (error) {
@@ -96,9 +93,9 @@ const QrCodeDisplay = ({ booking, paymentReference, bookingReference }: QrCodeDi
             <p className="text-sm text-center text-gray-600 mb-4">
               {t("confirmation.scanQrCode", "Scan this QR code to view your booking details")}
             </p>
-            {reference && (
+            {bookingRef && (
               <p className="text-sm text-center font-medium text-gray-700 mb-4">
-                {t("confirmation.referenceNumber", "Reference: ")}{reference}
+                {t("confirmation.referenceNumber", "Reference: ")}{bookingRef}
               </p>
             )}
             <div className="flex gap-3 w-full">

@@ -124,6 +124,8 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
     ? islandsData.map(island => island.name) 
     : fallbackIslands;
 
+  const validatedAllTimes = Object.values(Time);
+  
   const handleSelectFromIsland = (island: string) => {
     setSelectedFromIsland(island);
   };
@@ -143,7 +145,7 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
               islandNames={islandNames}
               isLoading={isLoading}
               timeRestrictions={{}}
-              allTimes={allTimes}
+              allTimes={validatedAllTimes}
             />
           </div>
         </Card>

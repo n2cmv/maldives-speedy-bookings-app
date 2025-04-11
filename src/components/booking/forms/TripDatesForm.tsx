@@ -42,7 +42,7 @@ const TripDatesForm = ({
   return (
     <TripDateTimeSelector
       date={departureDate}
-      time={booking.time as string}
+      time={booking.time}
       availableTimes={availableTimes}
       minDate={today}
       isDateOpen={departureDateOpen}

@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getBookingsByEmail } from "@/services/bookingService";
-import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox, AlertCircle, QrCode, Palmtree } from "lucide-react";
+import { ChevronLeft, Search, Ship, Calendar, Loader2, Users, Inbox, AlertCircle, QrCode } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/input-otp";
 import QRCode from "react-qr-code";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 
 const MyBookings = () => {
   const navigate = useNavigate();
@@ -153,27 +151,6 @@ const MyBookings = () => {
           return;
         }
         
-        console.log("Retrieved bookings data:", bookingsData);
-        
-        const activityBookings = bookingsData ? bookingsData.filter(booking => 
-          booking.is_activity_booking === true || 
-          (booking.activity !== null && booking.activity !== '')
-        ) : [];
-        
-        console.log("Activity bookings found:", activityBookings.length);
-        
-        if (activityBookings.length > 0) {
-          activityBookings.forEach(booking => {
-            console.log("Activity booking details:", {
-              id: booking.id,
-              isActivityFlag: booking.is_activity_booking,
-              activityName: booking.activity,
-              date: booking.departure_date,
-              time: booking.departure_time
-            });
-          });
-        }
-        
         setBookings(bookingsData || []);
         
         if (bookingsData && bookingsData.length === 0) {
@@ -203,35 +180,6 @@ const MyBookings = () => {
   const openQrDialog = (booking: any) => {
     setSelectedBooking(booking);
     setQrDialogOpen(true);
-  };
-
-  const isActivityBooking = (booking: any): boolean => {
-    // Detailed logging for troubleshooting
-    if (booking && booking.id) {
-      console.log(`Booking ${booking.id} activity flags:`, {
-        is_activity_booking: booking.is_activity_booking,
-        activity: booking.activity,
-        has_activity: booking.activity !== null && booking.activity !== ''
-      });
-    }
-    
-    // Check both the is_activity_booking flag AND the activity field
-    if (booking.is_activity_booking === true) {
-      console.log(`Booking ${booking.id} is marked as activity booking with flag`);
-      return true;
-    }
-    
-    if (booking.activity !== null && booking.activity !== '') {
-      console.log(`Booking ${booking.id} is activity booking with activity: ${booking.activity}`);
-      return true;
-    }
-    
-    console.log(`Booking ${booking.id} is NOT an activity booking`);
-    return false;
-  };
-
-  const getActivityName = (booking: any): string => {
-    return booking.activity || "Island Experience";
   };
 
   const containerVariants = {
@@ -399,100 +347,77 @@ const MyBookings = () => {
                 </motion.div>
               )}
               
-              {bookings.map((booking: any) => {
-                const isActivity = isActivityBooking(booking);
-                const activityName = isActivity ? getActivityName(booking) : null;
-                
-                return (
-                  <motion.div
-                    key={booking.id}
-                    variants={itemVariants}
-                    className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center">
-                          {isActivity ? (
-                            <Palmtree className="h-5 w-5 text-green-500 mr-2" />
-                          ) : (
-                            <Ship className="h-5 w-5 text-ocean mr-2" />
-                          )}
-                          <h3 className="font-medium text-ocean-dark">
-                            {isActivity ? (
-                              <>Activity: {activityName || "Island Experience"}</>
-                            ) : (
-                              <>{booking.from_location} → {booking.to_location}</>
-                            )}
-                          </h3>
-                        </div>
-                        
-                        <div className="flex items-center mt-2 text-sm text-gray-600">
-                          <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                          <span>{format(new Date(booking.departure_date), 'PPP')} at {booking.departure_time}</span>
-                        </div>
-                        
-                        <div className="flex items-center mt-1 text-sm text-gray-600">
-                          <Users className="h-4 w-4 mr-1 text-gray-400" />
-                          <span>
-                            {booking.passenger_count} {booking.passenger_count === 1 ? 'participant' : 'participants'}
-                          </span>
-                        </div>
-                        
-                        {!isActivity && booking.return_trip && booking.return_date && (
-                          <div className="flex items-start mt-3">
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Calendar className="h-4 w-4 mr-1 text-gray-400" />
-                              <span>Return: {format(new Date(booking.return_date), 'PPP')} at {booking.return_time}</span>
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="mt-2">
-                          <Badge variant="outline" className={isActivity ? 
-                            "bg-green-50 text-green-700 border-green-200" : 
-                            "bg-blue-50 text-blue-700 border-blue-200"}>
-                            {isActivity ? "Activity" : "Ferry"}
-                          </Badge>
-                        </div>
+              {bookings.map((booking: any) => (
+                <motion.div
+                  key={booking.id}
+                  variants={itemVariants}
+                  className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="flex items-center">
+                        <Ship className="h-5 w-5 text-ocean mr-2" />
+                        <h3 className="font-medium text-ocean-dark">
+                          {booking.from_location} → {booking.to_location}
+                        </h3>
                       </div>
                       
-                      <div className="text-right space-y-2">
-                        <div className="mb-2">
-                          {booking.payment_complete ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Confirmed
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              Pending
-                            </span>
-                          )}
-                        </div>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="flex items-center gap-1"
-                          onClick={() => openQrDialog(booking)}
-                        >
-                          <QrCode className="h-3 w-3" />
-                          <span>Show QR</span>
-                        </Button>
-                        
-                        {booking.payment_reference && (
-                          <p className="text-xs text-gray-500">
-                            Ref: {booking.payment_reference}
-                          </p>
-                        )}
-                        
-                        <p className="text-xs text-gray-500">
-                          {format(new Date(booking.created_at), 'PP')}
-                        </p>
+                      <div className="flex items-center mt-2 text-sm text-gray-600">
+                        <Calendar className="h-4 w-4 mr-1 text-gray-400" />
+                        <span>{format(new Date(booking.departure_date), 'PPP')} at {booking.departure_time}</span>
                       </div>
+                      
+                      <div className="flex items-center mt-1 text-sm text-gray-600">
+                        <Users className="h-4 w-4 mr-1 text-gray-400" />
+                        <span>{booking.passenger_count} {booking.passenger_count === 1 ? 'passenger' : 'passengers'}</span>
+                      </div>
+                      
+                      {booking.return_trip && booking.return_date && (
+                        <div className="flex items-start mt-3">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <Calendar className="h-4 w-4 mr-1 text-gray-400" />
+                            <span>Return: {format(new Date(booking.return_date), 'PPP')} at {booking.return_time}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </motion.div>
-                );
-              })}
+                    
+                    <div className="text-right space-y-2">
+                      <div className="mb-2">
+                        {booking.payment_complete ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Confirmed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Pending
+                          </span>
+                        )}
+                      </div>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex items-center gap-1"
+                        onClick={() => openQrDialog(booking)}
+                      >
+                        <QrCode className="h-3 w-3" />
+                        <span>Show QR</span>
+                      </Button>
+                      
+                      {booking.payment_reference && (
+                        <p className="text-xs text-gray-500">
+                          Ref: {booking.payment_reference}
+                        </p>
+                      )}
+                      
+                      <p className="text-xs text-gray-500">
+                        {format(new Date(booking.created_at), 'PP')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
           )}
         </div>
@@ -525,25 +450,9 @@ const MyBookings = () => {
                 </div>
                 
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Type:</span>
-                  <span className="font-medium">
-                    {isActivityBooking(selectedBooking) ? "Activity" : "Ferry Trip"}
-                  </span>
+                  <span className="text-sm text-gray-500">Trip:</span>
+                  <span className="font-medium">{selectedBooking.from_location} to {selectedBooking.to_location}</span>
                 </div>
-                
-                {!isActivityBooking(selectedBooking) && (
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">Trip:</span>
-                    <span className="font-medium">{selectedBooking.from_location} to {selectedBooking.to_location}</span>
-                  </div>
-                )}
-                
-                {isActivityBooking(selectedBooking) && (
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-500">Activity:</span>
-                    <span className="font-medium">{getActivityName(selectedBooking)}</span>
-                  </div>
-                )}
                 
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-500">Date:</span>

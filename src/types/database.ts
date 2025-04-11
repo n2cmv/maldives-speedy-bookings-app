@@ -30,9 +30,7 @@ export interface BookingData {
   passenger_count: number;
   payment_complete: boolean;
   payment_reference?: string | null;
-  passenger_info: any; // Changed from any[] to any to match Supabase's Json type
+  passenger_info: any[];
   created_at: string;
   updated_at: string;
-  activity?: string | null;
-  is_activity_booking?: boolean;
 }

@@ -32,7 +32,7 @@ const IslandModal = ({ islandName, isOpen, onClose }: IslandModalProps) => {
           </DialogClose>
         </DialogHeader>
         <div className="mt-2">
-          <IslandDetails islandName={islandName} />
+          <IslandDetails islandName={islandName as Island} />
         </div>
       </DialogContent>
     </Dialog>

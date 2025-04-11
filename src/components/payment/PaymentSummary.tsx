@@ -1,39 +1,22 @@
 
-import { format } from "date-fns";
+import React from "react";
 
 interface PaymentSummaryProps {
   bookingReference: string;
   totalAmount: number;
-  isActivityBooking?: boolean;
-  activity?: string;
 }
 
-const PaymentSummary = ({ bookingReference, totalAmount, isActivityBooking, activity }: PaymentSummaryProps) => {
-  const formattedDate = format(new Date(), "MMMM d, yyyy");
-  
+const PaymentSummary: React.FC<PaymentSummaryProps> = ({ bookingReference, totalAmount }) => {
   return (
-    <div className="border border-gray-200 rounded-lg p-4">
-      <div className="flex justify-between items-center mb-4 pb-4 border-b">
-        <div>
-          <h3 className="text-lg font-medium">{isActivityBooking ? "Activity Booking" : "Speedboat Booking"}</h3>
-          <p className="text-sm text-gray-500">{formattedDate}</p>
-        </div>
-        <div className="text-right">
-          <p className="text-sm text-gray-500">Reference</p>
-          <p className="font-medium">{bookingReference}</p>
-        </div>
+    <div className="border-b border-gray-200 pb-4">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-gray-700">Booking Reference:</span>
+        <span className="font-medium">{bookingReference}</span>
       </div>
-
-      {isActivityBooking && activity && (
-        <div className="mb-4 pb-4 border-b">
-          <p className="text-sm text-gray-500">Activity</p>
-          <p className="font-medium">{activity}</p>
-        </div>
-      )}
       
-      <div className="flex justify-between items-center pt-2">
-        <p className="font-bold">Total</p>
-        <p className="font-bold text-xl">${totalAmount.toFixed(2)} USD</p>
+      <div className="flex items-center justify-between">
+        <span className="text-gray-700">Total Amount:</span>
+        <span className="text-lg font-bold text-ocean-dark">${totalAmount.toFixed(2)}</span>
       </div>
     </div>
   );
