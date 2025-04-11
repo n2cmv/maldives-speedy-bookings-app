@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -27,7 +26,10 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
     }
 
     // Explicitly determine if this is an activity booking - improved detection
-    const isActivityBooking = !!booking.activity || !!booking.isActivityBooking || !!booking.is_activity_booking;
+    const isActivityBooking = 
+      booking.isActivityBooking === true || 
+      booking.is_activity_booking === true || 
+      (booking.activity !== undefined && booking.activity !== null && booking.activity !== "");
     
     console.log("Saving booking to database:", {
       isActivityBooking,
@@ -210,22 +212,6 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
   try {
     console.log("Fetching bookings for email:", email);
     
-    // Debug query to check for activity bookings first
-    const { data: activityCheck, error: activityCheckError } = await supabase
-      .from('bookings')
-      .select('id, activity, is_activity_booking')
-      .eq('user_email', email.toLowerCase().trim());
-      
-    if (activityCheck && activityCheck.length > 0) {
-      console.log("Activity check results:", activityCheck);
-      
-      const activityBookingsCheck = activityCheck.filter(booking => 
-        booking.is_activity_booking === true || booking.activity !== null
-      );
-      
-      console.log("Found activity bookings in check:", activityBookingsCheck.length);
-    }
-    
     // Main query to get all bookings
     const { data, error } = await supabase
       .from('bookings')
@@ -242,8 +228,6 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
     
     // Enhanced debug logging for all bookings
     if (data && data.length > 0) {
-      console.log("Retrieved bookings data:", data);
-      
       // Count and log activity bookings specifically
       const activityBookings = data.filter(booking => 
         booking.is_activity_booking === true || 
@@ -264,19 +248,6 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
           });
         });
       }
-      
-      // Log details about each booking for debugging
-      data.forEach(booking => {
-        console.log(`Booking ${booking.id} details:`, {
-          from: booking.from_location,
-          to: booking.to_location,
-          date: booking.departure_date,
-          isActivityBookingFlag: booking.is_activity_booking,
-          activity: booking.activity,
-          // Fix the TypeScript error by checking if passenger_info is an array before accessing length
-          passengerInfo: Array.isArray(booking.passenger_info) ? booking.passenger_info.length : 0
-        });
-      });
     }
 
     return { data, error: null };

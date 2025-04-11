@@ -42,6 +42,7 @@ const ActivityBookingsManager = () => {
   const [emailStatus, setEmailStatus] = useState<Record<string, { sending: boolean; error?: string }>>({});
   const [emailDetailsDialogOpen, setEmailDetailsDialogOpen] = useState<boolean>(false);
   const [emailErrorDetails, setEmailErrorDetails] = useState<string>("");
+  const [noDataFound, setNoDataFound] = useState<boolean>(false);
 
   useEffect(() => {
     fetchActivityBookings();
@@ -49,14 +50,14 @@ const ActivityBookingsManager = () => {
 
   const fetchActivityBookings = async () => {
     setIsLoading(true);
+    setNoDataFound(false);
     try {
       console.log("Fetching activity bookings...");
       
       // Get all bookings first, then filter for activities
       const { data: allBookings, error: allError } = await supabase
         .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
         
       if (allError) {
         console.error("Error fetching bookings:", allError);
@@ -66,26 +67,36 @@ const ActivityBookingsManager = () => {
       if (!allBookings || allBookings.length === 0) {
         console.log("No bookings found at all");
         setBookings([]);
+        setNoDataFound(true);
         setIsLoading(false);
         return;
       }
       
-      console.log(`Found ${allBookings.length} total bookings`);
+      console.log(`Found ${allBookings.length} total bookings, raw data:`, allBookings);
       
-      // Filter for activity bookings
+      // Filter for activity bookings with improved logging
       const activityBookings = allBookings.filter(booking => {
-        const isActivity = booking.is_activity_booking === true || (booking.activity !== null && booking.activity !== '');
-        if (isActivity) {
-          console.log("Found activity booking:", {
-            id: booking.id,
-            activity: booking.activity,
-            is_activity_booking: booking.is_activity_booking
-          });
-        }
-        return isActivity;
+        // Check both possible flags and activity field
+        const isActivityBooking = 
+          booking.is_activity_booking === true || 
+          (booking.activity !== null && booking.activity !== '');
+        
+        console.log(`Booking ID ${booking.id}: 
+          is_activity_booking flag: ${booking.is_activity_booking}, 
+          activity field: ${booking.activity}, 
+          considered activity booking: ${isActivityBooking}`);
+        
+        return isActivityBooking;
       });
       
       console.log(`Found ${activityBookings.length} activity bookings after filtering`);
+      
+      if (activityBookings.length === 0) {
+        setNoDataFound(true);
+      }
+      
+      // Sort by creation date
+      activityBookings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
       // Type assertion to tell TypeScript that activityBookings is compatible with BookingData[]
       setBookings(activityBookings as unknown as BookingData[]);
@@ -238,9 +249,8 @@ const ActivityBookingsManager = () => {
         <Button onClick={() => {
           setCurrentBooking({
             is_activity_booking: true, 
-            isActivityBooking: true, 
-            activity: ""
-          });  // Pre-set as activity booking
+            activity: "New Activity"
+          });
           setIsBookingFormOpen(true);
         }}>
           <Plus className="mr-2 h-4 w-4" /> Add Activity Booking
@@ -255,7 +265,11 @@ const ActivityBookingsManager = () => {
         <>
           {bookings.length === 0 ? (
             <div className="bg-white rounded-md p-8 text-center border">
-              <p className="text-gray-500">No activity bookings found. Try creating a new activity booking.</p>
+              <p className="text-gray-500">
+                {noDataFound 
+                  ? "No activity bookings found in the database. Try creating a new activity booking." 
+                  : "No activity bookings match your search criteria."}
+              </p>
             </div>
           ) : (
             <ActivityBookingTable

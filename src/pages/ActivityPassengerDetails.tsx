@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,7 +6,6 @@ import HeaderExtras from "@/components/HeaderExtras";
 import TripSummaryCard from "@/components/TripSummaryCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
 import PassengerForm from "@/components/PassengerForm";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";

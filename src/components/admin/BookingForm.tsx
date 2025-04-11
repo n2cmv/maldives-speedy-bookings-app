@@ -73,7 +73,7 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         payment_reference: booking.payment_reference || null,
         passenger_info: booking.passenger_info || [],
         activity: booking.activity || null,
-        is_activity_booking: booking.is_activity_booking || false,
+        is_activity_booking: booking.is_activity_booking || activityBookingMode || false,
       });
       setDate(booking.departure_date ? new Date(booking.departure_date) : undefined);
       setReturnDate(booking.return_date ? new Date(booking.return_date) : undefined);
@@ -97,13 +97,13 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         payment_reference: null,
         passenger_info: [],
         activity: null,
-        is_activity_booking: false,
+        is_activity_booking: activityBookingMode || false,
       });
       setDate(undefined);
       setReturnDate(undefined);
       setSelectedActivity(null);
     }
-  }, [booking]);
+  }, [booking, activityBookingMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,9 +117,16 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         return_date: returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
       };
 
-      if (activityBookingMode || selectedActivity) {
+      // Ensure activity booking flags are set correctly
+      if (activityBookingMode) {
         payload.is_activity_booking = true;
-        payload.activity = selectedActivity || "Unknown Activity";
+        
+        // Make sure activity field is never empty for an activity booking
+        if (!payload.activity || payload.activity.trim() === '') {
+          payload.activity = selectedActivity || "Unspecified Activity";
+        }
+        
+        console.log("Saving activity booking with payload:", payload);
       }
 
       let response;
@@ -139,6 +146,8 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
       if (response.error) {
         throw response.error;
       }
+      
+      console.log("Booking saved successfully:", response.data);
 
       toast({
         title: "Success",
@@ -157,18 +166,43 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
     }
   };
 
-  // Fix: Updated the event handler to properly handle different input types
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement; // Cast to HTMLInputElement to access 'type' and 'checked'
+    const { name, value, type } = e.target as HTMLInputElement;
     
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
   };
+  
+  const handleActivityChange = (value: string) => {
+    setSelectedActivity(value);
+    setFormData(prev => ({
+      ...prev,
+      activity: value,
+      // Always ensure the activity booking flag is set when an activity is selected
+      is_activity_booking: true
+    }));
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {activityBookingMode && (
+        <div>
+          <Label htmlFor="activity">Activity Name</Label>
+          <Input
+            type="text"
+            id="activity"
+            name="activity"
+            value={formData.activity || ''}
+            onChange={handleInputChange}
+            required={activityBookingMode}
+            placeholder="Enter activity name"
+            className="mt-1"
+          />
+        </div>
+      )}
+      
       <div>
         <Label htmlFor="user_email">User Email</Label>
         <Input
@@ -242,7 +276,7 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         />
       </div>
       <div>
-        <Label htmlFor="passenger_count">Passenger Count</Label>
+        <Label htmlFor="passenger_count">Participant Count</Label>
         <Input
           type="number"
           id="passenger_count"
@@ -352,18 +386,16 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
           </div>
         </>
       )}
+      
+      {/* Always include a hidden field for is_activity_booking when in activity mode */}
       {activityBookingMode && (
-        <div>
-          <Label htmlFor="activity">Activity</Label>
-          <Input
-            type="text"
-            id="activity"
-            name="activity"
-            value={formData.activity || ''}
-            onChange={handleInputChange}
-          />
-        </div>
+        <input 
+          type="hidden" 
+          name="is_activity_booking" 
+          value="true" 
+        />
       )}
+      
       <div className="flex justify-end space-x-2">
         <Button variant="ghost" onClick={onCancel}>
           Cancel
