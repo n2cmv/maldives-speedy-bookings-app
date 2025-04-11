@@ -30,7 +30,7 @@ const HowToBookSection = () => {
     },
     {
       number: 3,
-      title: "Travel with Ease",
+      title: "Instant Online Payment",
       description: "Receive your e-ticket and enjoy a comfortable transfer between islands."
     }
   ];
