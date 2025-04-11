@@ -31,7 +31,7 @@ const HowToBookSection = () => {
     {
       number: 3,
       title: "Instant Online Payment",
-      description: "Receive your e-ticket and enjoy a comfortable transfer between islands."
+      description: "Get instant ticket and confirmation when payment is done."
     }
   ];
 
