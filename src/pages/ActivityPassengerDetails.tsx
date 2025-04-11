@@ -11,17 +11,18 @@ import { motion } from "framer-motion";
 import PassengerForm from "@/components/PassengerForm";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Passenger } from "@/types/booking";
+import { Passenger, BookingInfo } from "@/types/booking";
 
 const ActivityPassengerDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [bookingInfo, setBookingInfo] = useState<any>(null);
+  const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
   const [passengers, setPassengers] = useState<any[]>([]);
   const [isValid, setIsValid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Wrap in setTimeout to prevent blocking the main thread
@@ -43,20 +44,26 @@ const ActivityPassengerDetails = () => {
         
         // Initialize passenger forms based on counts
         const initialPassengers = [];
-        for (let i = 0; i < booking.passengerCounts.adults; i++) {
-          initialPassengers.push({ type: 'adult', id: `adult-${i+1}` });
-        }
-        for (let i = 0; i < booking.passengerCounts.children; i++) {
-          initialPassengers.push({ type: 'child', id: `child-${i+1}` });
-        }
-        for (let i = 0; i < booking.passengerCounts.seniors; i++) {
-          initialPassengers.push({ type: 'senior', id: `senior-${i+1}` });
+        if (booking.passengerCounts) {
+          for (let i = 0; i < (booking.passengerCounts.adults || 0); i++) {
+            initialPassengers.push({ type: 'adult', id: `adult-${i+1}` });
+          }
+          for (let i = 0; i < (booking.passengerCounts.children || 0); i++) {
+            initialPassengers.push({ type: 'child', id: `child-${i+1}` });
+          }
+          for (let i = 0; i < (booking.passengerCounts.seniors || 0); i++) {
+            initialPassengers.push({ type: 'senior', id: `senior-${i+1}` });
+          }
+        } else {
+          // Fallback if no passenger counts are provided
+          initialPassengers.push({ type: 'adult', id: 'adult-1' });
         }
         
         setPassengers(initialPassengers);
         setIsLoading(false);
       } catch (error) {
         console.error("Error initializing passenger details:", error);
+        setError("An error occurred while loading your booking. Please try again.");
         setIsLoading(false);
       }
     }, 0);
@@ -80,6 +87,20 @@ const ActivityPassengerDetails = () => {
       
       // Store the updated booking info in session storage
       sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
+      
+      // Also store in localStorage for "My Bookings" feature
+      const storedBookings = localStorage.getItem("savedBookings");
+      const bookingsArray = storedBookings ? JSON.parse(storedBookings) : [];
+      
+      // Add this booking with a unique ID
+      const bookingWithId = {
+        ...updatedBookingInfo,
+        id: `activity-${Date.now()}`,
+        paymentComplete: false // Will be set to true after payment
+      };
+      
+      bookingsArray.push(bookingWithId);
+      localStorage.setItem("savedBookings", JSON.stringify(bookingsArray));
       
       // Navigate to payment page with updated booking info
       navigate("/payment", { state: updatedBookingInfo });
@@ -106,8 +127,27 @@ const ActivityPassengerDetails = () => {
     );
   }
   
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-800">
+          {error}
+        </div>
+        <Button onClick={() => navigate("/activity-booking")}>
+          Return to Activity Booking
+        </Button>
+      </div>
+    );
+  }
+  
   if (!bookingInfo) {
-    return null;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50">
+        <Button onClick={() => navigate("/activity-booking")}>
+          Start a New Activity Booking
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -150,17 +190,23 @@ const ActivityPassengerDetails = () => {
           
           <div className="lg:col-span-2">
             <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-              <PassengerForm
-                passengers={passengers}
-                onFormValidityChange={setIsValid}
-                onSubmit={handleSubmit}
-                submitButtonContent={
-                  <>
-                    Continue to Payment
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                }
-              />
+              {passengers.length > 0 ? (
+                <PassengerForm
+                  passengers={passengers}
+                  onFormValidityChange={setIsValid}
+                  onSubmit={handleSubmit}
+                  submitButtonContent={
+                    <>
+                      Continue to Payment
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  }
+                />
+              ) : (
+                <div className="p-4 text-center text-gray-500">
+                  No passengers selected. Please go back and select passengers.
+                </div>
+              )}
             </div>
           </div>
           

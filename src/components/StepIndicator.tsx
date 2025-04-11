@@ -16,8 +16,8 @@ interface StepIndicatorProps {
 }
 
 const steps: Step[] = [
-  { id: 1, name: "Select Island", path: "/booking" },
-  { id: 2, name: "Passenger Details", path: "/passenger-details" },
+  { id: 1, name: "Select Activity", path: "/activity-booking" },
+  { id: 2, name: "Participant Details", path: "/activity-passenger-details" },
   { id: 3, name: "Payment", path: "/payment" },
   { id: 4, name: "Confirmation", path: "/confirmation" },
 ];
@@ -32,8 +32,23 @@ const StepIndicator = ({ currentStep: propCurrentStep }: StepIndicatorProps) => 
   if (propCurrentStep !== undefined) {
     currentStep = propCurrentStep;
   } else {
-    const currentStepIndex = steps.findIndex(step => step.path === currentPath);
-    currentStep = currentStepIndex !== -1 ? currentStepIndex + 1 : 1;
+    // Check if this is an activity booking path
+    const isActivityPath = currentPath.includes('activity');
+    
+    if (isActivityPath) {
+      const currentStepIndex = steps.findIndex(step => step.path === currentPath);
+      currentStep = currentStepIndex !== -1 ? currentStepIndex + 1 : 1;
+    } else {
+      // For regular booking paths
+      const regularSteps = [
+        { id: 1, path: "/booking" },
+        { id: 2, path: "/passenger-details" },
+        { id: 3, path: "/payment" },
+        { id: 4, path: "/confirmation" }
+      ];
+      const regularStepIndex = regularSteps.findIndex(step => step.path === currentPath);
+      currentStep = regularStepIndex !== -1 ? regularStepIndex + 1 : 1;
+    }
   }
   
   // Calculate progress percentage

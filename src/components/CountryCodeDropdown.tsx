@@ -38,8 +38,14 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="w-full h-12 px-2 flex justify-between items-center bg-white"
-          onClick={(e) => e.preventDefault()} // Prevent form submission
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-label="Select country code"
+          className="w-full h-12 px-2 flex justify-between items-center bg-white border border-gray-200"
+          onClick={(e) => {
+            e.preventDefault(); // Prevent form submission
+            e.stopPropagation(); // Stop event propagation
+          }}
         >
           <span className="text-base">{value || "+1"}</span>
           <ChevronDown className="h-4 w-4 ml-1 flex-shrink-0" />
@@ -47,7 +53,7 @@ export const CountryCodeDropdown: React.FC<CountryCodeDropdownProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="w-full bg-white border border-gray-200 shadow-md z-50 max-h-64 overflow-y-auto"
+        className="w-[120px] bg-white border border-gray-200 shadow-md z-50 max-h-64 overflow-y-auto"
       >
         {COMMON_COUNTRY_CODES.map((item) => (
           <DropdownMenuItem

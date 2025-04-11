@@ -23,7 +23,7 @@ export interface PassengerCount {
 }
 
 export interface Passenger {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
   phone: string;
@@ -35,16 +35,16 @@ export interface Passenger {
 export interface TripDetails {
   from: Island | '';
   island: Island | '';
-  time: Time | '';
-  date?: Date;
+  time: Time | string;
+  date?: Date | string;
 }
 
 export interface BookingInfo {
   from: Island | '';
   island: Island | '';
-  time: Time | '';
+  time: Time | string;
   seats: number;
-  date?: Date;
+  date?: Date | string;
   passengerCounts?: PassengerCount;
   passengers?: Passenger[];
   returnTrip?: boolean;
@@ -54,12 +54,13 @@ export interface BookingInfo {
   id?: string; // For saved bookings
   activity?: string; // For activity bookings
   isActivityBooking?: boolean; // Flag to identify activity bookings
-  activityDate?: string; // Activity date (if different from trip date)
+  activityDate?: Date | string; // Activity date (if different from trip date)
   activityTime?: string; // Activity time (if different from trip time)
   activityLocation?: string; // Activity location
   activityDetails?: string; // Additional activity details
   activityImage?: string; // URL to activity image
   activityPrice?: number; // Price for the activity
+  bookingDate?: Date | string; // Date when booking was created
 }
 
 export interface SavedBooking extends BookingInfo {
