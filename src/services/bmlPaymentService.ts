@@ -1,4 +1,3 @@
-
 import { BookingInfo } from "@/types/booking";
 import crypto from 'crypto';
 
@@ -12,12 +11,14 @@ interface BMLPaymentResponse {
 export interface BMLPaymentConfig {
   clientId: string;
   apiKey: string;
+  forceRealMode?: boolean;
 }
 
 // BML API configuration
 export const BML_CONFIG: BMLPaymentConfig = {
   clientId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
-  apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImI4M2M4YzZiLTEyYmMtNGIyZS04NjQwLTVkOWU2Njc4NmFkYyIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NDM4MzkzNiwiZXhwIjo0OTAwMDU3NTM2fQ._09EMmA2kYHhHd1ytmBIEv0oAgn_8pakQkviFino9Vo"
+  apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImI4M2M4YzZiLTEyYmMtNGIyZS04NjQwLTVkOWU2Njc4NmFkYyIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NDM4MzkzNiwiZXhwIjo0OTAwMDU3NTM2fQ._09EMmA2kYHhHd1ytmBIEv0oAgn_8pakQkviFino9Vo",
+  forceRealMode: false
 };
 
 // BML Settings

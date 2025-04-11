@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { testBmlApiConnection, openBmlTestPage, API_BASE_URL, BML_CONFIG } from "@/services/bmlPaymentService";
+import { testBmlApiConnection, openBmlTestPage, BML_CONFIG } from "@/services/bmlPaymentService";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -125,7 +125,9 @@ const BmlApiTest = () => {
                     <h3 className="font-medium">Check Your Environment:</h3>
                     <p className="text-gray-600">
                       The application is currently using the BML <span className="font-semibold text-green-600">PRODUCTION</span> environment. 
-                      The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">{API_BASE_URL}</code>
+                      The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.forceRealMode ? 
+                        "https://api.merchants.bankofmaldives.com.mv" : 
+                        "https://api.uat.merchants.bankofmaldives.com.mv"}</code>
                     </p>
                   </div>
                   
@@ -135,7 +137,7 @@ const BmlApiTest = () => {
                       Ensure your BML API credentials are correct and have the necessary permissions.
                     </p>
                     <ul className="list-disc pl-5 mt-2 text-gray-600">
-                      <li>App ID: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.appId.substring(0, 8)}...</code></li>
+                      <li>Client ID: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.clientId.substring(0, 8)}...</code></li>
                       <li>API Key: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.apiKey.substring(0, 20)}...</code></li>
                     </ul>
                   </div>
