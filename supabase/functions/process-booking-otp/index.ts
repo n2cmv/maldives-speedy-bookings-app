@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -86,37 +87,59 @@ serve(async (req) => {
         );
       }
     
-      // Send email with OTP using the send-confirmation function
+      // Send email with OTP directly using Resend
       try {
-        const emailResponse = await supabase.functions.invoke("send-confirmation", {
-          body: {
-            email: email,
-            name: "Customer",
-            bookingDetails: {
-              otpCode: otpCode,
-              isOtpEmail: true
-            }
-          }
-        });
-        
-        if (emailResponse.error) {
-          console.error("Error sending OTP email:", emailResponse.error);
+        // Initialize the Resend client
+        const resendApiKey = Deno.env.get("RESEND_API_KEY");
+        if (!resendApiKey) {
+          console.error("RESEND_API_KEY environment variable is not set");
           return new Response(
             JSON.stringify({ 
               success: false, 
-              error: "Failed to send verification code email",
-              details: typeof emailResponse.error === 'object' ? JSON.stringify(emailResponse.error) : String(emailResponse.error)
+              error: "Email service not configured" 
             }),
-            { 
-              status: 500, 
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
+            {
+              status: 500,
+              headers: { "Content-Type": "application/json", ...corsHeaders },
             }
           );
         }
         
-        console.log("OTP email sent successfully");
+        const resend = new Resend(resendApiKey);
+        
+        // Send the OTP email
+        const emailResponse = await resend.emails.send({
+          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          to: [email],
+          subject: "Your Island Ferry Verification Code",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+              <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                <h1 style="color: #0AB3B8;">Island Ferry Verification Code</h1>
+              </div>
+              
+              <div style="padding: 20px 0;">
+                <p>Dear Customer,</p>
+                <p>Your verification code for accessing your Island Ferry bookings is:</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
+                  <h2 style="color: #0AB3B8; margin-top: 0; font-size: 32px; letter-spacing: 5px;">${otpCode}</h2>
+                </div>
+                
+                <p>This code will expire in 30 minutes.</p>
+                <p>If you did not request this code, you can safely ignore this email.</p>
+              </div>
+              
+              <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+                <p>Island Ferry Services &copy; 2025</p>
+              </div>
+            </div>
+          `,
+        });
+        
+        console.log("OTP email sent successfully:", emailResponse);
       } catch (emailError) {
-        console.error("Exception sending OTP email:", emailError);
+        console.error("Error sending OTP email:", emailError);
         return new Response(
           JSON.stringify({ 
             success: false, 

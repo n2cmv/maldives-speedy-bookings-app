@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash2, Send, AlertCircle } from "lucide-react";
 import { BookingData } from "@/types/database";
+import { toast } from "sonner";
 
 interface BookingTableProps {
   bookings: BookingData[];
@@ -29,6 +30,28 @@ const BookingTable = ({
   emailStatus,
   onShowEmailError
 }: BookingTableProps) => {
+  // Helper function to send email with toast notifications
+  const handleSendEmail = (booking: BookingData) => {
+    toast.promise(
+      () => new Promise((resolve, reject) => {
+        // Use the provided onSendEmail function
+        onSendEmail(booking);
+        
+        // This is just for the toast - the actual sending happens in the parent component
+        if (emailStatus[booking.id]?.error) {
+          reject(new Error(emailStatus[booking.id].error));
+        } else {
+          resolve(true);
+        }
+      }),
+      {
+        loading: 'Sending email...',
+        success: 'Email sent successfully!',
+        error: (err) => `Failed to send email: ${err.message || 'Unknown error'}`
+      }
+    );
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -77,7 +100,7 @@ const BookingTable = ({
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onSendEmail(booking)}
+                        onClick={() => handleSendEmail(booking)}
                         disabled={emailStatus[booking.id]?.sending}
                         className={emailStatus[booking.id]?.sending ? "opacity-50" : ""}
                       >
