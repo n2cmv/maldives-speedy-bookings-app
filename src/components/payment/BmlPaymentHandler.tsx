@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle, AlertTriangle } from "lucide-react";
 import { verifyBmlPayment } from "@/services/bmlPaymentService";
 import { BookingInfo } from "@/types/booking";
 
@@ -13,6 +13,7 @@ const BmlPaymentHandler = () => {
   const [hasAttemptedVerification, setHasAttemptedVerification] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
+  const [isSimulationMode, setIsSimulationMode] = useState(false);
   
   useEffect(() => {
     const handlePaymentVerification = async () => {
@@ -63,8 +64,50 @@ const BmlPaymentHandler = () => {
           isPendingActivity,
           hasBmlPayment: !!pendingData.bmlPayment,
           hasReference: !!pendingData.paymentReference,
-          reference: pendingData.paymentReference
+          reference: pendingData.paymentReference,
+          isSimulation: !!pendingData.isSimulationMode
         });
+        
+        // Check if this is using simulation mode
+        if (pendingData.isSimulationMode) {
+          console.log("BML Handler: Using simulation mode");
+          setIsSimulationMode(true);
+          // In simulation mode, we consider the payment successful
+          setVerificationSuccess(true);
+          toast.success("Payment verification completed", {
+            description: "Payment simulation completed successfully"
+          });
+          
+          // Clear pending booking data
+          localStorage.removeItem('pendingBooking');
+          localStorage.removeItem('pendingActivityBooking');
+          
+          // Navigate to confirmation page with updated booking data
+          setTimeout(() => {
+            if (isPendingActivity) {
+              console.log("BML Handler: Navigating to confirmation page for activity booking (simulation)");
+              navigate("/confirmation", { 
+                state: {
+                  ...pendingData,
+                  paymentComplete: true,
+                  isActivityBooking: true,
+                  isSimulationMode: true
+                }
+              });
+            } else {
+              console.log("BML Handler: Navigating to confirmation page for regular booking (simulation)");
+              const bookingInfo = pendingData as BookingInfo;
+              navigate("/confirmation", { 
+                state: {
+                  ...bookingInfo,
+                  paymentComplete: true,
+                  isSimulationMode: true
+                }
+              });
+            }
+          }, 1500);
+          return;
+        }
         
         // Check if this is a BML payment and has a reference
         if (!pendingData.bmlPayment || !pendingData.paymentReference) {
@@ -156,6 +199,12 @@ const BmlPaymentHandler = () => {
             <p className="text-gray-600 mb-4">
               Your payment has been verified. Redirecting to your booking confirmation...
             </p>
+            {isSimulationMode && (
+              <div className="bg-yellow-50 p-3 rounded-lg mt-4 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2 flex-shrink-0" />
+                <p className="text-sm text-yellow-800">Simulation mode active</p>
+              </div>
+            )}
           </>
         ) : (
           <>

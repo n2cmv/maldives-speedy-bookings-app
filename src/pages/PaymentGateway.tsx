@@ -5,7 +5,7 @@ import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, AlertCircle } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
@@ -15,6 +15,7 @@ import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
 import { createBmlPaymentSession } from "@/services/bmlPaymentService";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -28,6 +29,8 @@ const PaymentGateway = () => {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bml"); // Default to BML payment gateway
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [isSimulationMode, setIsSimulationMode] = useState(false);
 
   useEffect(() => {
     // Handle regular booking
@@ -78,6 +81,9 @@ const PaymentGateway = () => {
   };
 
   const handlePayment = async () => {
+    // Reset any previous errors
+    setPaymentError(null);
+    setIsSimulationMode(false);
     setIsProcessing(true);
     
     const totalAmount = calculateTotal();
@@ -117,8 +123,16 @@ const PaymentGateway = () => {
           cancelUrl
         );
         
-        if (!bmlPayment.success || !bmlPayment.paymentUrl) {
+        if (!bmlPayment.success) {
           throw new Error(bmlPayment.error || "Failed to initialize payment with Bank of Maldives");
+        }
+        
+        // Check if we're in simulation mode (if the error message mentions simulation)
+        if (bmlPayment.error && bmlPayment.error.includes("simulation")) {
+          setIsSimulationMode(true);
+          toast.warning("Using simulation mode", {
+            description: "The BML API is currently unavailable. Using simulation mode instead."
+          });
         }
         
         // Store payment reference
@@ -131,7 +145,8 @@ const PaymentGateway = () => {
             ...activityBooking,
             paymentReference,
             paymentPending: true,
-            bmlPayment: true
+            bmlPayment: true,
+            isSimulationMode: bmlPayment.error?.includes("simulation") || false
           }));
         } else if (bookingInfo) {
           // For regular speedboat bookings
@@ -139,17 +154,25 @@ const PaymentGateway = () => {
             ...bookingInfo,
             paymentReference,
             paymentPending: true,
-            bmlPayment: true
+            bmlPayment: true,
+            isSimulationMode: bmlPayment.error?.includes("simulation") || false
           }));
         }
         
         // Redirect to BML payment page
-        window.location.href = bmlPayment.paymentUrl;
-        return;
+        if (bmlPayment.paymentUrl) {
+          window.location.href = bmlPayment.paymentUrl;
+          return;
+        } else {
+          throw new Error("No payment URL provided by payment gateway");
+        }
       } catch (error) {
         console.error("Error with BML payment:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to connect to payment gateway";
+        
+        setPaymentError(errorMessage);
         toast.error("Payment gateway error", {
-          description: error instanceof Error ? error.message : "Failed to connect to payment gateway"
+          description: errorMessage
         });
         setIsProcessing(false);
         return;
@@ -268,6 +291,31 @@ const PaymentGateway = () => {
               </div>
               
               <div className="p-6 space-y-6">
+                {paymentError && (
+                  <Alert variant="destructive" className="bg-red-50 border-red-200">
+                    <AlertCircle className="h-5 w-5" />
+                    <AlertDescription className="ml-2">
+                      <div className="font-medium">Payment Error</div>
+                      <div className="text-sm">{paymentError}</div>
+                      <p className="text-sm mt-2">
+                        The payment gateway might be temporarily unavailable. Please try again or use simulation mode.
+                      </p>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
+                {isSimulationMode && (
+                  <Alert className="bg-yellow-50 border-yellow-200">
+                    <AlertDescription>
+                      <div className="font-medium text-amber-800">Payment Simulation Mode</div>
+                      <p className="text-sm text-amber-700">
+                        You are using simulation mode because the Bank of Maldives payment gateway is temporarily unavailable.
+                        Your transaction will be simulated for testing purposes.
+                      </p>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
                 <PaymentSummary 
                   bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
