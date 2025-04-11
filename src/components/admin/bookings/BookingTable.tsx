@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Send, AlertCircle } from "lucide-react";
+import { Edit, Trash2, Send, AlertCircle, Eye } from "lucide-react";
 import { BookingData } from "@/types/database";
 import { toast } from "sonner";
 
@@ -18,6 +18,7 @@ interface BookingTableProps {
   onEdit: (booking: BookingData) => void;
   onDelete: (bookingId: string) => void;
   onSendEmail: (booking: BookingData) => void;
+  onViewDetails: (booking: BookingData) => void;
   emailStatus: Record<string, { sending: boolean; error?: string }>;
   onShowEmailError: (bookingId: string) => void;
 }
@@ -27,6 +28,7 @@ const BookingTable = ({
   onEdit, 
   onDelete, 
   onSendEmail, 
+  onViewDetails,
   emailStatus,
   onShowEmailError
 }: BookingTableProps) => {
@@ -82,6 +84,14 @@ const BookingTable = ({
                 <TableCell>{booking.passenger_count}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => onViewDetails(booking)}
+                      title="View Details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="icon"

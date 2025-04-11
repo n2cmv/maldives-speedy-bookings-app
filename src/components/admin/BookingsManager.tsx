@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +27,7 @@ import { sendBookingConfirmationEmail } from "@/services/bookingService";
 import BookingForm from "@/components/admin/BookingForm";
 import SearchBar from "@/components/admin/common/SearchBar";
 import BookingTable from "@/components/admin/bookings/BookingTable";
+import BookingDetails from "@/components/admin/bookings/BookingDetails";
 import { BookingData } from "@/types/database";
 import { Time } from "@/types/booking";
 
@@ -41,6 +43,8 @@ const BookingsManager = () => {
   const [emailStatus, setEmailStatus] = useState<Record<string, { sending: boolean; error?: string }>>({});
   const [emailDetailsDialogOpen, setEmailDetailsDialogOpen] = useState<boolean>(false);
   const [emailErrorDetails, setEmailErrorDetails] = useState<string>("");
+  const [viewBookingDetails, setViewBookingDetails] = useState<BookingData | null>(null);
+  const [bookingDetailsDialogOpen, setBookingDetailsDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     fetchBookings();
@@ -74,6 +78,11 @@ const BookingsManager = () => {
   const handleEdit = (booking: BookingData) => {
     setCurrentBooking(booking);
     setIsBookingFormOpen(true);
+  };
+
+  const handleViewDetails = (booking: BookingData) => {
+    setViewBookingDetails(booking);
+    setBookingDetailsDialogOpen(true);
   };
 
   const handleDelete = async () => {
@@ -229,6 +238,7 @@ const BookingsManager = () => {
             setIsDeleteDialogOpen(true);
           }}
           onSendEmail={handleResendEmail}
+          onViewDetails={handleViewDetails}
           emailStatus={emailStatus}
           onShowEmailError={showEmailError}
         />
@@ -287,6 +297,11 @@ const BookingsManager = () => {
             <Button onClick={() => setEmailDetailsDialogOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
+      {/* Booking Details Dialog */}
+      <Dialog open={bookingDetailsDialogOpen} onOpenChange={setBookingDetailsDialogOpen}>
+        <BookingDetails booking={viewBookingDetails} />
       </Dialog>
     </div>
   );
