@@ -11,7 +11,7 @@ import PassengerForm from "@/components/PassengerForm";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Passenger, BookingInfo } from "@/types/booking";
-import { saveBookingToDatabase } from "@/services/bookingService";
+import { saveBookingToDatabase, generatePaymentReference } from "@/services/bookingService";
 
 const ActivityPassengerDetails = () => {
   const location = useLocation();
@@ -94,16 +94,21 @@ const ActivityPassengerDetails = () => {
         return;
       }
 
+      // Generate a payment reference for this activity booking
+      const paymentReference = generatePaymentReference();
+
       // Create the booking object with BOTH activity flags explicitly set
       const updatedBookingInfo = {
         ...bookingInfo,
         passengers: passengerDetails,
         isActivityBooking: true, // Ensure camelCase flag is set for UI
         is_activity_booking: true, // Ensure snake_case flag is set for database
-        activity: bookingInfo.activity || "Unknown Activity" // Ensure activity is set
+        activity: bookingInfo.activity || "Unknown Activity", // Ensure activity is set
+        paymentReference: paymentReference, // Add payment reference
+        paymentComplete: false // Will be set to true after payment
       };
       
-      console.log("Submitting activity booking with explicit flags:", updatedBookingInfo);
+      console.log("Submitting activity booking with explicit flags and payment reference:", updatedBookingInfo);
       
       // Save directly to database first
       const { data, error } = await saveBookingToDatabase(updatedBookingInfo);
