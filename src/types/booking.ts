@@ -52,7 +52,14 @@ export interface BookingInfo {
   paymentComplete?: boolean;
   paymentReference?: string;
   id?: string; // For saved bookings
-  activity?: string; // Added this for activity bookings
+  activity?: string; // For activity bookings
+  isActivityBooking?: boolean; // Flag to identify activity bookings
+  activityDate?: string; // Activity date (if different from trip date)
+  activityTime?: string; // Activity time (if different from trip time)
+  activityLocation?: string; // Activity location
+  activityDetails?: string; // Additional activity details
+  activityImage?: string; // URL to activity image
+  activityPrice?: number; // Price for the activity
 }
 
 export interface SavedBooking extends BookingInfo {

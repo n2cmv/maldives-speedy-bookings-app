@@ -83,6 +83,7 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
     const outboundSpeedboatDetails: RouteData | null = booking.outboundSpeedboatDetails || null;
     const returnSpeedboatDetails: RouteData | null = booking.returnSpeedboatDetails || null;
     
+    // Prepare the email data, including activity information if applicable
     const emailData = {
       email: primaryPassenger.email.trim().toLowerCase(),
       name: primaryPassenger.name,
@@ -105,7 +106,12 @@ export async function sendBookingConfirmationEmail(booking: BookingInfo & {
         returnSpeedboatName: returnSpeedboatDetails?.speedboat_name || null,
         returnSpeedboatImage: returnSpeedboatDetails?.speedboat_image_url || null,
         returnPickupLocation: returnSpeedboatDetails?.pickup_location || null,
-        returnPickupMapUrl: returnSpeedboatDetails?.pickup_map_url || null
+        returnPickupMapUrl: returnSpeedboatDetails?.pickup_map_url || null,
+        // Add activity details if this is an activity booking
+        isActivityBooking: !!booking.activity,
+        activity: booking.activity || "",
+        activityDate: booking.date ? new Date(booking.date).toLocaleDateString() : "",
+        activityTime: booking.time
       }
     };
     

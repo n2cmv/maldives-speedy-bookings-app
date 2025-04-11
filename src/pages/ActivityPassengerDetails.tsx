@@ -33,7 +33,13 @@ const ActivityPassengerDetails = () => {
           return;
         }
         
-        setBookingInfo(booking);
+        // Ensure we mark this as an activity booking
+        const updatedBooking = {
+          ...booking,
+          isActivityBooking: true
+        };
+        
+        setBookingInfo(updatedBooking);
         
         // Initialize passenger forms based on counts
         const initialPassengers = [];
@@ -62,13 +68,14 @@ const ActivityPassengerDetails = () => {
     navigate("/activity-booking", { state: { activity: bookingInfo?.activity } });
   };
 
-  const handleSubmit = (passengerDetails: any[]) => {
+  const handleSubmit = (passengerDetails: Passenger[]) => {
     if (!bookingInfo) return;
     
     try {
       const updatedBookingInfo = {
         ...bookingInfo,
-        passengers: passengerDetails
+        passengers: passengerDetails,
+        isActivityBooking: true // Ensure this flag is set for confirmation page
       };
       
       // Store the updated booking info in session storage
@@ -78,13 +85,13 @@ const ActivityPassengerDetails = () => {
       navigate("/payment", { state: updatedBookingInfo });
       
       toast({
-        title: "Passenger details saved!",
+        title: "Participant details saved!",
         description: "You're being redirected to payment."
       });
     } catch (error) {
       console.error("Error submitting passenger details:", error);
       toast({
-        title: "Error saving passenger details",
+        title: "Error saving participant details",
         description: "Please try again.",
         variant: "destructive"
       });
