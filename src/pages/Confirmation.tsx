@@ -47,11 +47,14 @@ const Confirmation = () => {
       return;
     }
     
+    console.log("Confirmation page received booking:", booking);
     setBookingInfo(booking);
     
     if (booking.isActivityBooking) {
       setIsActivityBooking(true);
     }
+    
+    saveBookingToLocalStorage(booking);
     
     const sendConfirmation = async () => {
       setIsLoading(true);
@@ -144,7 +147,7 @@ const Confirmation = () => {
                   isActivityBooking={isActivityBooking}
                 />
                 
-                <QrCodeDisplay bookingReference={bookingInfo.paymentReference} />
+                <QrCodeDisplay booking={bookingInfo} />
               </div>
             </div>
             
