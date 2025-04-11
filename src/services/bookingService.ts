@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -209,6 +208,29 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
       console.error("Error fetching bookings:", error);
     } else {
       console.log("Successfully retrieved bookings:", data?.length || 0);
+      
+      // Add logging to inspect and debug the retrieved bookings
+      if (data && data.length > 0) {
+        console.log("Retrieved bookings data:", data);
+        
+        // Log information about activity bookings specifically
+        const activityBookings = data.filter(booking => 
+          booking.is_activity_booking === true || booking.activity !== null && booking.activity !== ''
+        );
+        
+        console.log("Activity bookings found:", activityBookings.length);
+        if (activityBookings.length > 0) {
+          activityBookings.forEach(booking => {
+            console.log("Activity booking details:", {
+              id: booking.id,
+              isActivityFlag: booking.is_activity_booking,
+              activityName: booking.activity,
+              date: booking.departure_date,
+              time: booking.departure_time
+            });
+          });
+        }
+      }
     }
 
     return { data, error };
