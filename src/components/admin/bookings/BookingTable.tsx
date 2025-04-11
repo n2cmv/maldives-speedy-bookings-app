@@ -34,6 +34,7 @@ const BookingTable = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>ID</TableHead>
             <TableHead>Reference</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>From</TableHead>
@@ -47,6 +48,7 @@ const BookingTable = ({
           {bookings.length > 0 ? (
             bookings.map((booking) => (
               <TableRow key={booking.id}>
+                <TableCell className="font-mono text-xs text-gray-500">{booking.id.substring(0, 8)}...</TableCell>
                 <TableCell>{booking.payment_reference || "N/A"}</TableCell>
                 <TableCell>{booking.passenger_info && booking.passenger_info[0]?.email || booking.user_email || "N/A"}</TableCell>
                 <TableCell>{booking.from_location}</TableCell>
@@ -102,7 +104,7 @@ const BookingTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 No bookings found
               </TableCell>
             </TableRow>
