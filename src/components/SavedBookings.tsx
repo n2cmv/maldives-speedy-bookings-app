@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +20,17 @@ const SavedBookings = () => {
   
   useEffect(() => {
     if (open) {
-      setSavedBookings(getSavedBookingsFromLocalStorage());
+      const bookings = getSavedBookingsFromLocalStorage();
+      console.log("Retrieved saved bookings:", bookings);
+      
+      // Count activity bookings
+      const activityBookingsCount = bookings.filter(b => 
+        b.activity || b.isActivityBooking
+      ).length;
+      
+      console.log(`Found ${activityBookingsCount} activity bookings in local storage`);
+      
+      setSavedBookings(bookings);
     }
   }, [open]);
   
@@ -37,9 +46,19 @@ const SavedBookings = () => {
       if (booking.paymentComplete) {
         navigate("/confirmation", { state: booking });
       } else if (booking.passengers?.length) {
-        navigate("/passenger-details", { state: booking });
+        // For activity bookings, use a different route
+        if (booking.activity || booking.isActivityBooking) {
+          navigate("/activity-passenger-details", { state: booking });
+        } else {
+          navigate("/passenger-details", { state: booking });
+        }
       } else {
-        navigate("/booking", { state: booking });
+        // For activity bookings, use activity-booking route
+        if (booking.activity || booking.isActivityBooking) {
+          navigate("/activity-booking", { state: booking });
+        } else {
+          navigate("/booking", { state: booking });
+        }
       }
     }
   };
@@ -53,8 +72,22 @@ const SavedBookings = () => {
     });
   };
   
+  // Enhanced isActivityBooking function with detailed logging
   const isActivityBooking = (booking: BookingInfo): boolean => {
-    return !!booking.activity || !!booking.isActivityBooking;
+    // Check for activity property first
+    if (booking.activity && booking.activity.trim() !== '') {
+      console.log(`Saved booking ${booking.id} is an activity booking with activity: ${booking.activity}`);
+      return true;
+    }
+    
+    // Then check for the explicit flag
+    if (booking.isActivityBooking === true) {
+      console.log(`Saved booking ${booking.id} is marked as activity booking with flag`);
+      return true;
+    }
+    
+    console.log(`Saved booking ${booking.id} is NOT an activity booking`);
+    return false;
   };
   
   if (savedBookings.length === 0 && open) {

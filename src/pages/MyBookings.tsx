@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -155,16 +154,21 @@ const MyBookings = () => {
         
         console.log("Retrieved bookings data:", bookingsData);
         
-        // Add detailed logging for each booking to debug activity bookings
-        if (bookingsData && bookingsData.length > 0) {
-          bookingsData.forEach(booking => {
-            console.log(`Booking ${booking.id} details:`, {
-              from: booking.from_location,
-              to: booking.to_location,
+        const activityBookings = bookingsData ? bookingsData.filter(booking => 
+          booking.is_activity_booking === true || 
+          (booking.activity !== null && booking.activity !== '')
+        ) : [];
+        
+        console.log("Activity bookings found:", activityBookings.length);
+        
+        if (activityBookings.length > 0) {
+          activityBookings.forEach(booking => {
+            console.log("Activity booking details:", {
+              id: booking.id,
+              isActivityFlag: booking.is_activity_booking,
+              activityName: booking.activity,
               date: booking.departure_date,
-              isActivityBookingFlag: booking.is_activity_booking,
-              activity: booking.activity,
-              passengerInfo: booking.passenger_info ? booking.passenger_info.length : 0
+              time: booking.departure_time
             });
           });
         }
@@ -200,28 +204,21 @@ const MyBookings = () => {
     setQrDialogOpen(true);
   };
 
-  // Enhanced isActivityBooking function with better logging
   const isActivityBooking = (booking: any): boolean => {
-    // First, check for the explicit flag
+    console.log(`Booking ${booking.id} activity flags:`, {
+      is_activity_booking: booking.is_activity_booking,
+      activity: booking.activity,
+      has_activity: booking.activity !== null && booking.activity !== ''
+    });
+    
     if (booking.is_activity_booking === true) {
       console.log(`Booking ${booking.id} is marked as activity booking with flag`);
       return true;
     }
     
-    // Check for activity field
-    if (booking.activity && booking.activity.trim() !== '') {
+    if (booking.activity !== null && booking.activity !== '') {
       console.log(`Booking ${booking.id} is activity booking with activity: ${booking.activity}`);
       return true;
-    }
-    
-    // Check in passenger info
-    if (booking.passenger_info && Array.isArray(booking.passenger_info)) {
-      for (const passenger of booking.passenger_info) {
-        if (passenger.activity && passenger.activity.trim() !== '') {
-          console.log(`Booking ${booking.id} has passenger with activity: ${passenger.activity}`);
-          return true;
-        }
-      }
     }
     
     console.log(`Booking ${booking.id} is NOT an activity booking`);
@@ -229,19 +226,7 @@ const MyBookings = () => {
   };
 
   const getActivityName = (booking: any): string => {
-    if (booking.activity && booking.activity.trim() !== '') {
-      return booking.activity;
-    }
-    
-    if (booking.passenger_info && Array.isArray(booking.passenger_info)) {
-      for (const passenger of booking.passenger_info) {
-        if (passenger.activity && passenger.activity.trim() !== '') {
-          return passenger.activity;
-        }
-      }
-    }
-    
-    return "Activity";
+    return booking.activity || "Island Experience";
   };
 
   const containerVariants = {

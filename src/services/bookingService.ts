@@ -25,7 +25,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       booking.paymentReference = generatePaymentReference();
     }
 
-    // Explicitly determine if this is an activity booking
+    // Explicitly determine if this is an activity booking - improved detection
     const isActivityBooking = !!booking.activity || !!booking.isActivityBooking;
     
     console.log("Saving booking to database:", {
@@ -49,7 +49,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
-      // Store activity information in two places for backwards compatibility
+      // Ensure activity information is properly stored
       activity: booking.activity || null,
       is_activity_booking: isActivityBooking
     };
@@ -206,34 +206,50 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
 
     if (error) {
       console.error("Error fetching bookings:", error);
-    } else {
-      console.log("Successfully retrieved bookings:", data?.length || 0);
+      return { data: [], error };
+    }
+    
+    console.log("Successfully retrieved bookings:", data?.length || 0);
+    
+    // Enhanced debug logging for all bookings
+    if (data && data.length > 0) {
+      console.log("Retrieved bookings data:", data);
       
-      // Add logging to inspect and debug the retrieved bookings
-      if (data && data.length > 0) {
-        console.log("Retrieved bookings data:", data);
-        
-        // Log information about activity bookings specifically
-        const activityBookings = data.filter(booking => 
-          booking.is_activity_booking === true || booking.activity !== null && booking.activity !== ''
-        );
-        
-        console.log("Activity bookings found:", activityBookings.length);
-        if (activityBookings.length > 0) {
-          activityBookings.forEach(booking => {
-            console.log("Activity booking details:", {
-              id: booking.id,
-              isActivityFlag: booking.is_activity_booking,
-              activityName: booking.activity,
-              date: booking.departure_date,
-              time: booking.departure_time
-            });
+      // Count and log activity bookings specifically
+      const activityBookings = data.filter(booking => 
+        booking.is_activity_booking === true || 
+        (booking.activity !== null && booking.activity !== '')
+      );
+      
+      console.log("Activity bookings found:", activityBookings.length);
+      
+      // Log details about each activity booking
+      if (activityBookings.length > 0) {
+        activityBookings.forEach(booking => {
+          console.log("Activity booking details:", {
+            id: booking.id,
+            isActivityFlag: booking.is_activity_booking,
+            activityName: booking.activity,
+            date: booking.departure_date,
+            time: booking.departure_time
           });
-        }
+        });
       }
+      
+      // Log details about each booking for debugging
+      data.forEach(booking => {
+        console.log(`Booking ${booking.id} details:`, {
+          from: booking.from_location,
+          to: booking.to_location,
+          date: booking.departure_date,
+          isActivityBookingFlag: booking.is_activity_booking,
+          activity: booking.activity,
+          passengerInfo: booking.passenger_info ? booking.passenger_info.length : 0
+        });
+      });
     }
 
-    return { data, error };
+    return { data, error: null };
   } catch (error) {
     console.error("Exception fetching bookings:", error);
     return { data: [], error };
