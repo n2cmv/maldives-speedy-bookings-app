@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -36,7 +35,6 @@ const PaymentGateway = () => {
   const [forceRealMode, setForceRealMode] = useState(false);
 
   useEffect(() => {
-    // Handle regular booking
     if (!location.state?.isActivityBooking) {
       const booking = location.state as BookingInfo | null;
       if (!booking) {
@@ -46,7 +44,6 @@ const PaymentGateway = () => {
       
       setBookingInfo(booking);
     } 
-    // Handle activity booking
     else {
       const activityData = location.state;
       if (!activityData) {
@@ -57,10 +54,8 @@ const PaymentGateway = () => {
       setActivityBooking(activityData);
     }
     
-    // Generate a consistent reference number for this booking session using our standardized function
     setBookingReference(generatePaymentReference());
     
-    // Check if we're returning from a cancelled payment
     const searchParams = new URLSearchParams(location.search);
     const canceled = searchParams.get('canceled') === 'true';
     
@@ -69,7 +64,6 @@ const PaymentGateway = () => {
         description: "You canceled the payment process."
       });
       
-      // Clear any pending booking data
       localStorage.removeItem('pendingBooking');
       localStorage.removeItem('pendingActivityBooking');
     } 
@@ -84,14 +78,12 @@ const PaymentGateway = () => {
   };
 
   const handlePayment = async () => {
-    // Reset any previous errors
     setPaymentError(null);
     setIsSimulationMode(false);
     setIsProcessing(true);
     
     const totalAmount = calculateTotal();
     
-    // If using BML payment gateway
     if (paymentMethod === "bml") {
       try {
         toast.info("Connecting to Bank of Maldives payment gateway", {
@@ -102,7 +94,6 @@ const PaymentGateway = () => {
         const returnUrl = `${origin}/`;
         const cancelUrl = `${origin}/payment?canceled=true`;
         
-        // For activity booking, use a placeholder booking object for BML API
         const bookingForBml = activityBooking ? {
           from: "Activity Booking",
           island: activityBooking.activity?.name || "Activity",
@@ -119,7 +110,6 @@ const PaymentGateway = () => {
           throw new Error("Missing booking information");
         }
         
-        // Set up BML settings based on the user's preference
         const bmlSettings: BMLSettings = {
           forceRealMode: forceRealMode,
           disableSimulation: false,
@@ -137,10 +127,12 @@ const PaymentGateway = () => {
         );
         
         if (!bmlPayment.success) {
+          if (forceRealMode && bmlPayment.error?.includes("Failed to fetch")) {
+            throw new Error("Cannot connect to BML payment gateway. Turn off 'Force real mode' to use simulation instead.");
+          }
           throw new Error(bmlPayment.error || "Failed to initialize payment with Bank of Maldives");
         }
         
-        // Check if we're in simulation mode (if the error message mentions simulation)
         if (bmlPayment.error && bmlPayment.error.includes("simulation")) {
           setIsSimulationMode(true);
           toast.warning("Using simulation mode", {
@@ -148,12 +140,9 @@ const PaymentGateway = () => {
           });
         }
         
-        // Store payment reference
         const paymentReference = bmlPayment.reference || bookingReference;
         
-        // Store booking with payment reference before redirecting
         if (activityBooking) {
-          // For activity bookings
           localStorage.setItem('pendingActivityBooking', JSON.stringify({
             ...activityBooking,
             paymentReference,
@@ -163,7 +152,6 @@ const PaymentGateway = () => {
             bmlSettings
           }));
         } else if (bookingInfo) {
-          // For regular speedboat bookings
           localStorage.setItem('pendingBooking', JSON.stringify({
             ...bookingInfo,
             paymentReference,
@@ -174,7 +162,6 @@ const PaymentGateway = () => {
           }));
         }
         
-        // Redirect to BML payment page
         if (bmlPayment.paymentUrl) {
           window.location.href = bmlPayment.paymentUrl;
           return;
@@ -194,7 +181,6 @@ const PaymentGateway = () => {
       }
     }
     
-    // Fallback to simulation flow
     toast.info("Redirecting to payment gateway", {
       description: "You will be redirected to the Bank of Maldives payment page"
     });
@@ -216,7 +202,6 @@ const PaymentGateway = () => {
   const handlePaymentCompletion = (success: boolean) => {
     if (success) {
       if (activityBooking) {
-        // For activity bookings
         navigate("/confirmation", { 
           state: {
             ...activityBooking,
@@ -226,7 +211,6 @@ const PaymentGateway = () => {
           }
         });
       } else if (bookingInfo) {
-        // For regular speedboat bookings
         navigate("/confirmation", { 
           state: {
             ...bookingInfo,
@@ -252,7 +236,7 @@ const PaymentGateway = () => {
     
     const totalPassengers = bookingInfo.passengers.length || 0;
     const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
-    const journeyMultiplier = isReturnTrip ? 2 : 1; // Double the price for return trips
+    const journeyMultiplier = isReturnTrip ? 2 : 1;
     
     return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
   };
@@ -312,9 +296,18 @@ const PaymentGateway = () => {
                     <AlertDescription className="ml-2">
                       <div className="font-medium">Payment Error</div>
                       <div className="text-sm">{paymentError}</div>
-                      <p className="text-sm mt-2">
-                        The payment gateway might be temporarily unavailable. Please try again or use simulation mode.
-                      </p>
+                      {forceRealMode && paymentError.includes("Failed to fetch") && (
+                        <p className="text-sm mt-2 font-medium">
+                          You have "Force real payment mode" enabled. This is preventing simulation mode fallback.
+                          <br />
+                          <span className="underline">Turn off this option below to use simulation mode.</span>
+                        </p>
+                      )}
+                      {!forceRealMode && (
+                        <p className="text-sm mt-2">
+                          The payment gateway might be temporarily unavailable. Please try again or use simulation mode.
+                        </p>
+                      )}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -344,13 +337,15 @@ const PaymentGateway = () => {
                       checked={forceRealMode} 
                       onCheckedChange={setForceRealMode} 
                     />
-                    <Label htmlFor="force-real-mode" className="text-sm">
+                    <Label htmlFor="force-real-mode" className={`text-sm ${forceRealMode && paymentError ? 'text-red-600 font-medium' : ''}`}>
                       Force real payment mode (disable simulation fallback)
                     </Label>
                   </div>
                   <p className="text-xs text-slate-500 mt-2">
                     When enabled, the system will attempt to use the real BML payment gateway without falling back to simulation mode.
-                    This might result in errors if the gateway is not reachable.
+                    {forceRealMode ? 
+                      <span className="block mt-1 text-amber-700"> This might result in errors if the gateway is not reachable.</span> : 
+                      ''}
                   </p>
                 </div>
                 
