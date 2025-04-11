@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -244,7 +245,8 @@ export async function getBookingsByEmail(email: string): Promise<{ data: any[]; 
           date: booking.departure_date,
           isActivityBookingFlag: booking.is_activity_booking,
           activity: booking.activity,
-          passengerInfo: booking.passenger_info ? booking.passenger_info.length : 0
+          // Fix the TypeScript error by checking if passenger_info is an array before accessing length
+          passengerInfo: Array.isArray(booking.passenger_info) ? booking.passenger_info.length : 0
         });
       });
     }
