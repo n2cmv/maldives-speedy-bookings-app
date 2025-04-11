@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,52 +53,30 @@ const ActivityBookingsManager = () => {
     try {
       console.log("Fetching activity bookings...");
       
-      // Get all bookings first, then filter for activities
-      const { data: allBookings, error: allError } = await supabase
+      const { data: activityBookings, error } = await supabase
         .from('bookings')
-        .select('*');
+        .select('*')
+        .or('is_activity_booking.eq.true,activity.neq.null,activity.neq."",activity.not.is.null');
         
-      if (allError) {
-        console.error("Error fetching bookings:", allError);
-        throw allError;
+      if (error) {
+        console.error("Error fetching activity bookings:", error);
+        throw error;
       }
 
-      if (!allBookings || allBookings.length === 0) {
-        console.log("No bookings found at all");
+      if (!activityBookings || activityBookings.length === 0) {
+        console.log("No activity bookings found");
         setBookings([]);
         setNoDataFound(true);
         setIsLoading(false);
         return;
       }
       
-      console.log(`Found ${allBookings.length} total bookings, raw data:`, allBookings);
+      console.log(`Found ${activityBookings.length} activity bookings, raw data:`, activityBookings);
       
-      // Filter for activity bookings with improved logging
-      const activityBookings = allBookings.filter(booking => {
-        // Check both possible flags and activity field
-        const isActivityBooking = 
-          booking.is_activity_booking === true || 
-          (booking.activity !== null && booking.activity !== '');
-        
-        console.log(`Booking ID ${booking.id}: 
-          is_activity_booking flag: ${booking.is_activity_booking}, 
-          activity field: ${booking.activity}, 
-          considered activity booking: ${isActivityBooking}`);
-        
-        return isActivityBooking;
-      });
-      
-      console.log(`Found ${activityBookings.length} activity bookings after filtering`);
-      
-      if (activityBookings.length === 0) {
-        setNoDataFound(true);
-      }
-      
-      // Sort by creation date
       activityBookings.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       
-      // Type assertion to tell TypeScript that activityBookings is compatible with BookingData[]
       setBookings(activityBookings as unknown as BookingData[]);
+      setNoDataFound(activityBookings.length === 0);
     } catch (error) {
       console.error("Error fetching activity bookings:", error);
       toast({

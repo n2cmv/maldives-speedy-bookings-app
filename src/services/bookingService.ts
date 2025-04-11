@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { BookingInfo } from "@/types/booking";
 import { RouteData } from "@/types/database";
@@ -25,7 +26,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       booking.paymentReference = generatePaymentReference();
     }
 
-    // Explicitly determine if this is an activity booking - improved detection
+    // CRITICAL FIX: Explicitly check and set activity booking flags
     const isActivityBooking = 
       booking.isActivityBooking === true || 
       booking.is_activity_booking === true || 
@@ -35,8 +36,12 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       isActivityBooking,
       activity: booking.activity,
       isActivityBookingFlag: booking.isActivityBooking,
-      is_activity_booking_flag: booking.is_activity_booking
+      is_activity_booking_flag: booking.is_activity_booking,
+      booking: JSON.stringify(booking)
     });
+
+    // Double check if it's an activity booking but activity is empty
+    const activityName = booking.activity || (isActivityBooking ? "Unspecified Activity" : null);
 
     const bookingData = {
       user_email: booking.passengers?.[0].email || "",
@@ -53,8 +58,8 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
       payment_complete: booking.paymentComplete || false,
       payment_reference: booking.paymentReference || null,
       passenger_info: booking.passengers ? JSON.parse(JSON.stringify(booking.passengers)) : [],
-      // Ensure activity information is properly stored
-      activity: booking.activity || null,
+      // CRITICAL FIX: Ensure activity information is properly stored
+      activity: activityName,
       is_activity_booking: isActivityBooking
     };
 
@@ -63,8 +68,7 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
     const { data, error } = await supabase
       .from('bookings')
       .insert(bookingData)
-      .select()
-      .single();
+      .select();
 
     if (error) {
       console.error("Error saving booking:", error);
@@ -74,15 +78,15 @@ export async function saveBookingToDatabase(booking: BookingInfo): Promise<{ dat
     console.log("Booking successfully saved:", data);
     
     // Verify that the saved booking has the correct activity booking flags
-    if (isActivityBooking) {
+    if (isActivityBooking && data && data[0]) {
       console.log("Activity booking verification:", {
-        saved_id: data.id,
-        saved_activity: data.activity,
-        saved_is_activity_booking: data.is_activity_booking
+        saved_id: data[0].id,
+        saved_activity: data[0].activity,
+        saved_is_activity_booking: data[0].is_activity_booking
       });
     }
     
-    return { data, error: null };
+    return { data: data && data[0] ? data[0] : null, error: null };
   } catch (error) {
     console.error("Exception saving booking:", error);
     return { data: null, error };

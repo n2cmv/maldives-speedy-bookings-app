@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -10,6 +11,7 @@ import PassengerForm from "@/components/PassengerForm";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Passenger, BookingInfo } from "@/types/booking";
+import { saveBookingToDatabase } from "@/services/bookingService";
 
 const ActivityPassengerDetails = () => {
   const location = useLocation();
@@ -37,7 +39,7 @@ const ActivityPassengerDetails = () => {
           ...booking,
           isActivityBooking: true,
           // Explicitly set these fields to ensure proper storage in Supabase
-          activity: booking.activity || "Unknown Activity",
+          activity: booking.activity || "Unknown Activity", // Ensure activity has a value
           is_activity_booking: true // Add snake_case version for direct database mapping
         };
         
@@ -77,10 +79,22 @@ const ActivityPassengerDetails = () => {
     navigate("/activity-booking", { state: { activity: bookingInfo?.activity } });
   };
 
-  const handleSubmit = (passengerDetails: Passenger[]) => {
+  const handleSubmit = async (passengerDetails: Passenger[]) => {
     if (!bookingInfo) return;
     
     try {
+      // Double-check that activity is properly set
+      if (!bookingInfo.activity) {
+        console.error("Missing activity name");
+        toast({
+          title: "Missing activity information",
+          description: "Please go back and select an activity",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create the booking object with BOTH activity flags explicitly set
       const updatedBookingInfo = {
         ...bookingInfo,
         passengers: passengerDetails,
@@ -89,7 +103,16 @@ const ActivityPassengerDetails = () => {
         activity: bookingInfo.activity || "Unknown Activity" // Ensure activity is set
       };
       
-      console.log("Submitting activity booking:", updatedBookingInfo);
+      console.log("Submitting activity booking with explicit flags:", updatedBookingInfo);
+      
+      // Save directly to database first
+      const { data, error } = await saveBookingToDatabase(updatedBookingInfo);
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Activity booking saved to database:", data);
       
       // Store the updated booking info in session storage
       sessionStorage.setItem("currentActivityBooking", JSON.stringify(updatedBookingInfo));
@@ -101,7 +124,7 @@ const ActivityPassengerDetails = () => {
       // Add this booking with a unique ID
       const bookingWithId = {
         ...updatedBookingInfo,
-        id: `activity-${Date.now()}`,
+        id: data?.id || `activity-${Date.now()}`,
         paymentComplete: false // Will be set to true after payment
       };
       

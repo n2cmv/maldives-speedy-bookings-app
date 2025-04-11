@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,6 +55,13 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
 
   useEffect(() => {
     if (booking) {
+      console.log("Loading booking into form:", {
+        id: booking.id,
+        activity: booking.activity,
+        is_activity_booking: booking.is_activity_booking,
+        mode: activityBookingMode ? "activity mode" : "regular mode"
+      });
+      
       setFormData({
         id: booking.id || '',
         user_email: booking.user_email || '',
@@ -79,7 +85,12 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
       setReturnDate(booking.return_date ? new Date(booking.return_date) : undefined);
       setSelectedActivity(booking.activity || null);
     } else {
-      // Reset form data when creating a new booking
+      const isNewActivityBooking = activityBookingMode === true;
+      
+      console.log("Creating new booking form:", {
+        mode: isNewActivityBooking ? "activity mode" : "regular mode"
+      });
+      
       setFormData({
         id: '',
         user_email: '',
@@ -96,12 +107,12 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         payment_complete: false,
         payment_reference: null,
         passenger_info: [],
-        activity: null,
-        is_activity_booking: activityBookingMode || false,
+        activity: isNewActivityBooking ? "New Activity" : null,
+        is_activity_booking: isNewActivityBooking,
       });
       setDate(undefined);
       setReturnDate(undefined);
-      setSelectedActivity(null);
+      setSelectedActivity(isNewActivityBooking ? "New Activity" : null);
     }
   }, [booking, activityBookingMode]);
 
@@ -117,11 +128,9 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         return_date: returnDate ? format(returnDate, 'yyyy-MM-dd') : null,
       };
 
-      // Ensure activity booking flags are set correctly
       if (activityBookingMode) {
         payload.is_activity_booking = true;
         
-        // Make sure activity field is never empty for an activity booking
         if (!payload.activity || payload.activity.trim() === '') {
           payload.activity = selectedActivity || "Unspecified Activity";
         }
@@ -131,12 +140,14 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
 
       let response;
       if (id) {
+        console.log(`Updating booking ID ${id} with activity flag: ${payload.is_activity_booking}, activity: ${payload.activity}`);
         response = await supabase
           .from('bookings')
           .update(payload)
           .eq('id', id)
           .select();
       } else {
+        console.log(`Creating new booking with activity flag: ${payload.is_activity_booking}, activity: ${payload.activity}`);
         response = await supabase
           .from('bookings')
           .insert([payload])
@@ -169,10 +180,18 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
     
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }));
+    if (name === 'activity' && activityBookingMode && value) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        is_activity_booking: true
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      }));
+    }
   };
   
   const handleActivityChange = (value: string) => {
@@ -180,7 +199,6 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
     setFormData(prev => ({
       ...prev,
       activity: value,
-      // Always ensure the activity booking flag is set when an activity is selected
       is_activity_booking: true
     }));
   };
@@ -387,14 +405,11 @@ const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode }: Bookin
         </>
       )}
       
-      {/* Always include a hidden field for is_activity_booking when in activity mode */}
-      {activityBookingMode && (
-        <input 
-          type="hidden" 
-          name="is_activity_booking" 
-          value="true" 
-        />
-      )}
+      <input 
+        type="hidden" 
+        name="is_activity_booking" 
+        value="true" 
+      />
       
       <div className="flex justify-end space-x-2">
         <Button variant="ghost" onClick={onCancel}>
