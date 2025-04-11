@@ -43,7 +43,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <div className="flex items-center justify-center mt-6">
         <img 
           src={bankLogoUrl} 
-          alt="Payment Methods" 
+          alt="Bank of Maldives Payment Gateway" 
           className="h-8 md:h-10 w-auto"
         />
       </div>

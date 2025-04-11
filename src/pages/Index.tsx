@@ -1,8 +1,11 @@
+
 import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import BmlPaymentHandler from "@/components/payment/BmlPaymentHandler";
+
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   useEffect(() => {
@@ -25,6 +28,9 @@ const Index = () => {
   return <div className="min-h-screen bg-[#F5F5F7] overflow-hidden relative">
       <div className="absolute top-20 right-10 w-60 h-60 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-80 h-80 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
+      
+      {/* BML Payment Handler component will verify returning payments */}
+      <BmlPaymentHandler />
       
       <div className="relative z-10">
         <Header />

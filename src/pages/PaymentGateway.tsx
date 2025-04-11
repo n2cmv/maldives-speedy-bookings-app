@@ -13,6 +13,7 @@ import PaymentProcessingScreen from "@/components/payment/PaymentProcessingScree
 import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
 import { generatePaymentReference } from "@/services/bookingService";
+import { createBmlPaymentSession } from "@/services/bmlPaymentService";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -25,6 +26,7 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
+  const [usingBmlGateway, setUsingBmlGateway] = useState(true); // Default to BML payment gateway
 
   useEffect(() => {
     // Handle regular booking
@@ -60,9 +62,69 @@ const PaymentGateway = () => {
     }
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setIsProcessing(true);
     
+    const totalAmount = calculateTotal();
+    
+    // If using BML payment gateway
+    if (usingBmlGateway && bookingInfo) {
+      try {
+        toast.info("Connecting to Bank of Maldives payment gateway", {
+          description: "You will be redirected to the secure BML payment page"
+        });
+        
+        const origin = window.location.origin;
+        const returnUrl = `${origin}/confirmation`;
+        const cancelUrl = `${origin}/payment?canceled=true`;
+        
+        const bmlPayment = await createBmlPaymentSession(
+          bookingInfo,
+          totalAmount,
+          returnUrl,
+          cancelUrl
+        );
+        
+        if (!bmlPayment.success || !bmlPayment.paymentUrl) {
+          throw new Error(bmlPayment.error || "Failed to initialize payment with Bank of Maldives");
+        }
+        
+        // Store payment reference
+        const paymentReference = bmlPayment.reference || bookingReference;
+        
+        // Store booking with payment reference before redirecting
+        if (activityBooking) {
+          // For activity bookings
+          localStorage.setItem('pendingActivityBooking', JSON.stringify({
+            ...activityBooking,
+            paymentReference,
+            paymentPending: true,
+            bmlPayment: true
+          }));
+        } else if (bookingInfo) {
+          // For regular speedboat bookings
+          localStorage.setItem('pendingBooking', JSON.stringify({
+            ...bookingInfo,
+            paymentReference,
+            paymentPending: true,
+            bmlPayment: true
+          }));
+        }
+        
+        // Redirect to BML payment page
+        window.location.href = bmlPayment.paymentUrl;
+        return;
+      } catch (error) {
+        console.error("Error with BML payment:", error);
+        toast.error("Payment gateway error", {
+          description: error instanceof Error ? error.message : "Failed to connect to payment gateway"
+        });
+        setIsProcessing(false);
+        return;
+      }
+    }
+    
+    // Fallback to simulation flow
     toast.info("Redirecting to payment gateway", {
       description: "You will be redirected to the Bank of Maldives payment page"
     });
@@ -124,6 +186,22 @@ const PaymentGateway = () => {
     
     return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
   };
+
+  // Check if we're returning from BML with payment status
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const canceled = searchParams.get('canceled') === 'true';
+    
+    if (canceled) {
+      toast.error("Payment canceled", {
+        description: "You canceled the payment process."
+      });
+      
+      // Clear any pending booking data
+      localStorage.removeItem('pendingBooking');
+      localStorage.removeItem('pendingActivityBooking');
+    } 
+  }, [location.search]);
 
   if (!bookingInfo && !activityBooking) {
     return null;
