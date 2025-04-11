@@ -1,22 +1,39 @@
+import { CheckCircle2, Mail, AlertTriangle } from "lucide-react";
 
-import { Check } from "lucide-react";
-import { useTranslation } from "react-i18next";
+interface ConfirmationHeaderProps {
+  booking: any;
+  isEmailSent: boolean;
+  isActivityBooking?: boolean;
+}
 
-const ConfirmationHeader = () => {
-  const { t } = useTranslation();
-  
+const ConfirmationHeader = ({ booking, isEmailSent, isActivityBooking = false }: ConfirmationHeaderProps) => {
   return (
-    <>
-      <div className="flex items-center justify-center mb-6">
-        <div className="bg-green-100 rounded-full p-3">
-          <Check className="h-8 w-8 text-green-600" />
+    <div className="bg-ocean-light/10 py-8 px-6 md:px-10 border-b border-gray-200">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-ocean-dark">
+            {isActivityBooking ? "Activity Booking Confirmed!" : "Booking Confirmed!"}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            {isActivitySent ? "Your booking has been successfully processed." : "Your booking is confirmed, and an email receipt has been sent."}
+          </p>
+        </div>
+        
+        <div className="flex items-center">
+          {isEmailSent ? (
+            <div className="flex items-center text-green-600">
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              <span>Confirmation email sent</span>
+            </div>
+          ) : (
+            <div className="flex items-center text-yellow-600">
+              <AlertTriangle className="h-5 w-5 mr-2" />
+              <span>Failed to send email. Please check your inbox.</span>
+            </div>
+          )}
         </div>
       </div>
-      
-      <h2 className="text-2xl font-bold text-ocean-dark text-center mb-6">
-        {t("confirmation.title")}
-      </h2>
-    </>
+    </div>
   );
 };
 

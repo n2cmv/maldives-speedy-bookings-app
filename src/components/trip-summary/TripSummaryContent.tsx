@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { CardContent } from '@/components/ui/card';
+import { BookingInfo } from '@/types/booking';
 import JourneyInfo from './JourneyInfo';
 import JourneySeparator from './JourneySeparator';
 import PriceSummary from './PriceSummary';
-import { BookingInfo } from '@/types/booking';
 import { format } from 'date-fns';
+import { CardContent } from '../ui/card';
 
 interface TripSummaryContentProps {
   bookingInfo: BookingInfo;
@@ -14,66 +14,77 @@ interface TripSummaryContentProps {
   adultCount: number;
   childCount: number;
   seniorCount: number;
+  isActivityBooking?: boolean;
 }
 
-const TripSummaryContent = ({ 
-  bookingInfo, 
-  totalPrice, 
-  pricePerPerson, 
-  adultCount, 
-  childCount, 
-  seniorCount 
+const TripSummaryContent = ({
+  bookingInfo,
+  totalPrice,
+  pricePerPerson,
+  adultCount,
+  childCount,
+  seniorCount,
+  isActivityBooking = false
 }: TripSummaryContentProps) => {
   const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
-  const journeyMultiplier = isReturnTrip ? 2 : 1;
   
-  // Format dates if available
-  const departureDate = bookingInfo.date ? format(new Date(bookingInfo.date), 'MMM d, yyyy') : '';
-  const returnDate = bookingInfo.returnTripDetails?.date 
-    ? format(new Date(bookingInfo.returnTripDetails.date), 'MMM d, yyyy') 
-    : '';
-    
+  // Format date for display if it exists
+  const formatDate = (date?: Date | string) => {
+    if (!date) return '';
+    return typeof date === 'string' ? date : format(new Date(date), 'MMM d, yyyy');
+  };
+  
   const passengerPrices = [
-    { type: 'Adult', count: adultCount, pricePerPerson, journeyMultiplier },
-    { type: 'Child', count: childCount, pricePerPerson, journeyMultiplier },
-    { type: 'Senior', count: seniorCount, pricePerPerson, journeyMultiplier }
+    { type: 'Adults', count: adultCount, pricePerPerson, journeyMultiplier: isReturnTrip ? 2 : 1 },
+    { type: 'Children', count: childCount, pricePerPerson, journeyMultiplier: isReturnTrip ? 2 : 1 },
+    { type: 'Seniors', count: seniorCount, pricePerPerson, journeyMultiplier: isReturnTrip ? 2 : 1 }
   ];
 
   return (
-    <CardContent className="pt-6 bg-white">
-      <div className="relative">
-        {/* Outbound Journey */}
-        <JourneyInfo 
-          from={bookingInfo.from || 'Departure'} 
-          to={bookingInfo.island} 
-          time={bookingInfo.time} 
-          date={departureDate}
-          isReturnTrip={!!isReturnTrip}
-        />
-        
-        {/* Return Journey (if applicable) */}
-        {isReturnTrip && bookingInfo.returnTripDetails && (
-          <>
-            <JourneySeparator />
-            
-            <JourneyInfo 
-              from={bookingInfo.returnTripDetails.from} 
-              to={bookingInfo.returnTripDetails.island} 
-              time={bookingInfo.returnTripDetails.time} 
-              date={returnDate}
-              isReturn
-              isReturnTrip={true}
-            />
-          </>
-        )}
-        
-        <div className="border-t border-dashed border-ocean-light/30 my-4"></div>
-        
-        <PriceSummary 
-          passengerPrices={passengerPrices} 
+    <CardContent className="p-6">
+      {isActivityBooking ? (
+        // Activity Booking Summary
+        <>
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-ocean mb-2">{bookingInfo.activity}</h3>
+            <p className="text-sm text-gray-500">
+              {bookingInfo.date && formatDate(bookingInfo.date)} • {bookingInfo.time}
+            </p>
+          </div>
+        </>
+      ) : (
+        // Regular Trip Summary (Speedboat)
+        <>
+          <JourneyInfo
+            from={bookingInfo.from}
+            to={bookingInfo.island}
+            time={bookingInfo.time}
+            date={bookingInfo.date ? formatDate(bookingInfo.date) : ''}
+            isReturnTrip={isReturnTrip}
+          />
+          
+          {isReturnTrip && bookingInfo.returnTripDetails && (
+            <>
+              <JourneySeparator />
+              <JourneyInfo
+                from={bookingInfo.returnTripDetails.from || bookingInfo.island}
+                to={bookingInfo.returnTripDetails.island || bookingInfo.from}
+                time={bookingInfo.returnTripDetails.time}
+                date={bookingInfo.returnTripDetails.date ? formatDate(bookingInfo.returnTripDetails.date) : ''}
+                isReturn={true}
+                isReturnTrip={true}
+              />
+            </>
+          )}
+        </>
+      )}
+      
+      <div className="border-t border-dashed border-ocean-light/20 my-4 pt-4">
+        <PriceSummary
+          passengerPrices={passengerPrices}
           totalPrice={totalPrice}
           pricePerPerson={pricePerPerson}
-          isReturnTrip={!!isReturnTrip}
+          isReturnTrip={!isActivityBooking && isReturnTrip}
         />
       </div>
     </CardContent>

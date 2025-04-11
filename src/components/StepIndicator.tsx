@@ -11,6 +11,10 @@ type Step = {
   path: string;
 };
 
+interface StepIndicatorProps {
+  currentStep?: number;
+}
+
 const steps: Step[] = [
   { id: 1, name: "Select Island", path: "/booking" },
   { id: 2, name: "Passenger Details", path: "/passenger-details" },
@@ -18,13 +22,19 @@ const steps: Step[] = [
   { id: 4, name: "Confirmation", path: "/confirmation" },
 ];
 
-const StepIndicator = () => {
+const StepIndicator = ({ currentStep: propCurrentStep }: StepIndicatorProps) => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // Find the current step based on path
-  const currentStepIndex = steps.findIndex(step => step.path === currentPath);
-  const currentStep = currentStepIndex !== -1 ? currentStepIndex + 1 : 1;
+  // Find the current step based on path or use the prop value
+  let currentStep: number;
+  
+  if (propCurrentStep !== undefined) {
+    currentStep = propCurrentStep;
+  } else {
+    const currentStepIndex = steps.findIndex(step => step.path === currentPath);
+    currentStep = currentStepIndex !== -1 ? currentStepIndex + 1 : 1;
+  }
   
   // Calculate progress percentage
   const progressPercentage = Math.round((currentStep / steps.length) * 100);
