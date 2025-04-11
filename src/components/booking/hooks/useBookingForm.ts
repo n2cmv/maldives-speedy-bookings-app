@@ -73,19 +73,15 @@ export const useBookingForm = ({
     const MAX_PASSENGERS = 15;
     
     if (!booking.from || !booking.island || !booking.time || booking.seats < 1 || !departureDate) {
-      toast({
-        title: t("booking.form.invalidBooking", "Invalid booking"),
-        description: t("booking.form.fillOutboundFields", "Please fill in all the outbound journey fields correctly."),
-        variant: "destructive"
+      toast(t("booking.form.invalidBooking", "Invalid booking"), {
+        description: t("booking.form.fillOutboundFields", "Please fill in all the outbound journey fields correctly.")
       });
       return;
     }
     
     if (booking.seats > MAX_PASSENGERS) {
-      toast({
-        title: t("booking.form.tooManyPassengers", "Too many passengers"),
-        description: t("booking.form.maxPassengers", `Maximum ${MAX_PASSENGERS} passengers allowed per booking.`),
-        variant: "destructive"
+      toast(t("booking.form.tooManyPassengers", "Too many passengers"), {
+        description: t("booking.form.maxPassengers", `Maximum ${MAX_PASSENGERS} passengers allowed per booking.`)
       });
       return;
     }
