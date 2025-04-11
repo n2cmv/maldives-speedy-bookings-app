@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { testBmlApiConnection, openBmlTestPage } from "@/services/bmlPaymentService";
+import { testBmlApiConnection, openBmlTestPage, API_BASE_URL, BML_CONFIG } from "@/services/bmlPaymentService";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Header from "@/components/Header";
