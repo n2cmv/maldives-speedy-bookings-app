@@ -14,8 +14,10 @@ import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
-import { createBmlPaymentSession } from "@/services/bmlPaymentService";
+import { createBmlPaymentSession, BMLSettings } from "@/services/bmlPaymentService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -31,6 +33,7 @@ const PaymentGateway = () => {
   const [paymentMethod, setPaymentMethod] = useState("bml"); // Default to BML payment gateway
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isSimulationMode, setIsSimulationMode] = useState(false);
+  const [forceRealMode, setForceRealMode] = useState(false);
 
   useEffect(() => {
     // Handle regular booking
@@ -116,11 +119,21 @@ const PaymentGateway = () => {
           throw new Error("Missing booking information");
         }
         
+        // Set up BML settings based on the user's preference
+        const bmlSettings: BMLSettings = {
+          forceRealMode: forceRealMode,
+          disableSimulation: false,
+          apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+        };
+
+        console.log("Using BML settings:", bmlSettings);
+        
         const bmlPayment = await createBmlPaymentSession(
           bookingForBml,
           totalAmount,
           returnUrl,
-          cancelUrl
+          cancelUrl,
+          bmlSettings
         );
         
         if (!bmlPayment.success) {
@@ -146,7 +159,8 @@ const PaymentGateway = () => {
             paymentReference,
             paymentPending: true,
             bmlPayment: true,
-            isSimulationMode: bmlPayment.error?.includes("simulation") || false
+            isSimulationMode: bmlPayment.error?.includes("simulation") || false,
+            bmlSettings
           }));
         } else if (bookingInfo) {
           // For regular speedboat bookings
@@ -155,7 +169,8 @@ const PaymentGateway = () => {
             paymentReference,
             paymentPending: true,
             bmlPayment: true,
-            isSimulationMode: bmlPayment.error?.includes("simulation") || false
+            isSimulationMode: bmlPayment.error?.includes("simulation") || false,
+            bmlSettings
           }));
         }
         
@@ -320,6 +335,24 @@ const PaymentGateway = () => {
                   bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
                 />
+                
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                  <h3 className="text-sm font-medium mb-3">Developer Options</h3>
+                  <div className="flex items-center space-x-2">
+                    <Switch 
+                      id="force-real-mode" 
+                      checked={forceRealMode} 
+                      onCheckedChange={setForceRealMode} 
+                    />
+                    <Label htmlFor="force-real-mode" className="text-sm">
+                      Force real payment mode (disable simulation fallback)
+                    </Label>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    When enabled, the system will attempt to use the real BML payment gateway without falling back to simulation mode.
+                    This might result in errors if the gateway is not reachable.
+                  </p>
+                </div>
                 
                 <PaymentMethodSelector
                   selectedMethod={paymentMethod}

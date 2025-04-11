@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2, AlertCircle, CheckCircle, AlertTriangle } from "lucide-react";
-import { verifyBmlPayment } from "@/services/bmlPaymentService";
+import { verifyBmlPayment, BMLSettings } from "@/services/bmlPaymentService";
 import { BookingInfo } from "@/types/booking";
 
 const BmlPaymentHandler = () => {
@@ -65,8 +65,16 @@ const BmlPaymentHandler = () => {
           hasBmlPayment: !!pendingData.bmlPayment,
           hasReference: !!pendingData.paymentReference,
           reference: pendingData.paymentReference,
-          isSimulation: !!pendingData.isSimulationMode
+          isSimulation: !!pendingData.isSimulationMode,
+          bmlSettings: pendingData.bmlSettings
         });
+        
+        // Get any stored BML settings or use defaults
+        const bmlSettings: BMLSettings = pendingData.bmlSettings || {
+          forceRealMode: false,
+          disableSimulation: false,
+          apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+        };
         
         // Check if this is using simulation mode
         if (pendingData.isSimulationMode) {
@@ -119,9 +127,9 @@ const BmlPaymentHandler = () => {
           return;
         }
         
-        // Verify payment with BML
+        // Verify payment with BML using any stored settings
         console.log("BML Handler: Verifying payment with reference:", pendingData.paymentReference);
-        const verification = await verifyBmlPayment(pendingData.paymentReference);
+        const verification = await verifyBmlPayment(pendingData.paymentReference, bmlSettings);
         console.log("BML Handler: Verification result:", verification);
         
         if (verification.success && verification.verified) {

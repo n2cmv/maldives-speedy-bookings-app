@@ -21,20 +21,35 @@ export const BML_CONFIG: BMLPaymentConfig = {
   apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImI4M2M4YzZiLTEyYmMtNGIyZS04NjQwLTVkOWU2Njc4NmFkYyIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NDM4MzkzNiwiZXhwIjo0OTAwMDU3NTM2fQ._09EMmA2kYHhHd1ytmBIEv0oAgn_8pakQkviFino9Vo"
 };
 
+// BML Settings
+export interface BMLSettings {
+  forceRealMode: boolean;
+  disableSimulation: boolean;
+  apiBaseUrl: string;
+}
+
+// Default BML settings
+export const defaultBmlSettings: BMLSettings = {
+  forceRealMode: false,
+  disableSimulation: false,
+  apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+};
+
 // BML API endpoints 
 export const API_BASE_URL = "https://api.merchants.bankofmaldives.com.mv";
 const CREATE_PAYMENT_ENDPOINT = "/public/v1/payments";
 
 // Helper function to ensure we have the full URL for API endpoints
-export const getApiUrl = (endpoint: string): string => {
-  return `${API_BASE_URL}${endpoint}`;
+export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
+  const baseUrl = settings?.apiBaseUrl || API_BASE_URL;
+  return `${baseUrl}${endpoint}`;
 };
 
 /**
  * Tests the BML API connection
  * @returns Promise with the connection status
  */
-export async function testBmlApiConnection(): Promise<{
+export async function testBmlApiConnection(settings?: BMLSettings): Promise<{
   success: boolean;
   message: string;
   details?: any;
@@ -42,7 +57,7 @@ export async function testBmlApiConnection(): Promise<{
   try {
     console.log("BML Service: Testing API connection");
     // Send a simple HEAD request to check if API is reachable
-    const response = await fetch(getApiUrl("/public/v1/health"), {
+    const response = await fetch(getApiUrl("/public/v1/health", settings), {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
@@ -88,14 +103,18 @@ export async function testBmlApiConnection(): Promise<{
  * @param amount The payment amount in USD
  * @param returnUrl The URL to return to after payment completion
  * @param cancelUrl The URL to return to if payment is canceled
+ * @param settings Optional settings to configure BML payment behavior
  */
 export async function createBmlPaymentSession(
   booking: BookingInfo, 
   amount: number,
   returnUrl: string,
-  cancelUrl: string
+  cancelUrl: string,
+  settings?: BMLSettings
 ): Promise<BMLPaymentResponse> {
+  const bmlSettings = settings || defaultBmlSettings;
   console.log("BML Service: Creating payment session with amount:", amount);
+  console.log("BML Service: Using settings:", bmlSettings);
   
   try {
     // Generate a unique transaction ID for this payment
@@ -137,56 +156,66 @@ export async function createBmlPaymentSession(
     console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
 
     // Make API request to BML to create a payment session
-    const response = await fetch(getApiUrl(CREATE_PAYMENT_ENDPOINT), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
-        'mode': 'cors'
-      },
-      body: JSON.stringify(paymentData)
-    });
+    try {
+      // Attempt to connect to the real BML API
+      const response = await fetch(getApiUrl(CREATE_PAYMENT_ENDPOINT, bmlSettings), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
+          'mode': 'cors'
+        },
+        body: JSON.stringify(paymentData)
+      });
 
-    const responseStatus = response.status;
-    console.log("BML Service: Payment request status:", responseStatus);
-    
-    const data = await response.json();
-    console.log("BML Service: Payment request response:", JSON.stringify(data, null, 2));
+      const responseStatus = response.status;
+      console.log("BML Service: Payment request status:", responseStatus);
+      
+      const data = await response.json();
+      console.log("BML Service: Payment request response:", JSON.stringify(data, null, 2));
 
-    if (!response.ok) {
-      console.error("BML Service: Payment request error:", data);
-      return {
-        success: false,
-        error: data.message || `Failed to initialize payment (Status ${responseStatus})`
-      };
-    }
+      if (!response.ok) {
+        console.error("BML Service: Payment request error:", data);
+        return {
+          success: false,
+          error: data.message || `Failed to initialize payment (Status ${responseStatus})`
+        };
+      }
 
-    // Now using production endpoint, which should return the proper payment URL
-    return {
-      success: true,
-      paymentUrl: data.redirectUrl || data.checkoutUrl,
-      reference: txnId
-    };
-  } catch (error) {
-    console.error("BML Service: Error creating payment:", error);
-    
-    // If we get a "Failed to fetch" error, provide a simulation option
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.log("BML Service: Network error detected, providing fallback simulation");
-      
-      // Generate a reference and simulate success for dev/test environments
-      const simulatedRef = `SIM-${Date.now()}`;
-      
-      // In development/test environments, provide a fallback URL to the test payment page
-      const testPageUrl = "https://merchants.bankofmaldives.com.mv/test-payment-page";
-      
+      // Now using production endpoint, which should return the proper payment URL
       return {
         success: true,
-        paymentUrl: testPageUrl,
-        reference: simulatedRef,
-        error: "Using simulation mode due to network issues connecting to BML API"
+        paymentUrl: data.redirectUrl || data.checkoutUrl,
+        reference: txnId
       };
+    } catch (error) {
+      // Only use simulation if not explicitly disabled
+      if (bmlSettings.disableSimulation) {
+        throw error;
+      }
+      
+      // Check if we should use simulation mode
+      if (error instanceof TypeError && error.message === "Failed to fetch" && !bmlSettings.forceRealMode) {
+        console.log("BML Service: Network error detected, providing fallback simulation");
+        
+        // Generate a reference and simulate success for dev/test environments
+        const simulatedRef = `SIM-${Date.now()}`;
+        
+        // In development/test environments, provide a fallback URL to the test payment page
+        const testPageUrl = "https://merchants.bankofmaldives.com.mv/test-payment-page";
+        
+        return {
+          success: true,
+          paymentUrl: testPageUrl,
+          reference: simulatedRef,
+          error: "Using simulation mode due to network issues connecting to BML API"
+        };
+      } else {
+        throw error;
+      }
     }
+  } catch (error) {
+    console.error("BML Service: Error creating payment:", error);
     
     return {
       success: false,
@@ -199,17 +228,34 @@ export async function createBmlPaymentSession(
  * Verify the status of a BML payment
  * @param transactionId The transaction ID to verify
  */
-export async function verifyBmlPayment(transactionId: string): Promise<{
+export async function verifyBmlPayment(
+  transactionId: string,
+  settings?: BMLSettings
+): Promise<{
   success: boolean;
   verified: boolean;
   status?: string;
   error?: string;
   rawResponse?: any;
 }> {
+  const bmlSettings = settings || defaultBmlSettings;
   console.log("BML Service: Verifying payment with transaction ID:", transactionId);
   
   try {
-    const verifyUrl = getApiUrl(`/public/v1/payments/${transactionId}/status`);
+    // If simulation mode is not disabled and this is a simulated transaction
+    if (!bmlSettings.disableSimulation && transactionId.startsWith("SIM-")) {
+      console.log("BML Service: Detected simulated transaction ID, skipping actual verification");
+      
+      return {
+        success: true,
+        verified: true,
+        status: "COMPLETED",
+        error: "Using simulation mode"
+      };
+    }
+    
+    // For real verification
+    const verifyUrl = getApiUrl(`/public/v1/payments/${transactionId}/status`, bmlSettings);
     console.log("BML Service: Verification URL:", verifyUrl);
     
     const response = await fetch(verifyUrl, {
@@ -254,18 +300,20 @@ export async function verifyBmlPayment(transactionId: string): Promise<{
   } catch (error) {
     console.error("BML Service: Error verifying payment:", error);
     
-    // For dev/test environments, simulate payment verification
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.log("BML Service: Network error detected on verification, providing simulated verification");
-      
-      // If the transaction ID starts with "SIM-", treat it as a simulated payment
-      if (transactionId.startsWith("SIM-")) {
-        return {
-          success: true,
-          verified: true,
-          status: "COMPLETED",
-          error: "Using simulation mode due to network issues"
-        };
+    // For dev/test environments with simulated payments
+    if (!bmlSettings.disableSimulation) {
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        console.log("BML Service: Network error detected on verification, providing simulated verification");
+        
+        // If the transaction ID starts with "SIM-", treat it as a simulated payment
+        if (transactionId.startsWith("SIM-")) {
+          return {
+            success: true,
+            verified: true,
+            status: "COMPLETED",
+            error: "Using simulation mode due to network issues"
+          };
+        }
       }
     }
     
