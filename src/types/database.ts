@@ -33,4 +33,6 @@ export interface BookingData {
   passenger_info: any[];
   created_at: string;
   updated_at: string;
+  activity?: string | null;
+  is_activity_booking?: boolean;
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ interface BookingFormProps {
   booking?: any;
   onSaved: () => void;
   onCancel: () => void;
+  activityBookingMode?: boolean;
 }
 
 interface Passenger {
@@ -49,7 +51,13 @@ const availableIslands: Island[] = [
   'A.Dh Dhigurah', 'A.Dh Dhangethi', 'Aa. Mathiveri', 'Male\' City', 'Male\' Airport'
 ];
 
-const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
+const availableActivities = [
+  'Snorkeling Trip', 'Island Hopping Tour', 'Dolphin Watching Cruise',
+  'Sunset Fishing', 'Sandbank Trip', 'Diving Experience', 'Jet Ski Tour',
+  'Parasailing Adventure', 'Submarine Trip', 'Whale Shark Excursion'
+];
+
+const BookingForm = ({ booking, onSaved, onCancel, activityBookingMode = false }: BookingFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
@@ -101,6 +109,9 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
       }
     ]
   );
+  const [activity, setActivity] = useState<string>(
+    booking?.activity || ''
+  );
 
   const handleAddPassenger = () => {
     const newPassenger: Passenger = {
@@ -131,22 +142,42 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!fromLocation || !toLocation || !departureDate || !departureTime || !userEmail) {
+    if (!userEmail) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please enter a customer email",
         variant: "destructive",
       });
       return;
     }
-    
-    if (hasReturnTrip && (!returnFromLocation || !returnToLocation || !returnDate || !returnTime)) {
-      toast({
-        title: "Error",
-        description: "Please fill in all return trip fields",
-        variant: "destructive",
-      });
-      return;
+
+    if (activityBookingMode) {
+      if (!activity || !departureDate || !departureTime) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required activity fields",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      if (!fromLocation || !toLocation || !departureDate || !departureTime) {
+        toast({
+          title: "Error",
+          description: "Please fill in all required fields",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (hasReturnTrip && (!returnFromLocation || !returnToLocation || !returnDate || !returnTime)) {
+        toast({
+          title: "Error",
+          description: "Please fill in all return trip fields",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -168,7 +199,10 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         return_time: hasReturnTrip ? returnTime as string : null,
         payment_complete: paymentComplete,
         payment_reference: paymentReference || null,
-        passenger_info: passengerInfoAsJson
+        passenger_info: passengerInfoAsJson,
+        // Add activity fields if in activity booking mode
+        activity: activityBookingMode ? activity : null,
+        is_activity_booking: activityBookingMode
       };
 
       if (booking) {
@@ -250,153 +284,31 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
         </label>
       </div>
 
-      <div className="border-t pt-3">
-        <h3 className="text-sm font-medium mb-3">Outbound Trip</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label htmlFor="fromLocation" className="text-sm">From</Label>
-            <Select
-              value={fromLocation}
-              onValueChange={(value) => setFromLocation(value as Island)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableIslands.map((island) => (
-                  <SelectItem key={island} value={island}>
-                    {island}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="toLocation" className="text-sm">To</Label>
-            <Select
-              value={toLocation}
-              onValueChange={(value) => setToLocation(value as Island)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Select destination" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableIslands.map((island) => (
-                  <SelectItem key={island} value={island}>
-                    {island}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-sm">Departure Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal h-9"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {departureDate ? (
-                    format(departureDate, "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={departureDate}
-                  onSelect={setDepartureDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="departureTime" className="text-sm">Departure Time</Label>
-            <Select
-              value={departureTime}
-              onValueChange={(value) => setDepartureTime(value as Time)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Select time" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableTimes.map((time) => (
-                  <SelectItem key={time} value={time}>
-                    {time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="hasReturnTrip"
-          checked={hasReturnTrip}
-          onCheckedChange={(checked) => setHasReturnTrip(checked as boolean)}
-        />
-        <label
-          htmlFor="hasReturnTrip"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Include Return Trip
-        </label>
-      </div>
-
-      {hasReturnTrip && (
+      {activityBookingMode ? (
         <div className="border-t pt-3">
-          <h3 className="text-sm font-medium mb-3">Return Trip</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <h3 className="text-sm font-medium mb-3">Activity Booking</h3>
+          <div className="grid grid-cols-1 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="returnFromLocation" className="text-sm">From</Label>
+              <Label htmlFor="activity" className="text-sm">Activity</Label>
               <Select
-                value={returnFromLocation}
-                onValueChange={(value) => setReturnFromLocation(value as Island)}
+                value={activity}
+                onValueChange={(value) => setActivity(value)}
               >
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select location" />
+                  <SelectValue placeholder="Select activity" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableIslands.map((island) => (
-                    <SelectItem key={island} value={island}>
-                      {island}
+                  {availableActivities.map((act) => (
+                    <SelectItem key={act} value={act}>
+                      {act}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-
+            
             <div className="space-y-1">
-              <Label htmlFor="returnToLocation" className="text-sm">To</Label>
-              <Select
-                value={returnToLocation}
-                onValueChange={(value) => setReturnToLocation(value as Island)}
-              >
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select destination" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableIslands.map((island) => (
-                    <SelectItem key={island} value={island}>
-                      {island}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-sm">Return Date</Label>
+              <Label className="text-sm">Activity Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -404,8 +316,8 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
                     className="w-full justify-start text-left font-normal h-9"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {returnDate ? (
-                      format(returnDate, "PPP")
+                    {departureDate ? (
+                      format(departureDate, "PPP")
                     ) : (
                       <span>Pick a date</span>
                     )}
@@ -414,8 +326,8 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={returnDate}
-                    onSelect={setReturnDate}
+                    selected={departureDate}
+                    onSelect={setDepartureDate}
                     initialFocus
                   />
                 </PopoverContent>
@@ -423,10 +335,10 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="returnTime" className="text-sm">Return Time</Label>
+              <Label htmlFor="departureTime" className="text-sm">Activity Time</Label>
               <Select
-                value={returnTime}
-                onValueChange={(value) => setReturnTime(value as Time)}
+                value={departureTime}
+                onValueChange={(value) => setDepartureTime(value as Time)}
               >
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select time" />
@@ -442,6 +354,202 @@ const BookingForm = ({ booking, onSaved, onCancel }: BookingFormProps) => {
             </div>
           </div>
         </div>
+      ) : (
+        <>
+          <div className="border-t pt-3">
+            <h3 className="text-sm font-medium mb-3">Outbound Trip</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="fromLocation" className="text-sm">From</Label>
+                <Select
+                  value={fromLocation}
+                  onValueChange={(value) => setFromLocation(value as Island)}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableIslands.map((island) => (
+                      <SelectItem key={island} value={island}>
+                        {island}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="toLocation" className="text-sm">To</Label>
+                <Select
+                  value={toLocation}
+                  onValueChange={(value) => setToLocation(value as Island)}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Select destination" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableIslands.map((island) => (
+                      <SelectItem key={island} value={island}>
+                        {island}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-sm">Departure Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal h-9"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {departureDate ? (
+                        format(departureDate, "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={departureDate}
+                      onSelect={setDepartureDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="departureTime" className="text-sm">Departure Time</Label>
+                <Select
+                  value={departureTime}
+                  onValueChange={(value) => setDepartureTime(value as Time)}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Select time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTimes.map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="hasReturnTrip"
+              checked={hasReturnTrip}
+              onCheckedChange={(checked) => setHasReturnTrip(checked as boolean)}
+            />
+            <label
+              htmlFor="hasReturnTrip"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Include Return Trip
+            </label>
+          </div>
+
+          {hasReturnTrip && (
+            <div className="border-t pt-3">
+              <h3 className="text-sm font-medium mb-3">Return Trip</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="returnFromLocation" className="text-sm">From</Label>
+                  <Select
+                    value={returnFromLocation}
+                    onValueChange={(value) => setReturnFromLocation(value as Island)}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableIslands.map((island) => (
+                        <SelectItem key={island} value={island}>
+                          {island}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="returnToLocation" className="text-sm">To</Label>
+                  <Select
+                    value={returnToLocation}
+                    onValueChange={(value) => setReturnToLocation(value as Island)}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Select destination" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableIslands.map((island) => (
+                        <SelectItem key={island} value={island}>
+                          {island}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-sm">Return Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal h-9"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {returnDate ? (
+                          format(returnDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={returnDate}
+                        onSelect={setReturnDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="returnTime" className="text-sm">Return Time</Label>
+                  <Select
+                    value={returnTime}
+                    onValueChange={(value) => setReturnTime(value as Time)}
+                  >
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Select time" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTimes.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <div className="border-t pt-3">
