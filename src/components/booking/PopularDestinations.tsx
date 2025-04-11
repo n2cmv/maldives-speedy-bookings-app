@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Sun, Building, Anchor, Plane } from "lucide-react";
 
 interface PopularDestinationsProps {
-  onSelectFromIsland: (island: string) => void;
+  onSelectToIsland: (island: string) => void;
 }
 
-const PopularDestinations = ({ onSelectFromIsland }: PopularDestinationsProps) => {
+const PopularDestinations = ({ onSelectToIsland }: PopularDestinationsProps) => {
   const popularIslands = [
     { name: "Dhigurah", icon: <Sun className="text-yellow-500" size={16} /> },
     { name: "Dhangethi", icon: <Building className="text-blue-500" size={16} /> },
@@ -24,7 +24,7 @@ const PopularDestinations = ({ onSelectFromIsland }: PopularDestinationsProps) =
             variant="outline"
             size="sm"
             className="bg-white text-ocean-dark border-ocean-light/30 hover:bg-ocean/5 rounded-full pl-3 pr-4 py-5 flex gap-2 items-center font-medium transition-all"
-            onClick={() => onSelectFromIsland(island.name)}
+            onClick={() => onSelectToIsland(island.name)}
           >
             {island.icon}
             {island.name}
