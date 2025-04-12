@@ -27,6 +27,8 @@ const BmlPaymentHandler = () => {
           return;
         }
         
+        console.log("Verifying payment transaction:", transactionId);
+        
         // Verify the payment status
         const result = await bmlPaymentService.verifyPayment(transactionId);
         
@@ -40,6 +42,7 @@ const BmlPaymentHandler = () => {
             navigate("/");
           }
         } else {
+          console.log("Payment failed with status:", result.status);
           toast.error(`Payment ${result.status.toLowerCase()}`);
           navigate("/payment", { 
             state: { 

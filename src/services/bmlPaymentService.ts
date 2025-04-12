@@ -7,16 +7,20 @@ export const bmlPaymentService = {
   // Create a new payment transaction
   async createPayment(booking: BookingInfo): Promise<{ redirectUrl: string, transactionId: string }> {
     try {
-      // Calculate total amount (in cents, as required by BML API)
+      // Calculate total amount (in MVR, as required by BML API)
       const totalAmount = calculateTotalAmount(booking);
       
+      if (totalAmount <= 0) {
+        throw new Error("Invalid payment amount");
+      }
+
       const paymentPayload = {
-        amount: totalAmount * 100, // Convert to cents
+        amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
         currency: "MVR", // Maldivian rufiyaa
         provider: "bml_epos", // BML payment method
         signMethod: "sha1",
         paymentReference: booking.paymentReference,
-        customerReference: `Booking for ${booking.from} to ${booking.island}`,
+        customerReference: `Booking for ${booking.from || 'Male'} to ${booking.island || booking.to || 'Resort Island'}`,
         redirectUrl: `${window.location.origin}/confirmation?transaction=`,
         appVersion: "RetourMaldives_1.0"
       };
@@ -32,6 +36,7 @@ export const bmlPaymentService = {
       }
       
       if (!data || !data.id || !data.qrcode?.url) {
+        console.error("Invalid payment response:", data);
         throw new Error("Invalid payment response received");
       }
       
@@ -77,7 +82,9 @@ export const bmlPaymentService = {
 // Helper function to calculate total amount
 function calculateTotalAmount(booking: BookingInfo): number {
   const PRICE_PER_PERSON = 70; // USD per person per way
-  const totalPassengers = booking.passengers?.length || booking.seats || 0;
+  
+  // Handle cases where booking information might be incomplete
+  const totalPassengers = booking.passengers?.length || booking.seats || 1;
   const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
   const journeyMultiplier = isReturnTrip ? 2 : 1;
   

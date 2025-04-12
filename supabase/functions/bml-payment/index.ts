@@ -66,9 +66,9 @@ async function createPayment(req: Request) {
     const bmlPayload = {
       amount: amount,
       currency: currency,
-      redirectUrl: BML_MERCHANT_DETAILS.domain + "confirmation?transaction=",
-      customerReference: customerReference,
-      merchantReference: paymentReference
+      redirectUrl: `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=`,
+      customerReference: customerReference || "Booking Payment",
+      merchantReference: paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`
     };
     
     console.log('Creating payment with BML Connect:', JSON.stringify(bmlPayload));
@@ -107,7 +107,7 @@ async function createPayment(req: Request) {
       .insert({
         transaction_id: bmlResponse.id,
         local_id: localId,
-        customer_reference: customerReference,
+        customer_reference: customerReference || "Booking Payment",
         booking_reference: paymentReference,
         amount,
         currency,
@@ -144,7 +144,7 @@ async function createPayment(req: Request) {
   } catch (error) {
     console.error('Error creating payment:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', message: error.message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -259,7 +259,7 @@ async function verifyPayment(req: Request) {
   } catch (error) {
     console.error('Error verifying payment:', error);
     return new Response(
-      JSON.stringify({ state: 'FAILED', error: 'Internal server error' }),
+      JSON.stringify({ state: 'FAILED', error: 'Internal server error', message: error.message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }

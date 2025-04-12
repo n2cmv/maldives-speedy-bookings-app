@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -92,7 +91,12 @@ const PaymentGateway = () => {
           paymentData = {
             ...activityBooking,
             paymentReference,
-            paymentMethod
+            paymentMethod,
+            from: "Male", // Set default values for missing fields
+            to: activityBooking.activityName || "Activity",
+            island: activityBooking.location || "Maldives",
+            // Ensure we have non-empty values for required fields
+            seats: activityBooking.adultCount + (activityBooking.childCount || 0)
           };
         } else if (bookingInfo) {
           paymentData = {
@@ -117,7 +121,7 @@ const PaymentGateway = () => {
           }
           
           // Redirect to BML payment page
-          window.location.href = result.redirectUrl + "?transaction=" + result.transactionId;
+          window.location.href = result.redirectUrl;
         }
       }
       // For regular bank transfer payments
