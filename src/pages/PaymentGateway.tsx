@@ -5,7 +5,7 @@ import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, AlertCircle, InfoIcon } from "lucide-react";
+import { ChevronLeft, InfoIcon } from "lucide-react";
 import StepIndicator from "@/components/StepIndicator";
 import HeaderExtras from "@/components/HeaderExtras";
 import { motion } from "framer-motion";
@@ -14,9 +14,7 @@ import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
-import { createBmlPaymentSession, BMLSettings, testBmlApiConnection, getBmlWebhookUrl } from "@/services/bmlPaymentService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Label } from "@/components/ui/label";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -29,15 +27,10 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bml"); // Default to BML payment gateway
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer"); // Default to bank transfer
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [apiStatus, setApiStatus] = useState<{ success: boolean; message: string } | null>(null);
-  const [isTestingApi, setIsTestingApi] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState<string>("");
 
   useEffect(() => {
-    setWebhookUrl(getBmlWebhookUrl());
-    
     if (!location.state?.isActivityBooking) {
       const booking = location.state as BookingInfo | null;
       if (!booking) {
@@ -70,29 +63,7 @@ const PaymentGateway = () => {
       localStorage.removeItem('pendingBooking');
       localStorage.removeItem('pendingActivityBooking');
     }
-    
-    // Test API connection on load
-    checkApiConnection();
   }, [location.state, location.search, navigate]);
-  
-  const checkApiConnection = async () => {
-    setIsTestingApi(true);
-    try {
-      const settings: BMLSettings = {
-        apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
-      };
-      
-      const result = await testBmlApiConnection(settings);
-      setApiStatus(result);
-    } catch (error) {
-      setApiStatus({ 
-        success: false, 
-        message: error instanceof Error ? error.message : "Failed to test API connection" 
-      });
-    } finally {
-      setIsTestingApi(false);
-    }
-  };
 
   const handleGoBack = () => {
     if (activityBooking) {
@@ -108,87 +79,47 @@ const PaymentGateway = () => {
     
     const totalAmount = calculateTotal();
     
-    if (paymentMethod === "bml") {
-      try {
-        toast.info("Connecting to Bank of Maldives payment gateway", {
-          description: "You will be redirected to the secure BML payment page"
-        });
-        
-        const origin = window.location.origin;
-        const returnUrl = `${origin}/`;
-        const cancelUrl = `${origin}/payment?canceled=true`;
-        
-        const bookingForBml = activityBooking ? {
-          from: "Activity Booking",
-          island: activityBooking.activity?.name || "Activity",
-          date: activityBooking.date,
-          passengers: [{ 
-            name: activityBooking.fullName,
-            email: activityBooking.email,
-            phone: activityBooking.phone,
-            countryCode: activityBooking.countryCode
-          }]
-        } as BookingInfo : bookingInfo;
-        
-        if (!bookingForBml) {
-          throw new Error("Missing booking information");
-        }
-        
-        const bmlSettings: BMLSettings = {
-          apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+    try {
+      // Simulate a payment process
+      toast.info("Processing payment...");
+      
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generate a payment reference
+      const paymentReference = bookingReference;
+      
+      // Store completed booking data
+      if (activityBooking) {
+        const completedBooking = {
+          ...activityBooking,
+          paymentComplete: true,
+          paymentReference,
+          paymentMethod
         };
-
-        console.log("Using BML settings:", bmlSettings);
         
-        const bmlPayment = await createBmlPaymentSession(
-          bookingForBml,
-          totalAmount,
-          returnUrl,
-          cancelUrl,
-          bmlSettings
-        );
+        navigate("/confirmation", { state: completedBooking });
+      } else if (bookingInfo) {
+        const completedBooking = {
+          ...bookingInfo,
+          paymentComplete: true,
+          paymentReference,
+          paymentMethod
+        };
         
-        if (!bmlPayment.success) {
-          throw new Error(bmlPayment.error || "Failed to initialize payment with Bank of Maldives");
-        }
-        
-        const paymentReference = bmlPayment.reference || bookingReference;
-        
-        if (activityBooking) {
-          localStorage.setItem('pendingActivityBooking', JSON.stringify({
-            ...activityBooking,
-            paymentReference,
-            paymentPending: true,
-            bmlPayment: true,
-            bmlSettings
-          }));
-        } else if (bookingInfo) {
-          localStorage.setItem('pendingBooking', JSON.stringify({
-            ...bookingInfo,
-            paymentReference,
-            paymentPending: true,
-            bmlPayment: true,
-            bmlSettings
-          }));
-        }
-        
-        if (bmlPayment.paymentUrl) {
-          window.location.href = bmlPayment.paymentUrl;
-          return;
-        } else {
-          throw new Error("No payment URL provided by payment gateway");
-        }
-      } catch (error) {
-        console.error("Error with BML payment:", error);
-        const errorMessage = error instanceof Error ? error.message : "Failed to connect to payment gateway";
-        
-        setPaymentError(errorMessage);
-        toast.error("Payment gateway error", {
-          description: errorMessage
-        });
-        setIsProcessing(false);
-        return;
+        navigate("/confirmation", { state: completedBooking });
       }
+      
+      toast.success("Payment successful!");
+    } catch (error) {
+      console.error("Payment error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to process payment";
+      
+      setPaymentError(errorMessage);
+      toast.error("Payment error", {
+        description: errorMessage
+      });
+      setIsProcessing(false);
     }
   };
 
@@ -257,7 +188,6 @@ const PaymentGateway = () => {
               <div className="p-6 space-y-6">
                 {paymentError && (
                   <Alert variant="destructive" className="bg-red-50 border-red-200">
-                    <AlertCircle className="h-5 w-5" />
                     <AlertDescription className="ml-2">
                       <div className="font-medium">Payment Error</div>
                       <div className="text-sm">{paymentError}</div>
@@ -270,19 +200,17 @@ const PaymentGateway = () => {
                   totalAmount={calculateTotal()}
                 />
                 
-                {apiStatus && !isTestingApi && (
-                  <div className={`p-4 rounded-lg ${apiStatus.success ? 'bg-green-50 border border-green-100' : 'bg-amber-50 border border-amber-100'}`}>
-                    <div className="flex items-center">
-                      <InfoIcon className="h-5 w-5 mr-2 text-amber-600" />
-                      <div>
-                        <h3 className="font-medium text-gray-800">API Connection Status</h3>
-                        <p className={`text-sm mt-1 ${apiStatus.success ? 'text-green-700' : 'text-amber-700'}`}>
-                          {apiStatus.message}
-                        </p>
-                      </div>
+                <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <InfoIcon className="h-5 w-5 mr-2 text-blue-600" />
+                    <div>
+                      <h3 className="font-medium text-gray-800">Payment Information</h3>
+                      <p className="text-sm mt-1 text-blue-700">
+                        This is a demo payment system. In a real application, you would integrate with a payment provider.
+                      </p>
                     </div>
                   </div>
-                )}
+                </div>
                 
                 <PaymentMethodSelector
                   selectedMethod={paymentMethod}
@@ -293,7 +221,6 @@ const PaymentGateway = () => {
                   onPayment={handlePayment}
                   isProcessing={isProcessing}
                   bankLogoUrl={BANK_LOGO}
-                  webhookUrl={webhookUrl}
                 />
               </div>
             </div>

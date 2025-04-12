@@ -17,10 +17,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 import Activities from "./pages/Activities";
-import BmlApiTest from "./pages/BmlApiTest";
-
-// Import payment handler component
-import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -62,9 +58,6 @@ const App = () => {
           <TooltipProvider>
             <Toaster position="top-center" richColors closeButton />
             <BrowserRouter>
-              {/* BML Payment Handler - will only show when needed */}
-              <BmlPaymentHandler />
-              
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/booking" element={<BookingForm />} />
@@ -76,7 +69,6 @@ const App = () => {
                 <Route path="/activities" element={<Activities />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/bml-test" element={<BmlApiTest />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

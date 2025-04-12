@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -205,6 +206,7 @@ const Confirmation = () => {
                     <div className="hidden lg:block">
                       <PaymentInfo 
                         paymentReference={bookingInfo.paymentReference || ""}
+                        paymentMethod={bookingInfo.paymentMethod}
                       />
                     </div>
                   </div>
@@ -242,6 +244,7 @@ const Confirmation = () => {
                     <div className="lg:hidden">
                       <PaymentInfo 
                         paymentReference={bookingInfo.paymentReference || ""}
+                        paymentMethod={bookingInfo.paymentMethod}
                       />
                     </div>
                   </div>

@@ -1,5 +1,5 @@
 
-import { CreditCard, Check, AlertTriangle } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BookingInfo } from "@/types/booking";
 
@@ -7,13 +7,11 @@ export interface PaymentInfoProps {
   paymentReference: string;
   booking?: BookingInfo;
   paymentMethod?: string;
-  isSimulationMode?: boolean;
 }
 
 const PaymentInfo = ({ 
   paymentReference, 
-  paymentMethod = "Bank of Maldives",
-  isSimulationMode = false
+  paymentMethod = "Bank Transfer"
 }: PaymentInfoProps) => {
   const { t } = useTranslation();
   
@@ -30,13 +28,6 @@ const PaymentInfo = ({
         <p className="text-sm text-green-700 mt-1">
           {t("confirmation.paymentMethod", "Payment Method")}: {paymentMethod}
         </p>
-        
-        {isSimulationMode && (
-          <div className="mt-2 flex items-center text-amber-700 bg-amber-50 p-2 rounded text-xs">
-            <AlertTriangle className="h-3 w-3 mr-1 flex-shrink-0" />
-            <span>Simulated payment (for testing only)</span>
-          </div>
-        )}
       </div>
     </div>
   );

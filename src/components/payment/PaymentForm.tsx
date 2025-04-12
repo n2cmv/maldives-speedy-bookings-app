@@ -1,47 +1,26 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CreditCard, InfoIcon } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 interface PaymentFormProps {
   onPayment: () => void;
   isProcessing: boolean;
   bankLogoUrl: string;
-  webhookUrl?: string;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ 
   onPayment, 
   isProcessing,
-  bankLogoUrl,
-  webhookUrl 
+  bankLogoUrl 
 }) => {
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
         <p className="text-sm text-blue-800">
-          You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
+          This is a simulated payment system. In a real application, you would be redirected to a secure payment gateway.
         </p>
       </div>
-      
-      {webhookUrl && (
-        <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
-          <div className="flex items-start gap-2">
-            <InfoIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div className="space-y-2">
-              <p className="text-sm text-amber-800 font-medium">
-                Webhook Configuration Required
-              </p>
-              <p className="text-sm text-amber-700">
-                Set up this webhook URL in your BML merchant portal to receive payment notifications:
-              </p>
-              <div className="bg-white p-2 rounded border border-amber-200 font-mono text-xs break-all">
-                {webhookUrl}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       
       <Button
         onClick={onPayment}
@@ -56,7 +35,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         ) : (
           <>
             <CreditCard className="mr-2 h-5 w-5" />
-            Proceed to Payment
+            Complete Payment
           </>
         )}
       </Button>
@@ -64,13 +43,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <div className="flex items-center justify-center mt-6">
         <img 
           src={bankLogoUrl} 
-          alt="Bank of Maldives Payment Gateway" 
+          alt="Payment Provider" 
           className="h-8 md:h-10 w-auto"
         />
       </div>
       
       <p className="text-xs text-gray-500 text-center mt-4">
-        Your payment information is encrypted and securely processed by Bank of Maldives.
+        This is a demo payment system. No actual payments will be processed.
       </p>
     </div>
   );

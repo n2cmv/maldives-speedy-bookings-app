@@ -23,10 +23,16 @@ const PaymentMethodSelector = ({
   // Available payment methods
   const paymentMethods: PaymentMethod[] = [
     {
-      id: "bml",
-      name: "Bank of Maldives",
+      id: "bank_transfer",
+      name: "Bank Transfer",
       logo: "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png",
-      description: "Pay securely with Bank of Maldives payment gateway"
+      description: "Pay securely via bank transfer"
+    },
+    {
+      id: "card",
+      name: "Credit/Debit Card",
+      logo: "/placeholder.svg",
+      description: "Pay with your credit or debit card"
     }
     // More payment methods can be added here in the future
   ];
