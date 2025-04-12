@@ -36,11 +36,33 @@ const BmlPaymentHandler = () => {
         
         if (result.success) {
           toast.success("Payment successful!");
-          // Navigate to confirmation page with booking reference
-          if (result.bookingReference) {
-            // Need to fetch the complete booking before redirecting
-            navigate(`/confirmation/${result.bookingReference}`);
+          
+          // Retrieve pending booking from local storage
+          const pendingBooking = localStorage.getItem('pendingBooking');
+          const pendingActivityBooking = localStorage.getItem('pendingActivityBooking');
+          
+          let bookingData = null;
+          if (pendingBooking) {
+            bookingData = JSON.parse(pendingBooking);
+            localStorage.removeItem('pendingBooking');
+          } else if (pendingActivityBooking) {
+            bookingData = JSON.parse(pendingActivityBooking);
+            localStorage.removeItem('pendingActivityBooking');
+          }
+          
+          // Navigate to confirmation page with booking data
+          if (bookingData) {
+            // Add payment status to booking data
+            const completedBooking = {
+              ...bookingData,
+              paymentComplete: true,
+              paymentReference: bookingData.paymentReference || result.bookingReference || transactionId
+            };
+            
+            // Navigate to confirmation with completed booking data
+            navigate("/confirmation", { state: completedBooking });
           } else {
+            // If no pending booking data found, just navigate to confirmation
             navigate("/confirmation");
           }
         } else {
@@ -88,10 +110,15 @@ const BmlPaymentHandler = () => {
       }
     };
     
-    if (location.search.includes('transaction=') && isVerifying) {
+    // Check if we're returning from a payment (URL contains transaction parameter)
+    if (location.search.includes('transaction=')) {
+      console.log("BML Handler: Verifying payment. Path:", location.pathname, "Search:", location.search);
       verifyPayment();
+    } else {
+      console.log("BML Handler: Not verifying payment. Path:", location.pathname, "Search:", location.search);
+      setIsVerifying(false);
     }
-  }, [location.search, navigate, verifyAttempts, isVerifying]);
+  }, [location.search, location.pathname, navigate, verifyAttempts]);
   
   // Show processing screen while verifying payment
   if (isVerifying) {

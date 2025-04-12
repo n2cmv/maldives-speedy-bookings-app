@@ -17,6 +17,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 import Activities from "./pages/Activities";
+import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -64,11 +65,13 @@ const App = () => {
                 <Route path="/passenger-details" element={<PassengerDetails />} />
                 <Route path="/payment" element={<PaymentGateway />} />
                 <Route path="/confirmation" element={<Confirmation />} />
+                <Route path="/confirmation/:reference" element={<Confirmation />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/booking-lookup" element={<BookingLookup />} />
                 <Route path="/activities" element={<Activities />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/payment-confirmation" element={<BmlPaymentHandler />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

@@ -4,13 +4,19 @@ import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import BmlPaymentHandler from "@/components/payment/BmlPaymentHandler";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const location = useLocation();
-  const isReturningFromPayment = location.search.includes('transaction=');
+  const navigate = useNavigate();
+  
+  // If user lands on homepage with transaction parameter, redirect to payment-confirmation
+  useEffect(() => {
+    if (location.search.includes('transaction=')) {
+      navigate(`/payment-confirmation${location.search}`, { replace: true });
+    }
+  }, [location.search, navigate]);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -35,9 +41,6 @@ const Index = () => {
       <div className="absolute top-20 right-10 w-60 h-60 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-80 h-80 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       
-      {/* BML Payment Handler component will verify returning payments */}
-      {isReturningFromPayment && <BmlPaymentHandler />}
-      
       <div className="relative z-10">
         <Header />
         <main className="pt-16">
@@ -60,4 +63,5 @@ const Index = () => {
       <WhatsAppButton phoneNumber="+960 7443777" welcomeMessage="Hello! I'm interested in booking a speedboat transfer with Retour Maldives." />
     </div>;
 };
+
 export default Index;

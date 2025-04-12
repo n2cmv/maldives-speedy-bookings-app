@@ -23,6 +23,9 @@ export const bmlPaymentService = {
       const toLocation = booking.island || 'Resort Island';
       const customerReference = `Booking for ${fromLocation} to ${toLocation}`;
 
+      // Redirect to the dedicated payment confirmation route
+      const redirectUrl = `${window.location.origin}/payment-confirmation?transaction=`;
+
       const paymentPayload = {
         amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
         currency: "USD", // Using USD as shown in the BML dashboard
@@ -30,7 +33,7 @@ export const bmlPaymentService = {
         signMethod: "sha1",
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference,
-        redirectUrl: `${window.location.origin}/confirmation?transaction=`,
+        redirectUrl,
         appVersion: "RetourMaldives_1.0"
       };
       
