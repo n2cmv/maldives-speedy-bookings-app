@@ -20,7 +20,7 @@ export const bmlPaymentService = {
         provider: "bml_epos", // BML payment method
         signMethod: "sha1",
         paymentReference: booking.paymentReference,
-        customerReference: `Booking for ${booking.from || 'Male'} to ${booking.island || booking.to || 'Resort Island'}`,
+        customerReference: `Booking for ${booking.from || 'Male'} to ${booking.island || 'Resort Island'}`,
         redirectUrl: `${window.location.origin}/confirmation?transaction=`,
         appVersion: "RetourMaldives_1.0"
       };
