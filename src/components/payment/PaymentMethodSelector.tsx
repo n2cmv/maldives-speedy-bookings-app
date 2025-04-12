@@ -31,7 +31,7 @@ const PaymentMethodSelector = ({
     {
       id: "bml_connect",
       name: "BML Connect",
-      logo: "/placeholder.svg",
+      logo: "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png", // Using the bank logo for BML Connect
       description: "Pay with Bank of Maldives"
     },
     {

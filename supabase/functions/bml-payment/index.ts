@@ -19,18 +19,83 @@ interface BmlPaymentRequest {
   appVersion: string;
 }
 
+// Real BML merchant details
+const BML_MERCHANT_DETAILS = {
+  applicationId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
+  publicKey: "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmJXRnNaR2wyWlhNdGMzQmxaV1I1TFdKdmIydHBibWR6TFdGd2NDNXNiM1poWW14bExtRndjQzhpTENKaElqb2lZamd6WXpoak5tSXRNVEppWXkwMFlqSmxMVGcyTkRBdE5XUTVaVFkyTnpnMllXUmpJaXdpZFhFaU9pSXpNREE1WWpSak9TMHhaV001TFRRMVlqa3RPRFprT0MxbU5qY3pZelptTlRFeFlqTWlMQ0pwWVhRaU9qRTNORFF6T0RNNU16WXNJbVY0Y0NJNk5Ea3dNREExTnpVek5uMC5LdFJJQ0pVb0VQaHY1clM4YWFoOG53U3k5WE92NHRNb1hIb0RrNzdqNlVz",
+  domain: "https://maldives-speedy-bookings-app.lovable.app/"
+};
+
+// BML API endpoints
+const BML_CONNECT_API = {
+  createPayment: "https://api.merchant.bankofmaldives.com.mv/payments",
+  verifyPayment: "https://api.merchant.bankofmaldives.com.mv/payments/" // + transactionId
+};
+
 // Create payment transaction with BML Connect
 async function createPayment(req: Request) {
   try {
-    const { amount, currency, provider, signMethod, paymentReference, customerReference, redirectUrl, appVersion } = 
-      await req.json() as BmlPaymentRequest;
+    const { 
+      amount, 
+      currency, 
+      provider, 
+      signMethod, 
+      paymentReference, 
+      customerReference, 
+      redirectUrl, 
+      appVersion 
+    } = await req.json() as BmlPaymentRequest;
     
-    // For demo purposes, generate a mock BML payment URL
-    // In production, you would call the actual BML API with your API key
-    const transactionId = crypto.randomUUID().replace(/-/g, '');
+    // Get API key from environment variable
+    const apiKey = Deno.env.get('BML_API_KEY');
+    if (!apiKey) {
+      console.error('BML API key not configured');
+      return new Response(
+        JSON.stringify({ error: 'Payment processor not configured' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
     
-    // Create a signature (in production, this would use the actual algorithm from BML)
-    const signature = await createMockSignature(amount, currency);
+    // Generate a unique transaction ID
+    const localId = crypto.randomUUID();
+    
+    // Prepare request payload for BML API
+    const bmlPayload = {
+      amount: amount,
+      currency: currency,
+      redirectUrl: BML_MERCHANT_DETAILS.domain + "confirmation?transaction=",
+      customerReference: customerReference,
+      merchantReference: paymentReference
+    };
+    
+    console.log('Creating payment with BML Connect:', JSON.stringify(bmlPayload));
+    
+    // Call BML API to create payment
+    const response = await fetch(BML_CONNECT_API.createPayment, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
+      },
+      body: JSON.stringify(bmlPayload)
+    });
+    
+    const bmlResponse = await response.json();
+    
+    if (!response.ok) {
+      console.error('BML API error:', bmlResponse);
+      return new Response(
+        JSON.stringify({ error: 'Payment creation failed', details: bmlResponse }),
+        {
+          status: response.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
     
     // Store transaction details in Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -40,40 +105,36 @@ async function createPayment(req: Request) {
     const { error } = await supabase
       .from('bml_transactions')
       .insert({
-        transaction_id: transactionId,
-        local_id: crypto.randomUUID(),
+        transaction_id: bmlResponse.id,
+        local_id: localId,
         customer_reference: customerReference,
         booking_reference: paymentReference,
         amount,
         currency,
         provider,
-        state: 'QR_CODE_GENERATED'
+        state: bmlResponse.state
       });
       
     if (error) {
       console.error('Error storing transaction:', error);
-      return new Response(JSON.stringify({ 
-        error: 'Failed to create payment' 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to store payment details' 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
     
-    // Generate mock QR code URL - in production this would come from BML
-    const qrCodeUrl = `https://example.com/qr/${transactionId}`;
-    
-    // In a real implementation, this would be the actual response from the BML API
     return new Response(
       JSON.stringify({
-        id: transactionId,
-        state: 'QR_CODE_GENERATED',
-        created: new Date().toISOString(),
+        id: bmlResponse.id,
+        state: bmlResponse.state,
+        created: bmlResponse.created,
         amount,
         currency,
-        qrcode: {
-          url: qrCodeUrl
-        }
+        qrcode: bmlResponse.qrcode
       }),
       {
         status: 200,
@@ -107,8 +168,42 @@ async function verifyPayment(req: Request) {
       );
     }
     
-    // In a real implementation, we would call the BML API to verify the transaction status
-    // For this demo, we'll simulate a successful payment
+    // Get API key from environment variable
+    const apiKey = Deno.env.get('BML_API_KEY');
+    if (!apiKey) {
+      console.error('BML API key not configured');
+      return new Response(
+        JSON.stringify({ error: 'Payment processor not configured' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    console.log('Verifying payment with transaction ID:', transactionId);
+    
+    // Connect to BML API to verify payment status
+    const response = await fetch(`${BML_CONNECT_API.verifyPayment}${transactionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
+      }
+    });
+    
+    const bmlResponse = await response.json();
+    
+    if (!response.ok) {
+      console.error('BML API error during verification:', bmlResponse);
+      return new Response(
+        JSON.stringify({ error: 'Payment verification failed', details: bmlResponse }),
+        {
+          status: response.status,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
     
     // Connect to Supabase to update and retrieve the transaction
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -133,10 +228,10 @@ async function verifyPayment(req: Request) {
       );
     }
     
-    // Update status to CONFIRMED - in a real app, this would be based on the actual status
+    // Update status based on the BML API response
     const { error: updateError } = await supabase
       .from('bml_transactions')
-      .update({ state: 'CONFIRMED' })
+      .update({ state: bmlResponse.state })
       .eq('transaction_id', transactionId);
       
     if (updateError) {
@@ -153,7 +248,7 @@ async function verifyPayment(req: Request) {
     // Return success response with the transaction booking reference
     return new Response(
       JSON.stringify({
-        state: 'CONFIRMED',
+        state: bmlResponse.state,
         bookingReference: transaction.booking_reference
       }),
       {
@@ -171,18 +266,6 @@ async function verifyPayment(req: Request) {
       }
     );
   }
-}
-
-// Mock helper function to create signatures
-async function createMockSignature(amount: number, currency: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(`amount=${amount}&currency=${currency}`);
-  const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-  
-  // Convert to base64
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
 }
 
 // Route handler for different endpoints

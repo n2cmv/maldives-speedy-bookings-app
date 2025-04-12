@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { bmlPaymentService } from "@/services/bmlPaymentService";
 import { toast } from "sonner";
+import PaymentProcessingScreen from "./PaymentProcessingScreen";
 
 /**
  * Component to handle BML payment returns and verify the transaction status
@@ -61,7 +62,12 @@ const BmlPaymentHandler = () => {
     }
   }, [location.search, navigate]);
   
-  // Don't render anything visible, this is just a handler
+  // Show processing screen while verifying payment
+  if (isVerifying) {
+    return <PaymentProcessingScreen bankLogo="/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png" />;
+  }
+  
+  // Don't render anything visible once verification is complete (we'll navigate away)
   return null;
 };
 
