@@ -4,7 +4,7 @@ import { testBmlApiConnection, BML_CONFIG } from "@/services/bmlPaymentService";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Header from "@/components/Header";
-import { ArrowLeft, CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, ExternalLink, AlertTriangle, Server } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const BmlApiTest = () => {
@@ -32,7 +32,11 @@ const BmlApiTest = () => {
       toast.error("Error testing API connection", {
         description: error instanceof Error ? error.message : "Unknown error occurred"
       });
-      setTestResult({ success: false, message: "Error during API test" });
+      setTestResult({ 
+        success: false, 
+        message: "Error during API test - CORS restrictions may be preventing direct access",
+        isCorsError: error instanceof TypeError && error.message === "Failed to fetch"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +71,25 @@ const BmlApiTest = () => {
                 <p className="text-gray-600 mb-4">
                   Test the connection to the Bank of Maldives payment gateway API.
                 </p>
+                
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-6">
+                  <div className="flex items-start">
+                    <div className="mr-3 mt-1">
+                      <AlertTriangle className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-amber-800">CORS Restrictions</h3>
+                      <p className="text-sm text-amber-700 mt-1">
+                        Direct API testing from the browser may fail due to Cross-Origin Resource Sharing (CORS) 
+                        restrictions. This is normal and expected for payment gateways, which typically require 
+                        server-side requests.
+                      </p>
+                      <p className="text-sm text-amber-700 mt-2">
+                        In production, your server will handle these API calls, avoiding CORS issues.
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 
                 <div className="flex flex-col md:flex-row gap-4">
                   <Button 
@@ -109,6 +132,16 @@ const BmlApiTest = () => {
                           {testResult.message}
                         </p>
                         
+                        {testResult.isCorsError && (
+                          <div className="mt-3 pt-3 border-t border-red-200">
+                            <p className="text-red-700 font-medium">CORS Error Detected</p>
+                            <p className="text-sm text-red-700 mt-1">
+                              This is expected when testing directly from a browser. In production, 
+                              your backend server will handle these API calls.
+                            </p>
+                          </div>
+                        )}
+                        
                         {testResult.details && (
                           <div className="mt-4">
                             <h4 className="font-medium mb-2">Response Details:</h4>
@@ -143,6 +176,20 @@ const BmlApiTest = () => {
                       <li>Client ID: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.clientId.substring(0, 8)}...</code></li>
                       <li>API Key: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.apiKey.substring(0, 20)}...</code></li>
                     </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Server className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="font-medium text-blue-800">Server-Side Implementation</h3>
+                        <p className="text-sm text-blue-700 mt-1">
+                          For optimal security and to avoid CORS issues, payment gateway API calls 
+                          should be implemented server-side. Consider using Supabase Edge Functions 
+                          to handle payment processing securely.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   
                   <div>
