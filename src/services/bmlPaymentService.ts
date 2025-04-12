@@ -53,9 +53,14 @@ export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
 
 // Generate signature as per BML API v2.0 specs
 const generateSignature = (amount: number, currency: string, apiKey: string): string => {
-  // Format according to the API documentation: sha1('amount=2000&currency=MVR&apiKey=mysecretkey').digest('hex')
-  const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
-  return crypto.createHash('sha1').update(signString).digest('hex');
+  try {
+    // Format according to the API documentation: sha1('amount=2000&currency=MVR&apiKey=mysecretkey').digest('hex')
+    const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
+    return crypto.createHash('sha1').update(signString).digest('hex');
+  } catch (error) {
+    console.error("Error generating signature:", error);
+    throw new Error("Failed to generate payment signature");
+  }
 };
 
 /**
@@ -209,7 +214,7 @@ export async function createBmlPaymentSession(
       }
       
       // Check if we should use simulation mode
-      if (error instanceof TypeError && error.message === "Failed to fetch" && !bmlSettings.forceRealMode) {
+      if (error instanceof TypeError && error.message.includes("Failed to fetch") && !bmlSettings.forceRealMode) {
         console.log("BML Service: Network error detected, providing fallback simulation");
         
         // Generate a reference and simulate success for dev/test environments
@@ -317,7 +322,7 @@ export async function verifyBmlPayment(
     
     // For dev/test environments with simulated payments
     if (!bmlSettings.disableSimulation) {
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
+      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
         console.log("BML Service: Network error detected on verification, providing simulated verification");
         
         // If the transaction ID starts with "SIM-", treat it as a simulated payment

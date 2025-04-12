@@ -124,7 +124,7 @@ const BmlApiTest = () => {
                   <div>
                     <h3 className="font-medium">Check Your Environment:</h3>
                     <p className="text-gray-600">
-                      The application is currently using the BML <span className="font-semibold text-green-600">PRODUCTION</span> environment. 
+                      The application is currently using the BML <span className="font-semibold text-green-600">{BML_CONFIG.forceRealMode ? 'PRODUCTION' : 'TESTING'}</span> environment. 
                       The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.forceRealMode ? 
                         "https://api.merchants.bankofmaldives.com.mv" : 
                         "https://api.uat.merchants.bankofmaldives.com.mv"}</code>
