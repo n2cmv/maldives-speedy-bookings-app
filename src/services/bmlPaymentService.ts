@@ -18,13 +18,18 @@ export const bmlPaymentService = {
         throw new Error("Invalid payment amount");
       }
 
+      // Prepare customer reference with fallback values
+      const fromLocation = booking.from || 'Male';
+      const toLocation = booking.island || 'Resort Island';
+      const customerReference = `Booking for ${fromLocation} to ${toLocation}`;
+
       const paymentPayload = {
         amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
         currency: "MVR", // Maldivian rufiyaa
         provider: "bml_epos", // BML payment method
         signMethod: "sha1",
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
-        customerReference: `Booking for ${booking.from || 'Male'} to ${booking.island || 'Resort Island'}`,
+        customerReference,
         redirectUrl: `${window.location.origin}/confirmation?transaction=`,
         appVersion: "RetourMaldives_1.0"
       };

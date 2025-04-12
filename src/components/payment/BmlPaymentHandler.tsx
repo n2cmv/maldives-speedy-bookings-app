@@ -20,6 +20,7 @@ const BmlPaymentHandler = () => {
         // Extract transaction ID from URL parameters
         const searchParams = new URLSearchParams(location.search);
         const transactionId = searchParams.get('transaction');
+        const isMockPayment = searchParams.get('mock') === 'true';
         
         if (!transactionId) {
           setIsVerifying(false);
@@ -28,7 +29,7 @@ const BmlPaymentHandler = () => {
           return;
         }
         
-        console.log("Verifying payment transaction:", transactionId);
+        console.log("Verifying payment transaction:", transactionId, isMockPayment ? "(mock)" : "");
         
         // Verify the payment status
         const result = await bmlPaymentService.verifyPayment(transactionId);
@@ -44,6 +45,16 @@ const BmlPaymentHandler = () => {
           }
         } else {
           console.log("Payment failed with status:", result.status);
+          
+          // If this is a mock payment and status isn't confirming, we'll force it to confirm
+          // This is just for development purposes
+          if (isMockPayment && verifyAttempts < 3) {
+            console.log("Mock payment - retry attempt:", verifyAttempts + 1);
+            setVerifyAttempts(prev => prev + 1);
+            setTimeout(() => verifyPayment(), 1500);
+            return;
+          }
+          
           toast.error(`Payment ${result.status.toLowerCase()}`);
           navigate("/payment", { 
             state: { 
@@ -59,7 +70,7 @@ const BmlPaymentHandler = () => {
         // If we've tried less than 3 times, try again
         if (verifyAttempts < 2) {
           setVerifyAttempts(prev => prev + 1);
-          toast.error("Verification attempt failed, retrying...");
+          toast.warning("Verification attempt failed, retrying...");
           // Try again after a delay
           setTimeout(() => verifyPayment(), 2000);
           return;
