@@ -20,9 +20,6 @@ const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = ({ bankL
           <p className="text-gray-600">
             Please wait while your payment is being processed at Bank of Maldives...
           </p>
-          <p className="text-sm text-gray-500 mt-8">
-            (This is a simulation. In a real implementation, you would be on the bank's website)
-          </p>
         </div>
       </div>
     </div>

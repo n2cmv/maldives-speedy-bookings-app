@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -15,7 +16,6 @@ import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
 import { createBmlPaymentSession, BMLSettings, testBmlApiConnection, getBmlWebhookUrl } from "@/services/bmlPaymentService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
@@ -31,8 +31,6 @@ const PaymentGateway = () => {
   const [bookingReference, setBookingReference] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bml"); // Default to BML payment gateway
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [isSimulationMode, setIsSimulationMode] = useState(false);
-  const [forceRealMode, setForceRealMode] = useState(false);
   const [apiStatus, setApiStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState<string>("");
@@ -72,36 +70,29 @@ const PaymentGateway = () => {
       localStorage.removeItem('pendingBooking');
       localStorage.removeItem('pendingActivityBooking');
     }
+    
+    // Test API connection on load
+    checkApiConnection();
   }, [location.state, location.search, navigate]);
   
-  useEffect(() => {
-    const checkApiConnection = async () => {
-      if (forceRealMode) {
-        setIsTestingApi(true);
-        try {
-          const settings: BMLSettings = {
-            forceRealMode: true,
-            disableSimulation: true,
-            apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
-          };
-          
-          const result = await testBmlApiConnection(settings);
-          setApiStatus(result);
-        } catch (error) {
-          setApiStatus({ 
-            success: false, 
-            message: error instanceof Error ? error.message : "Failed to test API connection" 
-          });
-        } finally {
-          setIsTestingApi(false);
-        }
-      } else {
-        setApiStatus(null);
-      }
-    };
-    
-    checkApiConnection();
-  }, [forceRealMode]);
+  const checkApiConnection = async () => {
+    setIsTestingApi(true);
+    try {
+      const settings: BMLSettings = {
+        apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
+      };
+      
+      const result = await testBmlApiConnection(settings);
+      setApiStatus(result);
+    } catch (error) {
+      setApiStatus({ 
+        success: false, 
+        message: error instanceof Error ? error.message : "Failed to test API connection" 
+      });
+    } finally {
+      setIsTestingApi(false);
+    }
+  };
 
   const handleGoBack = () => {
     if (activityBooking) {
@@ -113,7 +104,6 @@ const PaymentGateway = () => {
 
   const handlePayment = async () => {
     setPaymentError(null);
-    setIsSimulationMode(false);
     setIsProcessing(true);
     
     const totalAmount = calculateTotal();
@@ -145,11 +135,7 @@ const PaymentGateway = () => {
         }
         
         const bmlSettings: BMLSettings = {
-          forceRealMode: forceRealMode,
-          disableSimulation: false,
-          apiBaseUrl: forceRealMode ? 
-            "https://api.merchants.bankofmaldives.com.mv" : 
-            "https://api.uat.merchants.bankofmaldives.com.mv"
+          apiBaseUrl: "https://api.merchants.bankofmaldives.com.mv"
         };
 
         console.log("Using BML settings:", bmlSettings);
@@ -163,17 +149,7 @@ const PaymentGateway = () => {
         );
         
         if (!bmlPayment.success) {
-          if (forceRealMode && bmlPayment.error?.includes("Failed to fetch")) {
-            throw new Error("Cannot connect to BML payment gateway. Turn off 'Force real mode' to use simulation instead.");
-          }
           throw new Error(bmlPayment.error || "Failed to initialize payment with Bank of Maldives");
-        }
-        
-        if (bmlPayment.error && bmlPayment.error.includes("simulation")) {
-          setIsSimulationMode(true);
-          toast.warning("Using simulation mode", {
-            description: "The BML API is currently unavailable. Using simulation mode instead."
-          });
         }
         
         const paymentReference = bmlPayment.reference || bookingReference;
@@ -184,7 +160,6 @@ const PaymentGateway = () => {
             paymentReference,
             paymentPending: true,
             bmlPayment: true,
-            isSimulationMode: bmlPayment.error?.includes("simulation") || false,
             bmlSettings
           }));
         } else if (bookingInfo) {
@@ -193,7 +168,6 @@ const PaymentGateway = () => {
             paymentReference,
             paymentPending: true,
             bmlPayment: true,
-            isSimulationMode: bmlPayment.error?.includes("simulation") || false,
             bmlSettings
           }));
         }
@@ -215,51 +189,6 @@ const PaymentGateway = () => {
         setIsProcessing(false);
         return;
       }
-    }
-    
-    toast.info("Redirecting to payment gateway", {
-      description: "You will be redirected to the Bank of Maldives payment page"
-    });
-    
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsRedirecting(true);
-      
-      simulatePaymentGateway();
-    }, 2000);
-  };
-
-  const simulatePaymentGateway = () => {
-    setTimeout(() => {
-      handlePaymentCompletion(true);
-    }, 3000);
-  };
-
-  const handlePaymentCompletion = (success: boolean) => {
-    if (success) {
-      if (activityBooking) {
-        navigate("/confirmation", { 
-          state: {
-            ...activityBooking,
-            paymentComplete: true,
-            paymentReference: bookingReference,
-            isActivityBooking: true
-          }
-        });
-      } else if (bookingInfo) {
-        navigate("/confirmation", { 
-          state: {
-            ...bookingInfo,
-            paymentComplete: true,
-            paymentReference: bookingReference
-          }
-        });
-      }
-    } else {
-      setIsRedirecting(false);
-      toast.error("Payment failed", {
-        description: "Your payment was not processed. Please try again."
-      });
     }
   };
 
@@ -332,33 +261,6 @@ const PaymentGateway = () => {
                     <AlertDescription className="ml-2">
                       <div className="font-medium">Payment Error</div>
                       <div className="text-sm">{paymentError}</div>
-                      {forceRealMode && paymentError.includes("Failed to fetch") && (
-                        <div className="mt-2 text-sm">
-                          <p className="font-medium">
-                            You have "Force real payment mode" enabled which is preventing simulation mode.
-                          </p>
-                          <p className="mt-1">
-                            To proceed with testing, either:
-                          </p>
-                          <ul className="list-disc ml-5 mt-1 space-y-1">
-                            <li>Turn off "Force real mode" below to use simulation mode</li>
-                            <li>Check your network connection to the BML payment gateway</li>
-                            <li>Verify that your API credentials are correct</li>
-                          </ul>
-                        </div>
-                      )}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {isSimulationMode && (
-                  <Alert className="bg-yellow-50 border-yellow-200">
-                    <AlertDescription>
-                      <div className="font-medium text-amber-800">Payment Simulation Mode</div>
-                      <p className="text-sm text-amber-700">
-                        You are using simulation mode because the Bank of Maldives payment gateway is temporarily unavailable.
-                        Your transaction will be simulated for testing purposes.
-                      </p>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -368,48 +270,19 @@ const PaymentGateway = () => {
                   totalAmount={calculateTotal()}
                 />
                 
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                  <h3 className="text-sm font-medium mb-3">Developer Options</h3>
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="force-real-mode" 
-                      checked={forceRealMode} 
-                      onCheckedChange={setForceRealMode} 
-                    />
-                    <Label htmlFor="force-real-mode" className={`text-sm ${forceRealMode && paymentError ? 'text-red-600 font-medium' : ''}`}>
-                      Force real payment mode (use BML production API)
-                    </Label>
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">
-                    When enabled, the system will attempt to use the real BML payment gateway.
-                    {forceRealMode ? (
-                      <span className="block mt-1 font-medium text-amber-700">
-                        This might result in errors if the gateway is not reachable or your API key is not valid for production.
-                      </span>
-                    ) : (
-                      <span className="block mt-1">
-                        When disabled, the system will use the UAT (testing) endpoint, or fall back to simulation if unavailable.
-                      </span>
-                    )}
-                  </p>
-                  
-                  {isTestingApi && (
-                    <div className="mt-3 flex items-center text-slate-600">
-                      <div className="w-4 h-4 border-2 border-ocean border-t-transparent rounded-full animate-spin mr-2"></div>
-                      <span className="text-xs">Testing API connection...</span>
-                    </div>
-                  )}
-                  
-                  {apiStatus && !isTestingApi && (
-                    <div className={`mt-3 text-xs rounded-md p-2 ${apiStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                      <div className="flex items-center">
-                        <InfoIcon className="h-3 w-3 mr-1" />
-                        <span className="font-medium">API Status:</span>
+                {apiStatus && !isTestingApi && (
+                  <div className={`p-4 rounded-lg ${apiStatus.success ? 'bg-green-50 border border-green-100' : 'bg-amber-50 border border-amber-100'}`}>
+                    <div className="flex items-center">
+                      <InfoIcon className="h-5 w-5 mr-2 text-amber-600" />
+                      <div>
+                        <h3 className="font-medium text-gray-800">API Connection Status</h3>
+                        <p className={`text-sm mt-1 ${apiStatus.success ? 'text-green-700' : 'text-amber-700'}`}>
+                          {apiStatus.message}
+                        </p>
                       </div>
-                      <p className="mt-1">{apiStatus.message}</p>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
                 
                 <PaymentMethodSelector
                   selectedMethod={paymentMethod}
