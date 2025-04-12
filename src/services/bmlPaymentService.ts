@@ -24,7 +24,7 @@ export const bmlPaymentService = {
       const customerReference = `Booking for ${fromLocation} to ${toLocation}`;
 
       // Redirect to the dedicated payment confirmation route
-      const redirectUrl = `${window.location.origin}/payment-confirmation?transaction=`;
+      const confirmationBaseUrl = `${window.location.origin}/payment-confirmation?transaction=`;
 
       const paymentPayload = {
         amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
@@ -33,7 +33,7 @@ export const bmlPaymentService = {
         signMethod: "sha1",
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference,
-        redirectUrl,
+        redirectUrl: confirmationBaseUrl,
         appVersion: "RetourMaldives_1.0"
       };
       
@@ -55,11 +55,11 @@ export const bmlPaymentService = {
       }
       
       // For QR code, handle case where it might not be returned
-      const redirectUrl = data.qrcode?.url || `${window.location.origin}/payment?error=qr_missing`;
+      const finalRedirectUrl = data.qrcode?.url || `${window.location.origin}/payment?error=qr_missing`;
       
       // Return the QR code URL and transaction ID
       return {
-        redirectUrl,
+        redirectUrl: finalRedirectUrl,
         transactionId: data.id
       };
     } catch (error) {
