@@ -27,6 +27,48 @@ export type Database = {
         }
         Relationships: []
       }
+      bml_transactions: {
+        Row: {
+          amount: number
+          booking_reference: string | null
+          created_at: string
+          currency: string
+          customer_reference: string | null
+          id: string
+          local_id: string | null
+          provider: string
+          state: string
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          booking_reference?: string | null
+          created_at?: string
+          currency: string
+          customer_reference?: string | null
+          id?: string
+          local_id?: string | null
+          provider: string
+          state: string
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_reference?: string | null
+          created_at?: string
+          currency?: string
+          customer_reference?: string | null
+          id?: string
+          local_id?: string | null
+          provider?: string
+          state?: string
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       booking_otps: {
         Row: {
           created_at: string
