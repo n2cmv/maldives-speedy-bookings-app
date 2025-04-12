@@ -1,3 +1,4 @@
+
 import { BookingInfo } from "@/types/booking";
 import crypto from 'crypto';
 
@@ -52,6 +53,7 @@ export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
 
 // Generate signature as per BML API v2.0 specs
 const generateSignature = (amount: number, currency: string, apiKey: string): string => {
+  // Format according to the API documentation: sha1('amount=2000&currency=MVR&apiKey=mysecretkey').digest('hex')
   const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
   return crypto.createHash('sha1').update(signString).digest('hex');
 };
