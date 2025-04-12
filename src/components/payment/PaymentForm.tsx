@@ -1,18 +1,20 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CreditCard } from "lucide-react";
+import { CreditCard, InfoIcon } from "lucide-react";
 
 interface PaymentFormProps {
   onPayment: () => void;
   isProcessing: boolean;
   bankLogoUrl: string;
+  webhookUrl?: string;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ 
   onPayment, 
   isProcessing,
-  bankLogoUrl 
+  bankLogoUrl,
+  webhookUrl 
 }) => {
   return (
     <div className="space-y-6">
@@ -21,6 +23,25 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           You will be redirected to the Bank of Maldives secure payment gateway to complete your transaction.
         </p>
       </div>
+      
+      {webhookUrl && (
+        <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+          <div className="flex items-start gap-2">
+            <InfoIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="space-y-2">
+              <p className="text-sm text-amber-800 font-medium">
+                Webhook Configuration Required
+              </p>
+              <p className="text-sm text-amber-700">
+                Set up this webhook URL in your BML merchant portal to receive payment notifications:
+              </p>
+              <div className="bg-white p-2 rounded border border-amber-200 font-mono text-xs break-all">
+                {webhookUrl}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <Button
         onClick={onPayment}

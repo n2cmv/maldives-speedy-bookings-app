@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -14,7 +13,7 @@ import PaymentSummary from "@/components/payment/PaymentSummary";
 import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
-import { createBmlPaymentSession, BMLSettings, testBmlApiConnection } from "@/services/bmlPaymentService";
+import { createBmlPaymentSession, BMLSettings, testBmlApiConnection, getBmlWebhookUrl } from "@/services/bmlPaymentService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -36,8 +35,11 @@ const PaymentGateway = () => {
   const [forceRealMode, setForceRealMode] = useState(false);
   const [apiStatus, setApiStatus] = useState<{ success: boolean; message: string } | null>(null);
   const [isTestingApi, setIsTestingApi] = useState(false);
+  const [webhookUrl, setWebhookUrl] = useState<string>("");
 
   useEffect(() => {
+    setWebhookUrl(getBmlWebhookUrl());
+    
     if (!location.state?.isActivityBooking) {
       const booking = location.state as BookingInfo | null;
       if (!booking) {
@@ -69,10 +71,9 @@ const PaymentGateway = () => {
       
       localStorage.removeItem('pendingBooking');
       localStorage.removeItem('pendingActivityBooking');
-    } 
+    }
   }, [location.state, location.search, navigate]);
   
-  // Test API connection on load or when force real mode changes
   useEffect(() => {
     const checkApiConnection = async () => {
       if (forceRealMode) {
@@ -419,6 +420,7 @@ const PaymentGateway = () => {
                   onPayment={handlePayment}
                   isProcessing={isProcessing}
                   bankLogoUrl={BANK_LOGO}
+                  webhookUrl={webhookUrl}
                 />
               </div>
             </div>

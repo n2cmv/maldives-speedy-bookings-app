@@ -51,26 +51,28 @@ export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
 };
 
 /**
- * Generate signature as per BML API v2.0 specs using Web Crypto API
+ * Updated signature generator using SHA-256 as per latest BML API specs
  * This is a browser-compatible implementation
  */
 const generateSignature = async (amount: number, currency: string, apiKey: string): Promise<string> => {
   try {
-    // Format according to the API documentation: sha1('amount=2000&currency=MVR&apiKey=mysecretkey').digest('hex')
+    // Format according to the updated API documentation
     const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
     
-    // Convert the string to Uint8Array
+    console.log("BML Service: Generating signature with string:", signString);
+    
+    // Convert the string to Uint8Array for Web Crypto API
     const encoder = new TextEncoder();
     const data = encoder.encode(signString);
     
-    // Generate SHA-1 hash
-    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    // Generate SHA-256 hash (updated from SHA-1)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     
     // Convert to hex string
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
-    console.log("BML Service: Generated signature for amount:", amount, "currency:", currency);
+    console.log("BML Service: Generated signature:", hashHex);
     return hashHex;
   } catch (error) {
     console.error("Error generating signature:", error);
@@ -93,8 +95,9 @@ export async function testBmlApiConnection(settings?: BMLSettings): Promise<{
     const response = await fetch(getApiUrl("/public/v1/health", settings), {
       method: 'GET',
       headers: {
-        'Authorization': `${BML_CONFIG.apiKey}`,
-        'Accept': 'application/json'
+        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
     
@@ -180,9 +183,10 @@ export async function createBmlPaymentSession(
         appVersion: "RetourMaldives1.0", // App version for tracking
         apiVersion: "2.0", // API version
         deviceId: BML_CONFIG.clientId, // Using client ID as device ID
-        signMethod: "sha1", // Signature method
+        signMethod: "sha256", // Updated from sha1 to sha256
         redirectUrl: returnUrl,
-        cancelUrl: cancelUrl
+        cancelUrl: cancelUrl,
+        notificationUrl: returnUrl // Adding webhook notification URL
       };
 
       console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
@@ -197,7 +201,7 @@ export async function createBmlPaymentSession(
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': BML_CONFIG.apiKey,
+            'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
             'Accept': 'application/json'
           },
           body: JSON.stringify(paymentData)
@@ -315,7 +319,7 @@ export async function verifyBmlPayment(
     const response = await fetch(verifyUrl, {
       method: 'GET',
       headers: {
-        'Authorization': BML_CONFIG.apiKey,
+        'Authorization': `Bearer ${BML_CONFIG.apiKey}`,
         'Accept': 'application/json'
       }
     });
@@ -385,4 +389,11 @@ export async function verifyBmlPayment(
  */
 export function openBmlTestPage(): void {
   window.open("https://merchants.bankofmaldives.com.mv/test-payment-page", "_blank");
+}
+
+/**
+ * Get BML payment webhook URL for configuration in BML merchant portal
+ */
+export function getBmlWebhookUrl(): string {
+  return window.location.origin + "/api/bml-webhook";
 }
