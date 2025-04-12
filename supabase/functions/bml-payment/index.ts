@@ -66,81 +66,93 @@ async function createPayment(req: Request) {
     const bmlPayload = {
       amount: amount,
       currency: currency,
-      redirectUrl: `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=`,
+      redirectUrl: redirectUrl || `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=`,
       customerReference: customerReference || "Booking Payment",
       merchantReference: paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`
     };
     
     console.log('Creating payment with BML Connect:', JSON.stringify(bmlPayload));
     
-    // Call BML API to create payment
-    const response = await fetch(BML_CONNECT_API.createPayment, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
-      },
-      body: JSON.stringify(bmlPayload)
-    });
-    
-    const bmlResponse = await response.json();
-    
-    if (!response.ok) {
-      console.error('BML API error:', bmlResponse);
-      return new Response(
-        JSON.stringify({ error: 'Payment creation failed', details: bmlResponse }),
-        {
-          status: response.status,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
-    // Store transaction details in Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    const { error } = await supabase
-      .from('bml_transactions')
-      .insert({
-        transaction_id: bmlResponse.id,
-        local_id: localId,
-        customer_reference: customerReference || "Booking Payment",
-        booking_reference: paymentReference,
-        amount,
-        currency,
-        provider,
-        state: bmlResponse.state
+    // Call BML API to create payment with better error handling
+    try {
+      const response = await fetch(BML_CONNECT_API.createPayment, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
+        },
+        body: JSON.stringify(bmlPayload)
       });
       
-    if (error) {
-      console.error('Error storing transaction:', error);
+      // Log response status and headers for debugging
+      console.log('BML API Response Status:', response.status);
+      console.log('BML API Response Status Text:', response.statusText);
+      
+      const bmlResponse = await response.json();
+      
+      if (!response.ok) {
+        console.error('BML API error:', bmlResponse);
+        return new Response(
+          JSON.stringify({ error: 'Payment creation failed', details: bmlResponse }),
+          {
+            status: response.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      // Store transaction details in Supabase
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      const { error } = await supabase
+        .from('bml_transactions')
+        .insert({
+          transaction_id: bmlResponse.id,
+          local_id: localId,
+          customer_reference: customerReference || "Booking Payment",
+          booking_reference: paymentReference,
+          amount,
+          currency,
+          provider,
+          state: bmlResponse.state
+        });
+        
+      if (error) {
+        console.error('Error storing transaction:', error);
+        // Continue even if database storage fails
+      }
+      
+      return new Response(
+        JSON.stringify({
+          id: bmlResponse.id,
+          state: bmlResponse.state,
+          created: bmlResponse.created,
+          amount,
+          currency,
+          qrcode: bmlResponse.qrcode
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    } catch (apiError) {
+      console.error('Error calling BML API:', apiError);
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to store payment details' 
-        }), {
-          status: 500,
+          error: 'Payment gateway error', 
+          message: apiError.message,
+          tip: 'This may be due to network issues or API key configuration'
+        }),
+        {
+          status: 502,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }
-    
-    return new Response(
-      JSON.stringify({
-        id: bmlResponse.id,
-        state: bmlResponse.state,
-        created: bmlResponse.created,
-        amount,
-        currency,
-        qrcode: bmlResponse.qrcode
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
   } catch (error) {
     console.error('Error creating payment:', error);
     return new Response(
@@ -184,78 +196,83 @@ async function verifyPayment(req: Request) {
     console.log('Verifying payment with transaction ID:', transactionId);
     
     // Connect to BML API to verify payment status
-    const response = await fetch(`${BML_CONNECT_API.verifyPayment}${transactionId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
-      }
-    });
-    
-    const bmlResponse = await response.json();
-    
-    if (!response.ok) {
-      console.error('BML API error during verification:', bmlResponse);
-      return new Response(
-        JSON.stringify({ error: 'Payment verification failed', details: bmlResponse }),
-        {
-          status: response.status,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    try {
+      const response = await fetch(`${BML_CONNECT_API.verifyPayment}${transactionId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
         }
-      );
-    }
-    
-    // Connect to Supabase to update and retrieve the transaction
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // First, get the transaction
-    const { data: transaction, error: fetchError } = await supabase
-      .from('bml_transactions')
-      .select('*')
-      .eq('transaction_id', transactionId)
-      .single();
+      });
       
-    if (fetchError || !transaction) {
-      console.error('Error fetching transaction:', fetchError);
-      return new Response(
-        JSON.stringify({ state: 'FAILED', error: 'Transaction not found' }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-    
-    // Update status based on the BML API response
-    const { error: updateError } = await supabase
-      .from('bml_transactions')
-      .update({ state: bmlResponse.state })
-      .eq('transaction_id', transactionId);
+      const bmlResponse = await response.json();
       
-    if (updateError) {
-      console.error('Error updating transaction:', updateError);
+      if (!response.ok) {
+        console.error('BML API error during verification:', bmlResponse);
+        return new Response(
+          JSON.stringify({ error: 'Payment verification failed', details: bmlResponse }),
+          {
+            status: response.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      // Connect to Supabase to update and retrieve the transaction
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      // First, get the transaction
+      const { data: transaction, error: fetchError } = await supabase
+        .from('bml_transactions')
+        .select('*')
+        .eq('transaction_id', transactionId)
+        .single();
+        
+      if (fetchError || !transaction) {
+        console.error('Error fetching transaction:', fetchError);
+        // Continue even if transaction not found
+      }
+      
+      // Update status based on the BML API response
+      if (transaction) {
+        const { error: updateError } = await supabase
+          .from('bml_transactions')
+          .update({ state: bmlResponse.state })
+          .eq('transaction_id', transactionId);
+          
+        if (updateError) {
+          console.error('Error updating transaction:', updateError);
+          // Continue even if update fails
+        }
+      }
+      
+      // Return success response with the transaction booking reference
       return new Response(
-        JSON.stringify({ state: 'FAILED', error: 'Could not update transaction' }),
+        JSON.stringify({
+          state: bmlResponse.state,
+          bookingReference: transaction?.booking_reference
+        }),
         {
-          status: 500,
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    } catch (apiError) {
+      console.error('Error calling BML verification API:', apiError);
+      return new Response(
+        JSON.stringify({
+          state: 'FAILED',
+          error: 'Payment verification error',
+          message: apiError.message
+        }),
+        {
+          status: 502,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
     }
-    
-    // Return success response with the transaction booking reference
-    return new Response(
-      JSON.stringify({
-        state: bmlResponse.state,
-        bookingReference: transaction.booking_reference
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
   } catch (error) {
     console.error('Error verifying payment:', error);
     return new Response(

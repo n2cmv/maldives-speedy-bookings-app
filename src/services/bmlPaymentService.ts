@@ -7,6 +7,10 @@ export const bmlPaymentService = {
   // Create a new payment transaction
   async createPayment(booking: BookingInfo): Promise<{ redirectUrl: string, transactionId: string }> {
     try {
+      if (!booking) {
+        throw new Error("Invalid booking data");
+      }
+      
       // Calculate total amount (in MVR, as required by BML API)
       const totalAmount = calculateTotalAmount(booking);
       
@@ -19,11 +23,13 @@ export const bmlPaymentService = {
         currency: "MVR", // Maldivian rufiyaa
         provider: "bml_epos", // BML payment method
         signMethod: "sha1",
-        paymentReference: booking.paymentReference,
+        paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference: `Booking for ${booking.from || 'Male'} to ${booking.island || 'Resort Island'}`,
         redirectUrl: `${window.location.origin}/confirmation?transaction=`,
         appVersion: "RetourMaldives_1.0"
       };
+      
+      console.log("Creating BML payment with payload:", paymentPayload);
       
       // Call the Supabase edge function to create the payment
       const { data, error } = await supabase.functions.invoke("bml-payment/create", {
@@ -35,14 +41,17 @@ export const bmlPaymentService = {
         throw new Error(`Payment creation failed: ${error.message}`);
       }
       
-      if (!data || !data.id || !data.qrcode?.url) {
+      if (!data || !data.id) {
         console.error("Invalid payment response:", data);
         throw new Error("Invalid payment response received");
       }
       
+      // For QR code, handle case where it might not be returned
+      const redirectUrl = data.qrcode?.url || `${window.location.origin}/payment?error=qr_missing`;
+      
       // Return the QR code URL and transaction ID
       return {
-        redirectUrl: data.qrcode.url,
+        redirectUrl,
         transactionId: data.id
       };
     } catch (error) {
@@ -58,6 +67,10 @@ export const bmlPaymentService = {
     bookingReference?: string;
   }> {
     try {
+      if (!transactionId) {
+        throw new Error("Transaction ID is required");
+      }
+      
       const { data, error } = await supabase.functions.invoke("bml-payment/verify", {
         body: { transactionId }
       });
@@ -67,10 +80,14 @@ export const bmlPaymentService = {
         throw new Error(`Payment verification failed: ${error.message}`);
       }
       
+      // Handle case where data might not be complete
+      const status = data?.state || "FAILED";
+      const bookingReference = data?.bookingReference;
+      
       return {
-        status: data.state,
-        success: data.state === "CONFIRMED",
-        bookingReference: data.bookingReference
+        status,
+        success: status === "CONFIRMED",
+        bookingReference
       };
     } catch (error) {
       console.error("BML payment verification failed:", error);

@@ -10,6 +10,7 @@ import PaymentProcessingScreen from "./PaymentProcessingScreen";
  */
 const BmlPaymentHandler = () => {
   const [isVerifying, setIsVerifying] = useState(true);
+  const [verifyAttempts, setVerifyAttempts] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -23,7 +24,7 @@ const BmlPaymentHandler = () => {
         if (!transactionId) {
           setIsVerifying(false);
           toast.error("Invalid payment return URL");
-          navigate("/");
+          navigate("/payment");
           return;
         }
         
@@ -39,7 +40,7 @@ const BmlPaymentHandler = () => {
             // Need to fetch the complete booking before redirecting
             navigate(`/confirmation/${result.bookingReference}`);
           } else {
-            navigate("/");
+            navigate("/confirmation");
           }
         } else {
           console.log("Payment failed with status:", result.status);
@@ -47,23 +48,39 @@ const BmlPaymentHandler = () => {
           navigate("/payment", { 
             state: { 
               failed: true, 
-              reason: result.status 
+              reason: result.status,
+              transactionId
             } 
           });
         }
       } catch (error) {
         console.error("Payment verification error:", error);
+        
+        // If we've tried less than 3 times, try again
+        if (verifyAttempts < 2) {
+          setVerifyAttempts(prev => prev + 1);
+          toast.error("Verification attempt failed, retrying...");
+          // Try again after a delay
+          setTimeout(() => verifyPayment(), 2000);
+          return;
+        }
+        
         toast.error("Failed to verify payment");
-        navigate("/");
+        navigate("/payment", { 
+          state: { 
+            failed: true, 
+            reason: "VERIFICATION_ERROR"
+          } 
+        });
       } finally {
         setIsVerifying(false);
       }
     };
     
-    if (location.search.includes('transaction=')) {
+    if (location.search.includes('transaction=') && isVerifying) {
       verifyPayment();
     }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, verifyAttempts, isVerifying]);
   
   // Show processing screen while verifying payment
   if (isVerifying) {
