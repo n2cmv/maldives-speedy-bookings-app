@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { testBmlApiConnection, openBmlTestPage, BML_CONFIG } from "@/services/bmlPaymentService";
+import { testBmlApiConnection, BML_CONFIG } from "@/services/bmlPaymentService";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -36,6 +36,11 @@ const BmlApiTest = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // Function to open BML test page in a new tab
+  const openBmlTestPage = () => {
+    window.open("https://api.merchants.bankofmaldives.com.mv/docs", "_blank");
   };
   
   return (
@@ -79,11 +84,11 @@ const BmlApiTest = () => {
                   
                   <Button 
                     variant="outline" 
-                    onClick={() => openBmlTestPage()}
+                    onClick={openBmlTestPage}
                     className="flex items-center gap-2"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    Open BML Test Page
+                    Open BML API Docs
                   </Button>
                 </div>
                 
@@ -124,10 +129,8 @@ const BmlApiTest = () => {
                   <div>
                     <h3 className="font-medium">Check Your Environment:</h3>
                     <p className="text-gray-600">
-                      The application is currently using the BML <span className="font-semibold text-green-600">{BML_CONFIG.forceRealMode ? 'PRODUCTION' : 'TESTING'}</span> environment. 
-                      The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">{BML_CONFIG.forceRealMode ? 
-                        "https://api.merchants.bankofmaldives.com.mv" : 
-                        "https://api.uat.merchants.bankofmaldives.com.mv"}</code>
+                      The application is currently using the BML <span className="font-semibold text-green-600">PRODUCTION</span> environment. 
+                      The API base URL is: <code className="bg-gray-100 px-2 py-1 rounded">https://api.merchants.bankofmaldives.com.mv</code>
                     </p>
                   </div>
                   
