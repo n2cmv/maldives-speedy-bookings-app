@@ -15,6 +15,20 @@ const PaymentInfo = ({
 }: PaymentInfoProps) => {
   const { t } = useTranslation();
   
+  // Format the payment method name for display
+  const formatPaymentMethodName = (method: string) => {
+    switch (method) {
+      case "bank_transfer":
+        return "Bank Transfer";
+      case "bml_connect":
+        return "BML Connect";
+      case "card":
+        return "Credit/Debit Card";
+      default:
+        return method;
+    }
+  };
+  
   return (
     <div className="bg-green-50 border border-green-100 rounded-lg p-4 flex items-start">
       <div className="rounded-full bg-green-100 p-1.5 mr-3 flex-shrink-0">
@@ -26,7 +40,7 @@ const PaymentInfo = ({
           {t("confirmation.reference", "Payment Reference")}: <span className="font-medium">{paymentReference}</span>
         </p>
         <p className="text-sm text-green-700 mt-1">
-          {t("confirmation.paymentMethod", "Payment Method")}: {paymentMethod}
+          {t("confirmation.paymentMethod", "Payment Method")}: {formatPaymentMethodName(paymentMethod)}
         </p>
       </div>
     </div>

@@ -5,11 +5,12 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import BmlPaymentHandler from "@/components/payment/BmlPaymentHandler";
 
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const location = useLocation();
-  const isReturningFromPayment = location.search.includes('status=');
+  const isReturningFromPayment = location.search.includes('transaction=');
   
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +34,9 @@ const Index = () => {
   return <div className="min-h-screen bg-[#F5F5F7] overflow-hidden relative">
       <div className="absolute top-20 right-10 w-60 h-60 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-80 h-80 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
+      
+      {/* BML Payment Handler component will verify returning payments */}
+      {isReturningFromPayment && <BmlPaymentHandler />}
       
       <div className="relative z-10">
         <Header />

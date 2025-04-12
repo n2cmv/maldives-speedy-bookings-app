@@ -29,6 +29,12 @@ const PaymentMethodSelector = ({
       description: "Pay securely via bank transfer"
     },
     {
+      id: "bml_connect",
+      name: "BML Connect",
+      logo: "/placeholder.svg",
+      description: "Pay with Bank of Maldives"
+    },
+    {
       id: "card",
       name: "Credit/Debit Card",
       logo: "/placeholder.svg",

@@ -15,6 +15,7 @@ import PaymentForm from "@/components/payment/PaymentForm";
 import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { bmlPaymentService } from "@/services/bmlPaymentService";
 
 const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
@@ -80,37 +81,76 @@ const PaymentGateway = () => {
     const totalAmount = calculateTotal();
     
     try {
-      // Simulate a payment process
-      toast.info("Processing payment...");
-      
-      // Simulate payment processing delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
       // Generate a payment reference
       const paymentReference = bookingReference;
       
-      // Store completed booking data
-      if (activityBooking) {
-        const completedBooking = {
-          ...activityBooking,
-          paymentComplete: true,
-          paymentReference,
-          paymentMethod
-        };
+      // For BML Connect payments
+      if (paymentMethod === "bml_connect") {
+        let paymentData;
         
-        navigate("/confirmation", { state: completedBooking });
-      } else if (bookingInfo) {
-        const completedBooking = {
-          ...bookingInfo,
-          paymentComplete: true,
-          paymentReference,
-          paymentMethod
-        };
+        if (activityBooking) {
+          paymentData = {
+            ...activityBooking,
+            paymentReference,
+            paymentMethod
+          };
+        } else if (bookingInfo) {
+          paymentData = {
+            ...bookingInfo,
+            paymentReference,
+            paymentMethod
+          };
+        }
         
-        navigate("/confirmation", { state: completedBooking });
+        if (paymentData) {
+          toast.info("Redirecting to BML payment...");
+          setIsRedirecting(true);
+          
+          // Call the BML payment service
+          const result = await bmlPaymentService.createPayment(paymentData);
+          
+          // Store the booking data for when returning from payment
+          if (activityBooking) {
+            localStorage.setItem("pendingActivityBooking", JSON.stringify(paymentData));
+          } else {
+            localStorage.setItem("pendingBooking", JSON.stringify(paymentData));
+          }
+          
+          // Redirect to BML payment page
+          window.location.href = result.redirectUrl + "?transaction=" + result.transactionId;
+        }
       }
-      
-      toast.success("Payment successful!");
+      // For regular bank transfer payments
+      else {
+        // Simulate a payment process
+        toast.info("Processing payment...");
+        
+        // Simulate payment processing delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Store completed booking data
+        if (activityBooking) {
+          const completedBooking = {
+            ...activityBooking,
+            paymentComplete: true,
+            paymentReference,
+            paymentMethod
+          };
+          
+          navigate("/confirmation", { state: completedBooking });
+        } else if (bookingInfo) {
+          const completedBooking = {
+            ...bookingInfo,
+            paymentComplete: true,
+            paymentReference,
+            paymentMethod
+          };
+          
+          navigate("/confirmation", { state: completedBooking });
+        }
+        
+        toast.success("Payment successful!");
+      }
     } catch (error) {
       console.error("Payment error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to process payment";
@@ -120,6 +160,7 @@ const PaymentGateway = () => {
         description: errorMessage
       });
       setIsProcessing(false);
+      setIsRedirecting(false);
     }
   };
 
@@ -206,7 +247,7 @@ const PaymentGateway = () => {
                     <div>
                       <h3 className="font-medium text-gray-800">Payment Information</h3>
                       <p className="text-sm mt-1 text-blue-700">
-                        This is a demo payment system. In a real application, you would integrate with a payment provider.
+                        This is a demo payment system. In a real application, you would be redirected to a secure payment provider.
                       </p>
                     </div>
                   </div>
