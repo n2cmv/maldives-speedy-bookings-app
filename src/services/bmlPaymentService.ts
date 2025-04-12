@@ -26,6 +26,7 @@ export const bmlPaymentService = {
       // Redirect to the dedicated payment confirmation route
       const confirmationBaseUrl = `${window.location.origin}/payment-confirmation?transaction=`;
 
+      // Include merchant ID in the payment payload
       const paymentPayload = {
         amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
         currency: "USD", // Using USD as shown in the BML dashboard
@@ -34,6 +35,7 @@ export const bmlPaymentService = {
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference,
         redirectUrl: confirmationBaseUrl,
+        merchantId: "8633129903", // Merchant ID provided
         appVersion: "RetourMaldives_1.0"
       };
       

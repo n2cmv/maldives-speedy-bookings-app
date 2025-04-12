@@ -16,6 +16,7 @@ interface BmlPaymentRequest {
   paymentReference: string;
   customerReference: string;
   redirectUrl: string;
+  merchantId: string;
   appVersion: string;
 }
 
@@ -25,6 +26,7 @@ const USE_MOCK_BML_API = true;
 // BML merchant details from the dashboard (updated with correct values)
 const BML_MERCHANT_DETAILS = {
   applicationId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
+  merchantId: "8633129903", // Added Merchant ID
   currency: "USD",
   domain: "https://maldives-speedy-bookings-app.lovable.app/",
   publicKey: "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmJXRnNaR2wyWlhNdGMzQmxaV1I1TFdKdmIydHBibWR6TFdGd2NDNXNiM1poWW14bExtRndjQzhpTENKaElqb2lZamd6WXpoak5tSXRNVEppWXkwMFlqSmxMVGcyTkRBdE5XUTVaVFkyTnpnMllXUmpJaXdpZFhFaU9pSXpNREE1WWpSak9TMHhaV001TFRRMVlqa3RPRFprT0MxbU5qY3pZelptTlRFeFlqTWlMQ0pwWVhRaU9qRTNORFF6T0RNNU16WXNJbVY0Y0NJNk5Ea3dNREExTnpVek5uMC5LdFJJQ0pVb0VQaHY1clM4YWFoOG53U3k5WE92NHRNb1hIb0RrNzdqNlVz",
@@ -60,6 +62,7 @@ async function createPayment(req: Request) {
       paymentReference, 
       customerReference, 
       redirectUrl, 
+      merchantId,
       appVersion 
     } = await req.json() as BmlPaymentRequest;
     
@@ -83,7 +86,8 @@ async function createPayment(req: Request) {
       currency: BML_MERCHANT_DETAILS.currency || "USD",  // Use the configured currency
       redirectUrl: redirectUrl || `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=`,
       customerReference: customerReference || "Booking Payment",
-      merchantReference: paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`
+      merchantReference: paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
+      merchantId: merchantId || BML_MERCHANT_DETAILS.merchantId // Use provided or default merchant ID
     };
     
     console.log('Creating payment with BML Connect:', JSON.stringify(bmlPayload));
