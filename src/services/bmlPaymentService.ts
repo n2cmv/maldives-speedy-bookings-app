@@ -1,6 +1,5 @@
 
 import { BookingInfo } from "@/types/booking";
-import crypto from 'crypto';
 
 interface BMLPaymentResponse {
   success: boolean;
@@ -51,12 +50,28 @@ export const getApiUrl = (endpoint: string, settings?: BMLSettings): string => {
   return `${baseUrl}${endpoint}`;
 };
 
-// Generate signature as per BML API v2.0 specs
-const generateSignature = (amount: number, currency: string, apiKey: string): string => {
+/**
+ * Generate signature as per BML API v2.0 specs using Web Crypto API
+ * This is a browser-compatible implementation
+ */
+const generateSignature = async (amount: number, currency: string, apiKey: string): Promise<string> => {
   try {
     // Format according to the API documentation: sha1('amount=2000&currency=MVR&apiKey=mysecretkey').digest('hex')
     const signString = `amount=${amount}&currency=${currency}&apiKey=${apiKey}`;
-    return crypto.createHash('sha1').update(signString).digest('hex');
+    
+    // Convert the string to Uint8Array
+    const encoder = new TextEncoder();
+    const data = encoder.encode(signString);
+    
+    // Generate SHA-1 hash
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    
+    // Convert to hex string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    console.log("BML Service: Generated signature for amount:", amount, "currency:", currency);
+    return hashHex;
   } catch (error) {
     console.error("Error generating signature:", error);
     throw new Error("Failed to generate payment signature");
@@ -150,88 +165,108 @@ export async function createBmlPaymentSession(
     // Convert amount to cents as per API requirements
     const amountInCents = Math.round(amount * 100);
     
-    // Generate signature according to BML API v2.0
-    const signature = generateSignature(amountInCents, "USD", BML_CONFIG.apiKey);
-
-    // Prepare payment request data according to BML API v2.0 specifications
-    const paymentData = {
-      localId: txnId,
-      customerReference: `Booking for ${customer.name}`,
-      signature: signature,
-      amount: amountInCents,
-      currency: "USD",
-      provider: "bml_epos", // Using BML EPOS provider as specified in docs
-      appVersion: "RetourMaldives1.0", // App version for tracking
-      apiVersion: "2.0", // API version
-      deviceId: BML_CONFIG.clientId, // Using client ID as device ID
-      signMethod: "sha1", // Signature method
-      redirectUrl: returnUrl,
-      cancelUrl: cancelUrl
-    };
-
-    console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
-
-    // Make API request to BML to create a payment session
     try {
-      // Attempt to connect to the BML API
-      const apiUrl = getApiUrl(CREATE_PAYMENT_ENDPOINT, bmlSettings);
-      console.log("BML Service: Using API URL:", apiUrl);
-      
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': BML_CONFIG.apiKey,
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(paymentData)
-      });
+      // Generate signature according to BML API v2.0 using browser-compatible method
+      const signature = await generateSignature(amountInCents, "USD", BML_CONFIG.apiKey);
 
-      const responseStatus = response.status;
-      console.log("BML Service: Payment request status:", responseStatus);
-      
-      const data = await response.json();
-      console.log("BML Service: Payment request response:", JSON.stringify(data, null, 2));
-
-      if (!response.ok) {
-        console.error("BML Service: Payment request error:", data);
-        return {
-          success: false,
-          error: data.message || `Failed to initialize payment (Status ${responseStatus})`
-        };
-      }
-
-      // For successful responses, extract QR code URL or redirect URL
-      return {
-        success: true,
-        paymentUrl: data.qrCode?.url || data.redirectUrl,
-        reference: txnId
+      // Prepare payment request data according to BML API v2.0 specifications
+      const paymentData = {
+        localId: txnId,
+        customerReference: `Booking for ${customer.name}`,
+        signature: signature,
+        amount: amountInCents,
+        currency: "USD",
+        provider: "bml_epos", // Using BML EPOS provider as specified in docs
+        appVersion: "RetourMaldives1.0", // App version for tracking
+        apiVersion: "2.0", // API version
+        deviceId: BML_CONFIG.clientId, // Using client ID as device ID
+        signMethod: "sha1", // Signature method
+        redirectUrl: returnUrl,
+        cancelUrl: cancelUrl
       };
-    } catch (error) {
-      // Only use simulation if not explicitly disabled
-      if (bmlSettings.disableSimulation) {
-        throw error;
+
+      console.log("BML Service: Initiating payment request with data:", JSON.stringify(paymentData, null, 2));
+
+      // Make API request to BML to create a payment session
+      try {
+        // Attempt to connect to the BML API
+        const apiUrl = getApiUrl(CREATE_PAYMENT_ENDPOINT, bmlSettings);
+        console.log("BML Service: Using API URL:", apiUrl);
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': BML_CONFIG.apiKey,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(paymentData)
+        });
+
+        const responseStatus = response.status;
+        console.log("BML Service: Payment request status:", responseStatus);
+        
+        const data = await response.json();
+        console.log("BML Service: Payment request response:", JSON.stringify(data, null, 2));
+
+        if (!response.ok) {
+          console.error("BML Service: Payment request error:", data);
+          return {
+            success: false,
+            error: data.message || `Failed to initialize payment (Status ${responseStatus})`
+          };
+        }
+
+        // For successful responses, extract QR code URL or redirect URL
+        return {
+          success: true,
+          paymentUrl: data.qrCode?.url || data.redirectUrl,
+          reference: txnId
+        };
+      } catch (error) {
+        // Only use simulation if not explicitly disabled
+        if (bmlSettings.disableSimulation) {
+          throw error;
+        }
+        
+        // Check if we should use simulation mode
+        if (error instanceof TypeError && error.message.includes("Failed to fetch") && !bmlSettings.forceRealMode) {
+          console.log("BML Service: Network error detected, providing fallback simulation");
+          
+          // Generate a reference and simulate success for dev/test environments
+          const simulatedRef = `SIM-${Date.now()}`;
+          
+          // In development/test environments, provide a fallback URL to the test payment page
+          const testPageUrl = "https://merchants.bankofmaldives.com.mv/test-payment-page";
+          
+          return {
+            success: true,
+            paymentUrl: testPageUrl,
+            reference: simulatedRef,
+            error: "Using simulation mode due to network issues connecting to BML API"
+          };
+        } else {
+          throw error;
+        }
       }
+    } catch (signatureError) {
+      console.error("BML Service: Error generating signature:", signatureError);
       
-      // Check if we should use simulation mode
-      if (error instanceof TypeError && error.message.includes("Failed to fetch") && !bmlSettings.forceRealMode) {
-        console.log("BML Service: Network error detected, providing fallback simulation");
-        
-        // Generate a reference and simulate success for dev/test environments
+      // If in development mode and not forcing real mode, provide a simulated response
+      if (!bmlSettings.forceRealMode && !bmlSettings.disableSimulation) {
+        console.log("BML Service: Signature error detected, providing fallback simulation");
         const simulatedRef = `SIM-${Date.now()}`;
-        
-        // In development/test environments, provide a fallback URL to the test payment page
         const testPageUrl = "https://merchants.bankofmaldives.com.mv/test-payment-page";
         
         return {
           success: true,
           paymentUrl: testPageUrl,
           reference: simulatedRef,
-          error: "Using simulation mode due to network issues connecting to BML API"
+          error: "Using simulation mode due to signature generation issues"
         };
-      } else {
-        throw error;
       }
+      
+      throw signatureError;
     }
   } catch (error) {
     console.error("BML Service: Error creating payment:", error);
