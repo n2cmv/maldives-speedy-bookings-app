@@ -2,7 +2,7 @@
 import { BookingInfo } from "@/types/booking";
 import { supabase } from "@/integrations/supabase/client";
 
-// BML Connect integration service
+// BML Connect integration service with updated configuration
 export const bmlPaymentService = {
   // Create a new payment transaction
   async createPayment(booking: BookingInfo): Promise<{ redirectUrl: string, transactionId: string }> {
@@ -11,7 +11,7 @@ export const bmlPaymentService = {
         throw new Error("Invalid booking data");
       }
       
-      // Calculate total amount (in MVR, as required by BML API)
+      // Calculate total amount (in USD, as configured in BML Connect dashboard)
       const totalAmount = calculateTotalAmount(booking);
       
       if (totalAmount <= 0) {
@@ -25,7 +25,7 @@ export const bmlPaymentService = {
 
       const paymentPayload = {
         amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
-        currency: "MVR", // Maldivian rufiyaa
+        currency: "USD", // Using USD as shown in the BML dashboard
         provider: "bml_epos", // BML payment method
         signMethod: "sha1",
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,

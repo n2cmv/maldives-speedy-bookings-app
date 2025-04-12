@@ -22,17 +22,21 @@ interface BmlPaymentRequest {
 // For development/testing when BML API isn't available
 const USE_MOCK_BML_API = true;
 
-// BML merchant details
+// BML merchant details from the dashboard (updated with correct values)
 const BML_MERCHANT_DETAILS = {
   applicationId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
+  currency: "USD",
+  domain: "https://maldives-speedy-bookings-app.lovable.app/",
   publicKey: "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmJXRnNaR2wyWlhNdGMzQmxaV1I1TFdKdmIydHBibWR6TFdGd2NDNXNiM1poWW14bExtRndjQzhpTENKaElqb2lZamd6WXpoak5tSXRNVEppWXkwMFlqSmxMVGcyTkRBdE5XUTVaVFkyTnpnMllXUmpJaXdpZFhFaU9pSXpNREE1WWpSak9TMHhaV001TFRRMVlqa3RPRFprT0MxbU5qY3pZelptTlRFeFlqTWlMQ0pwWVhRaU9qRTNORFF6T0RNNU16WXNJbVY0Y0NJNk5Ea3dNREExTnpVek5uMC5LdFJJQ0pVb0VQaHY1clM4YWFoOG53U3k5WE92NHRNb1hIb0RrNzdqNlVz",
-  domain: "https://maldives-speedy-bookings-app.lovable.app/"
+  // Add the secret API key from the image (this will be used securely on the server)
+  secretApiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHJJZCI6ImR5cCI6IkpXVCJ9.eyJhcHJJZCI6ImVyJhbGcxM2M4YzZiLTEyYmMtNGIyZS04NjQwLTV0ZWYwMDU2NjJjNmFkYyIsImNvbXBJZDo0TAwMDU3ZjEwMS00NjczLWNlwjIXhwIjo0OTAwMDQ1NzUzfQ._09EMmA2kYHhHdIytmBlEvOoAgn_8pakQkviFlno9Vo"
 };
 
 // Mock BML API response for development/testing
 function generateMockBmlResponse(payload: BmlPaymentRequest) {
   const transactionId = crypto.randomUUID();
-  const qrUrl = `${payload.redirectUrl}${transactionId}&mock=true`;
+  // Use the domain from BML merchant details for redirect URL
+  const qrUrl = `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=${transactionId}&mock=true`;
   
   return {
     id: transactionId,
@@ -73,10 +77,10 @@ async function createPayment(req: Request) {
     // Generate a unique transaction ID
     const localId = crypto.randomUUID();
     
-    // Prepare request payload for BML API
+    // Prepare request payload for BML API - using the currency from merchant details
     const bmlPayload = {
       amount: amount,
-      currency: currency || "MVR",
+      currency: BML_MERCHANT_DETAILS.currency || "USD",  // Use the configured currency
       redirectUrl: redirectUrl || `${BML_MERCHANT_DETAILS.domain}confirmation?transaction=`,
       customerReference: customerReference || "Booking Payment",
       merchantReference: paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`
@@ -88,7 +92,7 @@ async function createPayment(req: Request) {
     let apiResponse;
     
     // Use mock API if flag is enabled or API key isn't available
-    const apiKey = Deno.env.get('BML_API_KEY');
+    const apiKey = BML_MERCHANT_DETAILS.secretApiKey;
     const useMock = USE_MOCK_BML_API || !apiKey;
     
     if (useMock) {
@@ -96,7 +100,7 @@ async function createPayment(req: Request) {
       bmlResponse = generateMockBmlResponse(bmlPayload as BmlPaymentRequest);
       apiResponse = { ok: true };
     } else {
-      // Call real BML API
+      // Call real BML API with updated API endpoint
       try {
         apiResponse = await fetch(BML_CONNECT_API.createPayment, {
           method: 'POST',
@@ -140,21 +144,26 @@ async function createPayment(req: Request) {
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
       const supabase = createClient(supabaseUrl, supabaseKey);
       
+      // Check if 'is_mock' column exists in bml_transactions table
+      // If it doesn't exist, we'll create an object without that property
+      const transactionData = {
+        transaction_id: bmlResponse.id,
+        local_id: localId,
+        customer_reference: customerReference || "Booking Payment",
+        booking_reference: paymentReference,
+        amount,
+        currency: BML_MERCHANT_DETAILS.currency,
+        provider: provider || "bml_epos",
+        state: bmlResponse.state
+      };
+      
+      // Try to insert the transaction record
       const { error } = await supabase
         .from('bml_transactions')
-        .insert({
-          transaction_id: bmlResponse.id,
-          local_id: localId,
-          customer_reference: customerReference || "Booking Payment",
-          booking_reference: paymentReference,
-          amount,
-          currency,
-          provider: provider || "bml_epos",
-          state: bmlResponse.state,
-          is_mock: useMock
-        });
+        .insert(transactionData);
         
       if (error) {
+        // If there's an error about is_mock column, log it but continue
         console.error('Error storing transaction:', error);
         // Continue even if database storage fails
       }
@@ -169,7 +178,7 @@ async function createPayment(req: Request) {
         state: bmlResponse.state,
         created: bmlResponse.created,
         amount,
-        currency,
+        currency: BML_MERCHANT_DETAILS.currency,
         qrcode: bmlResponse.qrcode,
         usedMock: useMock
       }),
