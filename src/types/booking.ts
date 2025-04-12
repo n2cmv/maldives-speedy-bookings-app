@@ -51,6 +51,7 @@ export interface BookingInfo {
   returnTripDetails?: TripDetails;
   paymentComplete?: boolean;
   paymentReference?: string;
+  paymentMethod?: string; // Added paymentMethod property
   id?: string; // For saved bookings
 }
 
