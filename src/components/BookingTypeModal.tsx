@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Anchor, Boat } from "lucide-react"; // Import Boat icon
+import { Anchor, Boat as LucideBoat } from "lucide-react"; // Change Boat to LucideBoat
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ const BookingTypeModal = ({ isOpen, onClose }: BookingTypeModalProps) => {
             onClick={onClose}
           >
             <div className="bg-[#0AB3B8]/10 p-4 rounded-full mb-4">
-              <Boat className="h-10 w-10 text-[#0AB3B8]" /> {/* Changed from Anchor to Boat */}
+              <LucideBoat className="h-10 w-10 text-[#0AB3B8]" /> {/* Use LucideBoat instead of Boat */}
             </div>
             <div className="text-center">
               <h3 className="font-bold text-lg text-gray-900 mb-2">Speedboat Transfer</h3>
