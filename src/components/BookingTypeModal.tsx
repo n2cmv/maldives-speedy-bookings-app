@@ -1,7 +1,6 @@
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Ship, CalendarDays, X } from "lucide-react";
+import { Ship, CalendarDays } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -49,14 +48,6 @@ const BookingTypeModal = ({ isOpen, onClose }: BookingTypeModalProps) => {
             <p className="text-gray-500 text-center text-sm mt-2">Explore excursions and experiences</p>
           </Link>
         </div>
-        
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-500"
-          aria-label="Close"
-        >
-          <X className="h-5 w-5" />
-        </button>
       </DialogContent>
     </Dialog>
   );
