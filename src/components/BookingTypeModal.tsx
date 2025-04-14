@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Ship, CalendarDays } from "lucide-react";
+import { Anchor, CalendarDays } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ const BookingTypeModal = ({ isOpen, onClose }: BookingTypeModalProps) => {
             onClick={onClose}
           >
             <div className="bg-[#0AB3B8]/10 p-4 rounded-full mb-4">
-              <Ship className="h-10 w-10 text-[#0AB3B8]" />
+              <Anchor className="h-10 w-10 text-[#0AB3B8]" />
             </div>
             <h3 className="font-bold text-lg text-gray-900">Speedboat Transfer</h3>
             <p className="text-gray-500 text-center text-sm mt-2">Book transportation between islands</p>
@@ -42,7 +42,7 @@ const BookingTypeModal = ({ isOpen, onClose }: BookingTypeModalProps) => {
             onClick={onClose}
           >
             <div className="bg-[#0AB3B8]/10 p-4 rounded-full mb-4">
-              <CalendarDays className="h-10 w-10 text-[#0AB3B8]" />
+              <Anchor className="h-10 w-10 text-[#0AB3B8]" />
             </div>
             <h3 className="font-bold text-lg text-gray-900">Activities</h3>
             <p className="text-gray-500 text-center text-sm mt-2">Explore excursions and experiences</p>
