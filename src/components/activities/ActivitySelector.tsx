@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Activity } from "./ActivityForm";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { 
-  Fish, 
+  Anchor,  // Replace Fish with Anchor 
   Sailboat, 
   Turtle, 
   Umbrella, 
@@ -81,7 +82,7 @@ const activities: Activity[] = [
 const getActivityIcon = (id: string) => {
   switch (id) {
     case "manta":
-      return <Fish className="h-5 w-5 text-blue-600" />;
+      return <Anchor className="h-5 w-5 text-blue-600" />; // Changed from Fish to Anchor
     case "whaleshark":
       return <Sailboat className="h-5 w-5 text-blue-800" />;
     case "turtle":
@@ -95,9 +96,9 @@ const getActivityIcon = (id: string) => {
     case "sunset_fishing":
       return <Sunset className="h-5 w-5 text-orange-600" />;
     case "nurse_shark":
-      return <Fish className="h-5 w-5 text-gray-600" />;
+      return <Anchor className="h-5 w-5 text-gray-600" />; // Also changed to Anchor
     default:
-      return <Fish className="h-5 w-5 text-blue-600" />;
+      return <Anchor className="h-5 w-5 text-blue-600" />; // Default changed to Anchor
   }
 };
 
