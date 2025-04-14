@@ -3,11 +3,14 @@ import { Ship, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
+import BookingTypeModal from "./BookingTypeModal";
 
 const Header = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const location = useLocation();
+  const [showBookingModal, setShowBookingModal] = useState(false);
   
   // Check if we're on the home page
   const isHomePage = location.pathname === '/';
@@ -26,9 +29,12 @@ const Header = () => {
         
         <nav className="flex items-center space-x-4">
           {isHomePage && (
-            <Link to="/booking" className="inline-flex items-center gap-2 bg-[#0AB3B8] hover:bg-[#005C99] text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+            <button 
+              onClick={() => setShowBookingModal(true)}
+              className="inline-flex items-center gap-2 bg-[#0AB3B8] hover:bg-[#005C99] text-white font-medium py-2 px-4 rounded-lg transition-all duration-300"
+            >
               {t("common.bookNow", "Book Now")}
-            </Link>
+            </button>
           )}
           
           <Link to="/my-bookings" className={`flex items-center ${isMobile ? "" : "space-x-1"} text-[#005C99] hover:text-[#0AB3B8] transition-colors font-medium`}>
@@ -37,6 +43,11 @@ const Header = () => {
           </Link>
         </nav>
       </div>
+      
+      <BookingTypeModal 
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+      />
     </header>
   );
 };

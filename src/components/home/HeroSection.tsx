@@ -4,11 +4,13 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import BookingTypeModal from "../BookingTypeModal";
 
 const HeroSection = () => {
   const { t } = useTranslation();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showBookingModal, setShowBookingModal] = useState(false);
   
   useEffect(() => {
     const fetchVideo = async () => {
@@ -98,10 +100,13 @@ const HeroSection = () => {
           Efficient, reliable, and designed with you in mind.
         </p>
         
-        <Link to="/booking" className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0AB3B8]/80 text-white font-medium py-4 px-10 rounded-xl shadow-lg transition-all duration-300 text-xl">
+        <button 
+          onClick={() => setShowBookingModal(true)} 
+          className="inline-flex items-center bg-[#0AB3B8] hover:bg-[#0AB3B8]/80 text-white font-medium py-4 px-10 rounded-xl shadow-lg transition-all duration-300 text-xl"
+        >
           {t('common.bookNow')}
           <ArrowRight className="ml-2 h-5 w-5" />
-        </Link>
+        </button>
       </div>
       
       <div className="absolute bottom-12 left-0 right-0 flex justify-center">
@@ -114,6 +119,11 @@ const HeroSection = () => {
           <ChevronDown className="h-6 w-6 animate-bounce" />
         </button>
       </div>
+      
+      <BookingTypeModal 
+        isOpen={showBookingModal} 
+        onClose={() => setShowBookingModal(false)} 
+      />
     </div>
   );
 };
