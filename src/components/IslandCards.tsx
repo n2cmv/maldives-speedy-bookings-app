@@ -29,13 +29,6 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
       description: "A tranquil island with rich cultural heritage and traditional Maldivian lifestyle.",
       travelTime: "2 hours",
       bestFor: "Cultural Experience"
-    },
-    {
-      name: "Aa. Mathiveri",
-      image: "https://images.unsplash.com/photo-1518877593221-1f28583780b4",
-      description: "Known for its marine biodiversity and vibrant underwater ecosystem.",
-      travelTime: "2.5 hours",
-      bestFor: "Diving & Marine Life"
     }
   ];
   
@@ -46,7 +39,7 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
         const { data, error } = await supabase
           .from('islands')
           .select('*')
-          .limit(3);
+          .limit(2);
         
         if (error) {
           console.error('Error fetching islands:', error);
@@ -70,11 +63,11 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
   const displayIslands = islandsData.length > 0 
     ? islandsData.map((island, index) => ({
         name: island.name,
-        image: island.image_url || fallbackIslands[index % 3].image,
+        image: island.image_url || fallbackIslands[index % 2].image,
         description: island.description,
         // Using fixed values for these as they're not in the DB schema
-        travelTime: fallbackIslands[index % 3].travelTime,
-        bestFor: fallbackIslands[index % 3].bestFor
+        travelTime: fallbackIslands[index % 2].travelTime,
+        bestFor: fallbackIslands[index % 2].bestFor
       }))
     : fallbackIslands;
 
@@ -87,7 +80,7 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       {displayIslands.map((island) => (
         <Card key={island.name} className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
           <div className="relative h-48">

@@ -53,20 +53,6 @@ const islandDataMap: Record<Island, IslandData> = {
     },
     accommodation: ["Local guesthouses", "Homestays", "Budget hotels"]
   },
-  "Aa. Mathiveri": {
-    name: "Aa. Mathiveri",
-    fullDescription: "Mathiveri is a picturesque island in the Alif Alif Atoll known for its marine biodiversity and vibrant underwater ecosystem. The island boasts beautiful white sandy beaches, crystal clear waters, and is surrounded by colorful coral reefs. It's an excellent destination for marine enthusiasts and underwater photographers.",
-    imageUrl: "https://images.unsplash.com/photo-1518877593221-1f28583780b4",
-    travelTime: "2.5 hours",
-    bestFor: ["Diving", "Marine Life", "Photography"],
-    activities: ["Scuba diving", "Snorkeling", "Marine life observation", "Beach picnics", "Island hopping"],
-    weather: {
-      season: "Best visited November-April",
-      temperature: "26°C - 31°C",
-      rainfall: "Moderate year-round"
-    },
-    accommodation: ["Diving resorts", "Beach bungalows", "Water villas"]
-  },
   // Default values for other islands - these would be filled with proper data in a real application
   "Male": {
     name: "Male",
@@ -95,20 +81,6 @@ const islandDataMap: Record<Island, IslandData> = {
       rainfall: "Moderate year-round"
     },
     accommodation: ["Hotels", "Guesthouses", "Transit accommodations"]
-  },
-  "Maafushi": {
-    name: "Maafushi",
-    fullDescription: "One of the most popular local islands for tourists in the Maldives.",
-    imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    travelTime: "1 hour",
-    bestFor: ["Budget travel", "Water sports", "Beaches"],
-    activities: ["Water sports", "Snorkeling", "Beach", "Excursions"],
-    weather: {
-      season: "November to April (best time)",
-      temperature: "27°C - 31°C",
-      rainfall: "Low during dry season"
-    },
-    accommodation: ["Budget hotels", "Guesthouses", "Small resorts"]
   },
   "Baa Atoll": {
     name: "Baa Atoll",

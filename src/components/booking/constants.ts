@@ -23,23 +23,19 @@ export const islandTimeRestrictions: Record<string, Time[]> = {
   'A.Dh Dhangethi': [Time.AM_700, Time.PM_130],
   'Male': allTimes,
   'Hulhumale': allTimes,
-  'Maafushi': allTimes,
   'Baa Atoll': allTimes,
   'Ari Atoll': allTimes,
   'Male\' City': allTimes,
-  'Male\' Airport': allTimes,
-  'Aa. Mathiveri': allTimes
+  'Male\' Airport': allTimes
 };
 
 export const fallbackIslands = [
   'Male', 
   'Hulhumale', 
-  'Maafushi', 
   'Baa Atoll', 
   'Ari Atoll', 
   'Male\' City', 
   'Male\' Airport',
   'A.Dh Dhigurah',
-  'A.Dh Dhangethi',
-  'Aa. Mathiveri'
+  'A.Dh Dhangethi'
 ];

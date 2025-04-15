@@ -25,22 +25,6 @@ const Islands = () => {
       description: "A charming local island with rich cultural heritage and beautiful beaches.",
       location: "Ari Atoll",
       travelTime: "2 hours by speedboat"
-    },
-    {
-      name: "Mathiveri Island",
-      slug: "mathiveri",
-      image: "https://images.unsplash.com/photo-1518877593221-1f28583780b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-      description: "Known for its marine biodiversity and vibrant underwater ecosystem.",
-      location: "Alif Alif Atoll",
-      travelTime: "2.5 hours by speedboat"
-    },
-    {
-      name: "Maafushi Island",
-      slug: "maafushi",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-      description: "One of the most popular local islands for tourists in the Maldives.",
-      location: "South Male Atoll",
-      travelTime: "1 hour by speedboat"
     }
   ];
   
