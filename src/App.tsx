@@ -1,9 +1,9 @@
-
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useScrollToTop } from "@/hooks/use-scroll-top";
 
 // Import pages
 import Index from "./pages/Index";
@@ -38,6 +38,9 @@ import { BookingInfo } from "./types/booking";
 const App = () => {
   // Create a client instance inside the component to avoid React hook issues
   const [queryClient] = useState(() => new QueryClient());
+  
+  // Apply scroll to top hook globally
+  useScrollToTop();
   
   // Set up listener to save booking info to local storage when navigation happens
   useEffect(() => {
