@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
 import Header from "@/components/Header";
@@ -15,8 +15,8 @@ import PaymentMethodSelector from "@/components/payment/PaymentMethodSelector";
 import { generatePaymentReference } from "@/services/bookingService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { bmlPaymentService } from "@/services/bmlPaymentService";
+import { useScrollToTop } from "@/hooks/use-scroll-top";
 
-const PRICE_PER_PERSON = 70; // USD per person per way - matching TripSummaryCard
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
 
 const PaymentGateway = () => {
@@ -27,8 +27,10 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer"); // Default to bank transfer
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  
+  useScrollToTop();
 
   useEffect(() => {
     if (!location.state?.isActivityBooking) {
@@ -80,10 +82,8 @@ const PaymentGateway = () => {
     const totalAmount = calculateTotal();
     
     try {
-      // Generate a payment reference
       const paymentReference = bookingReference;
       
-      // For BML Connect payments
       if (paymentMethod === "bml_connect") {
         let paymentData;
         
@@ -92,10 +92,9 @@ const PaymentGateway = () => {
             ...activityBooking,
             paymentReference,
             paymentMethod,
-            from: "Male", // Set default values for missing fields
+            from: "Male",
             to: activityBooking.activityName || "Activity",
             island: activityBooking.location || "Maldives",
-            // Ensure we have non-empty values for required fields
             seats: activityBooking.adultCount + (activityBooking.childCount || 0)
           };
         } else if (bookingInfo) {
@@ -110,29 +109,21 @@ const PaymentGateway = () => {
           toast.info("Redirecting to BML payment...");
           setIsRedirecting(true);
           
-          // Call the BML payment service
           const result = await bmlPaymentService.createPayment(paymentData);
           
-          // Store the booking data for when returning from payment
           if (activityBooking) {
             localStorage.setItem("pendingActivityBooking", JSON.stringify(paymentData));
           } else {
             localStorage.setItem("pendingBooking", JSON.stringify(paymentData));
           }
           
-          // Redirect to BML payment page
           window.location.href = result.redirectUrl;
         }
-      }
-      // For regular bank transfer payments
-      else {
-        // Simulate a payment process
+      } else {
         toast.info("Processing payment...");
         
-        // Simulate payment processing delay
         await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Store completed booking data
         if (activityBooking) {
           const completedBooking = {
             ...activityBooking,

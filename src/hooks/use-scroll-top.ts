@@ -19,3 +19,4 @@ export const useScrollToTop = () => {
     document.documentElement.scrollTop = 0;
   }, [location.pathname]);
 };
+

@@ -1,4 +1,5 @@
 
+import React from "react";
 import { useLocation } from "react-router-dom";
 import BookingSection from "@/components/BookingSection";
 import Header from "@/components/Header";
@@ -6,10 +7,14 @@ import { Island } from "@/types/booking";
 import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
 import HeaderExtras from "@/components/HeaderExtras";
+import { useScrollToTop } from "@/hooks/use-scroll-top";
 
 const BookingForm = () => {
   const location = useLocation();
   const preSelectedIsland = location.state?.island as Island | undefined;
+  
+  // Apply scroll to top hook
+  useScrollToTop();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
