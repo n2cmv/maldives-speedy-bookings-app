@@ -13,6 +13,7 @@ export type IslandName = string;
 
 export interface IslandDetails {
   name: string;
+  tagline?: string;
   slug: string;
   fullDescription: string;
   heroImage: string;
@@ -48,5 +49,14 @@ export interface IslandDetails {
     title: string;
     description: string;
     icon?: string;
+  }>;
+  quickFacts?: Array<{
+    label: string;
+    value: string;
+    icon: string;
+  }>;
+  faqs?: Array<{
+    question: string;
+    answer: string;
   }>;
 }
