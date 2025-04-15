@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -19,8 +18,7 @@ import { bmlPaymentService } from "@/services/bmlPaymentService";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
 
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
-// Add the missing constant
-const PRICE_PER_PERSON = 35; // Base price per person in USD
+const PRICE_PER_PERSON = 35;
 
 const PaymentGateway = () => {
   const location = useLocation();
@@ -44,8 +42,7 @@ const PaymentGateway = () => {
       }
       
       setBookingInfo(booking);
-    } 
-    else {
+    } else {
       const activityData = location.state;
       if (!activityData) {
         navigate("/activities");
