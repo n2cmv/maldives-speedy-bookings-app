@@ -1,3 +1,4 @@
+
 import { useIsMobile } from "@/hooks/use-mobile";
 import { HeroSection, ToursSection, WhyChooseUsSection, HowToBookSection } from "./home";
 import { Link } from "react-router-dom";
@@ -12,8 +13,6 @@ const WelcomeSection = () => {
         <ToursSection />
         <WhyChooseUsSection />
         <HowToBookSection />
-        
-        
       </div>
     </div>;
 };

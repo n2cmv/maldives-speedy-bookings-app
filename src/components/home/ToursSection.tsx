@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Anchor, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Anchor, ChevronRight, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -65,6 +66,29 @@ const ToursSection = () => {
     title: "Turtles",
     description: "Swim alongside gentle sea turtles in their natural habitat in crystal clear waters."
   }];
+  
+  const islands = [{
+    imageSrc: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80",
+    title: "Dhigurah",
+    description: "A paradise for whale shark enthusiasts with pristine beaches and vibrant marine life."
+  }, {
+    imageSrc: "https://images.unsplash.com/photo-1586861256632-52a3db1bf5ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=2012&q=80",
+    title: "Dhangethi",
+    description: "Authentic Maldivian culture meets stunning beaches and rich coral reefs."
+  }, {
+    imageSrc: "https://images.unsplash.com/photo-1589979481223-deb893043163?ixlib=rb-4.0.3&auto=format&fit=crop&w=2076&q=80",
+    title: "Maamigili",
+    description: "Known for its incredible diving spots and abundant marine wildlife."
+  }, {
+    imageSrc: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80",
+    title: "Fenfushi",
+    description: "Untouched natural beauty with traditional Maldivian hospitality and charm."
+  }, {
+    imageSrc: "https://images.unsplash.com/photo-1540202404-a2f29016b523?ixlib=rb-4.0.3&auto=format&fit=crop&w=2333&q=80",
+    title: "Thoddoo",
+    description: "Famous for lush vegetation, fruit farms, and breathtaking beach views."
+  }];
+  
   const isMobile = useIsMobile();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [api, setApi] = useState<any>(null);
@@ -134,7 +158,7 @@ const ToursSection = () => {
         </div>
       </div>
 
-      {/* Excursions Section - Now moved below Island Exploration */}
+      {/* Excursions Section */}
       <div className="py-12 -mt-10">
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
@@ -178,6 +202,57 @@ const ToursSection = () => {
               <Button className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto">
                 <Anchor className="w-5 h-5" />
                 Explore Activities
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+      
+      {/* Discover Islands Section - New section added below */}
+      <div className="py-12 -mt-10">
+        <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
+          <div className="mb-12 max-w-md">
+            <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">ISLAND DISCOVERY</span>
+            <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Discover Islands</h2>
+            <p className="text-[#505056] text-lg leading-relaxed">
+              Explore the breathtaking local islands of Maldives with
+              their unique cultures, pristine beaches, and authentic
+              experiences waiting to be discovered.
+            </p>
+          </div>
+          
+          <div className="relative overflow-hidden"> 
+            {isMobile && <>
+                <button onClick={scrollPrev} className="absolute left-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground" aria-label="Previous slide">
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <button onClick={scrollNext} className="absolute right-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground" aria-label="Next slide">
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </>}
+
+            <Carousel ref={carouselRef} setApi={setApi} opts={{
+            align: "start",
+            dragFree: true
+          }} className="w-full">
+              <CarouselContent className="-ml-2 md:-ml-2">
+                {islands.map((island, index) => <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4 pl-2 md:pl-2">
+                    <ActivityCard imageSrc={island.imageSrc} title={island.title} description={island.description} />
+                  </CarouselItem>)}
+              </CarouselContent>
+              <div className="hidden md:block">
+                <CarouselPrevious className="absolute left-4 top-1/3 -translate-y-1/2" />
+                <CarouselNext className="absolute right-4 top-1/3 -translate-y-1/2" />
+              </div>
+            </Carousel>
+          </div>
+          
+          <div className="flex justify-center mt-12">
+            <Link to="/islands">
+              <Button className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto">
+                <MapPin className="w-5 h-5" />
+                Explore Islands
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
