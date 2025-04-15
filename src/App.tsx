@@ -19,6 +19,10 @@ import BookingLookup from "./pages/BookingLookup";
 import Activities from "./pages/Activities";
 import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
+// Import Islands pages
+import Islands from "./pages/Islands";
+import DhigurahIsland from "./pages/Islands/DhigurahIsland";
+
 // Import i18n configuration
 import "./i18n/i18n";
 import { I18nextProvider } from "react-i18next";
@@ -72,6 +76,11 @@ const App = () => {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/payment-confirmation" element={<BmlPaymentHandler />} />
+                
+                {/* Islands routes */}
+                <Route path="/islands" element={<Islands />} />
+                <Route path="/islands/dhigurah" element={<DhigurahIsland />} />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
