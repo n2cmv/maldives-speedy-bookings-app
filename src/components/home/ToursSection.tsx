@@ -192,9 +192,9 @@ const ToursSection = () => {
       </div>
 
       <div className="py-12 -mt-10">
-        <div className="bg-[#F0F4F8] rounded-3xl p-8 md:p-16 overflow-hidden"> 
+        <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
-            <span className="uppercase text-sm font-medium tracking-wider text-[#005C99]">ISLAND ADVENTURES</span>
+            <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">ISLAND ADVENTURES</span>
             <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Island Exploration</h2>
             <p className="text-[#505056] text-lg leading-relaxed">
               Discover unique island landscapes and hidden gems.
@@ -252,7 +252,7 @@ const ToursSection = () => {
           <div className="flex justify-center mt-12">
             <Link to="/activities">
               <Button 
-                className="bg-[#005C99] hover:bg-[#003A66] text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
+                className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
               >
                 <Anchor className="w-5 h-5" />
                 Explore Locations
