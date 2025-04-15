@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Anchor, ChevronRight, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -66,7 +65,6 @@ const ToursSection = () => {
     title: "Turtles",
     description: "Swim alongside gentle sea turtles in their natural habitat in crystal clear waters."
   }];
-  
   const islands = [{
     imageSrc: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80",
     title: "Dhigurah",
@@ -88,7 +86,6 @@ const ToursSection = () => {
     title: "Thoddoo",
     description: "Famous for lush vegetation, fruit farms, and breathtaking beach views."
   }];
-  
   const isMobile = useIsMobile();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [api, setApi] = useState<any>(null);
@@ -113,7 +110,7 @@ const ToursSection = () => {
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
             <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">Speed boat transfers</span>
-            <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Popular Islands</h2>
+            <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Popular Speedboat Transfers</h2>
             <p className="text-[#505056] text-lg leading-relaxed">
               Discover unique island landscapes and hidden gems.
               Experience the untouched beauty of the Maldivian archipelago.
