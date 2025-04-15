@@ -52,7 +52,7 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main className="pt-16">
+        <main className="pt-32">
           <WelcomeSection />
         </main>
       </div>
@@ -74,4 +74,3 @@ const Index = () => {
 };
 
 export default Index;
-
