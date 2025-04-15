@@ -1,12 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useScrollToTop } from "@/hooks/use-scroll-top";
 import Header from "@/components/Header";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Ship, ChevronRight } from "lucide-react";
 
 const Islands = () => {
+  useScrollToTop();
+
   const [searchTerm, setSearchTerm] = useState("");
   
   const featuredIslands = [
