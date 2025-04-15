@@ -1,37 +1,18 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import HeaderExtras from "@/components/HeaderExtras";
 import ActivityForm from "@/components/activities/ActivityForm";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useScrollToTop } from "@/hooks/use-scroll-top";
 
 const Activities = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isMobile = useIsMobile();
   
-  // Enhanced scroll to top when component mounts
-  useEffect(() => {
-    // Force scroll to top with a small delay to ensure it works on mobile
-    const timer = setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'auto' // Use 'auto' instead of 'smooth' for more consistent behavior
-      });
-      
-      // For mobile devices, try an additional approach
-      if (isMobile) {
-        document.body.scrollTop = 0; // For Safari on iOS
-        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [isMobile]);
+  // Use the new scroll-to-top hook
+  useScrollToTop();
 
   const handleSubmit = (formData: any) => {
     setIsSubmitting(true);

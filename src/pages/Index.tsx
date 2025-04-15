@@ -11,6 +11,15 @@ const Index = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+  }, [location.pathname]);
+  
   // If user lands on homepage with transaction parameter, redirect to payment-confirmation
   useEffect(() => {
     if (location.search.includes('transaction=')) {
@@ -65,3 +74,4 @@ const Index = () => {
 };
 
 export default Index;
+
