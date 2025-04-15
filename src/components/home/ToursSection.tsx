@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Anchor, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -118,6 +119,80 @@ const ToursSection = () => {
 
   return (
     <div className="space-y-16">
+      {/* Island Exploration Section - Now moved to the top */}
+      <div className="py-12 -mt-10">
+        <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
+          <div className="mb-12 max-w-md">
+            <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">ISLAND ADVENTURES</span>
+            <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Island Exploration</h2>
+            <p className="text-[#505056] text-lg leading-relaxed">
+              Discover unique island landscapes and hidden gems.
+              Experience the untouched beauty of the Maldivian archipelago.
+            </p>
+          </div>
+          
+          <div className="relative overflow-hidden"> 
+            {isMobile && (
+              <>
+                <button 
+                  onClick={scrollPrev}
+                  className="absolute left-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
+                  aria-label="Previous slide"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <button 
+                  onClick={scrollNext}
+                  className="absolute right-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
+                  aria-label="Next slide"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </>
+            )}
+
+            <Carousel
+              ref={carouselRef}
+              setApi={setApi}
+              opts={{
+                align: "start",
+                dragFree: true
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-2">
+                {activities.map((activity, index) => (
+                  <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4 pl-2 md:pl-2">
+                    <ActivityCard 
+                      imageSrc={activity.imageSrc}
+                      title={activity.title}
+                      description={activity.description}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="hidden md:block">
+                <CarouselPrevious className="absolute left-4 top-1/3 -translate-y-1/2" />
+                <CarouselNext className="absolute right-4 top-1/3 -translate-y-1/2" />
+              </div>
+            </Carousel>
+          </div>
+          
+          <div className="flex justify-center mt-12">
+            <Link to="/activities">
+              <Button 
+                className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
+              >
+                <Anchor className="w-5 h-5" />
+                Explore Locations
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Excursions Section - Now moved below Island Exploration */}
       <div className="py-12 -mt-10">
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
@@ -184,78 +259,6 @@ const ToursSection = () => {
               >
                 <Anchor className="w-5 h-5" />
                 Explore Activities
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="py-12 -mt-10">
-        <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
-          <div className="mb-12 max-w-md">
-            <span className="uppercase text-sm font-medium tracking-wider text-[#0AB3B8]">ISLAND ADVENTURES</span>
-            <h2 className="text-4xl md:text-5xl font-semibold text-[#1D1D1F] mt-2 mb-6">Island Exploration</h2>
-            <p className="text-[#505056] text-lg leading-relaxed">
-              Discover unique island landscapes and hidden gems.
-              Experience the untouched beauty of the Maldivian archipelago.
-            </p>
-          </div>
-          
-          <div className="relative overflow-hidden"> 
-            {isMobile && (
-              <>
-                <button 
-                  onClick={scrollPrev}
-                  className="absolute left-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
-                  aria-label="Previous slide"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </button>
-                <button 
-                  onClick={scrollNext}
-                  className="absolute right-2 top-1/3 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center hover:bg-accent hover:text-accent-foreground"
-                  aria-label="Next slide"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </>
-            )}
-
-            <Carousel
-              ref={carouselRef}
-              setApi={setApi}
-              opts={{
-                align: "start",
-                dragFree: true
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-2">
-                {activities.map((activity, index) => (
-                  <CarouselItem key={index} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/3 xl:basis-1/4 pl-2 md:pl-2">
-                    <ActivityCard 
-                      imageSrc={activity.imageSrc}
-                      title={activity.title}
-                      description={activity.description}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <div className="hidden md:block">
-                <CarouselPrevious className="absolute left-4 top-1/3 -translate-y-1/2" />
-                <CarouselNext className="absolute right-4 top-1/3 -translate-y-1/2" />
-              </div>
-            </Carousel>
-          </div>
-          
-          <div className="flex justify-center mt-12">
-            <Link to="/activities">
-              <Button 
-                className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto"
-              >
-                <Anchor className="w-5 h-5" />
-                Explore Locations
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
