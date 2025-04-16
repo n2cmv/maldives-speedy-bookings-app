@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { MessageSquare, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface WhatsAppButtonProps {
   phoneNumber: string;
@@ -14,6 +15,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Format phone number (remove any non-digit characters)
   const formattedPhone = phoneNumber.replace(/\D/g, '');
@@ -30,7 +32,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className={`fixed ${isMobile ? 'bottom-20' : 'bottom-6'} right-6 z-50`}>
       {isOpen && (
         <div className="bg-white rounded-lg shadow-lg p-4 mb-3 w-72 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="flex justify-between items-center mb-3">
