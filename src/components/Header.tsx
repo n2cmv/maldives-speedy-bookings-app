@@ -45,9 +45,9 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Narrower subnavigation */}
+        {/* Narrower subnavigation with true transparency */}
         {!isMobile && (
-          <div className="bg-white/5 backdrop-blur-2xl border-t border-white/5 shadow-lg glass-morphism">
+          <div className="bg-transparent backdrop-blur-md border-t border-white/10 shadow-md">
             <div className="container mx-auto px-4 py-2">
               <div className="flex space-x-8 text-sm font-medium">
                 <Link to="/" className="text-[#005C99] hover:text-[#0AB3B8] transition-colors">
