@@ -1,3 +1,4 @@
+
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -43,9 +44,9 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - absolutely transparent */}
+        {/* Secondary Menu - blurry glass effect */}
         {!isMobile && (
-          <div className="absolute left-0 right-0 top-full z-50 bg-transparent backdrop-blur-none border-none">
+          <div className="absolute left-0 right-0 top-full z-50 bg-white/10 backdrop-blur-md border-t border-white/20">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
@@ -77,3 +78,4 @@ const Header = () => {
 };
 
 export default Header;
+
