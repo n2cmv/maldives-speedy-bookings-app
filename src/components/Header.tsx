@@ -1,3 +1,4 @@
+
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -44,9 +45,9 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - more glassy/transparent effect */}
+        {/* Secondary Menu - true glassmorphism effect */}
         {!isMobile && (
-          <div className="bg-white/10 backdrop-blur-lg border-t border-white/20">
+          <div className="bg-transparent backdrop-blur-md border-t border-white/5">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
