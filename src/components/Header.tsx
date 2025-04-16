@@ -1,9 +1,11 @@
+
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import BookingTypeModal from "./BookingTypeModal";
+import MobileBottomNav from "./MobileBottomNav";
 
 const Header = () => {
   const {
@@ -38,7 +40,7 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - removed border */}
+        {/* Secondary Menu - only visible on desktop */}
         {!isMobile && <div className="absolute left-0 right-0 top-full z-50 bg-white/90 backdrop-blur-[8.4px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
@@ -60,6 +62,12 @@ const Header = () => {
       </header>
       
       <div className={`h-${isMobile ? '16' : '24'}`}></div>
+      
+      {/* Add mobile bottom navigation */}
+      {isMobile && <MobileBottomNav />}
+      
+      {/* Add bottom padding on mobile to account for bottom navigation */}
+      {isMobile && <div className="h-16 pb-safe"></div>}
       
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
     </>;

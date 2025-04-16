@@ -1,14 +1,17 @@
+
 import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Ship, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Scroll to top when component mounts
   useEffect(() => {
@@ -60,7 +63,7 @@ const Index = () => {
           <ChevronUp className="h-5 w-5" />
         </button>}
 
-      <div className="relative z-10 w-full flex flex-col items-center justify-center pb-8 pt-4 text-sm text-[#86868B]">
+      <div className={`relative z-10 w-full flex flex-col items-center justify-center pb-${isMobile ? '20' : '8'} pt-4 text-sm text-[#86868B]`}>
         <div className="flex items-center justify-center gap-2 mb-2">
           <Ship className="h-4 w-4 text-[#0066CC]" />
           <span className="font-medium text-[#1D1D1F]">Retour Maldives</span>
