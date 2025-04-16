@@ -47,7 +47,7 @@ const Header = () => {
         
         {/* Narrower subnavigation */}
         {!isMobile && (
-          <div className="bg-white/5 backdrop-blur-xl border-t border-white/10 shadow-sm">
+          <div className="bg-white/5 backdrop-blur-2xl border-t border-white/5 shadow-lg glass-morphism">
             <div className="container mx-auto px-4 py-2">
               <div className="flex space-x-8 text-sm font-medium">
                 <Link to="/" className="text-[#005C99] hover:text-[#0AB3B8] transition-colors">
