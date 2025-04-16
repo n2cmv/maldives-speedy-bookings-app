@@ -1,4 +1,3 @@
-
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +11,6 @@ const Header = () => {
   const location = useLocation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   
-  // Check if we're on the home page
   const isHomePage = location.pathname === '/';
   
   return (
@@ -45,9 +43,9 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - true glassmorphism effect */}
+        {/* Secondary Menu - completely transparent */}
         {!isMobile && (
-          <div className="bg-transparent backdrop-blur-md border-t border-white/5">
+          <div className="bg-transparent backdrop-blur-sm border-t border-transparent">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
@@ -68,7 +66,6 @@ const Header = () => {
         )}
       </header>
       
-      {/* Adjust the main content padding to account for the secondary menu */}
       <div className={`h-${isMobile ? '16' : '24'}`}></div>
       
       <BookingTypeModal 
