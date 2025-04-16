@@ -1,4 +1,3 @@
-
 import { Ship, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +11,6 @@ const Header = () => {
   const location = useLocation();
   const [showBookingModal, setShowBookingModal] = useState(false);
 
-  // Check if we're on the home page
   const isHomePage = location.pathname === '/';
   return <>
       <header className="backdrop-blur-md bg-[#FEF7CD]/60 shadow-sm fixed top-0 left-0 right-0 z-50">
@@ -38,17 +36,17 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Narrower subnavigation with blur effect */}
-        {!isMobile && <div className="backdrop-blur-md border-t border-[#FEF7CD] bg-[#FEF7CD]/30">
+        {/* Narrower subnavigation with pink, glassy effect */}
+        {!isMobile && <div className="backdrop-blur-md border-t border-pink-100/30 bg-pink-50/20">
             <div className="container mx-auto px-4 py-2">
               <div className="flex space-x-8 text-sm font-medium">
-                <Link to="/" className="text-[#FFC300] hover:text-[#FFD700] transition-colors">
+                <Link to="/" className="text-pink-600 hover:text-pink-800 transition-colors">
                   Popular Speedboat Transfers
                 </Link>
-                <Link to="/activities" className="text-[#FFC300] hover:text-[#FFD700] transition-colors">
+                <Link to="/activities" className="text-pink-600 hover:text-pink-800 transition-colors">
                   Popular Activities
                 </Link>
-                <Link to="/islands" className="text-[#FFC300] hover:text-[#FFD700] transition-colors">
+                <Link to="/islands" className="text-pink-600 hover:text-pink-800 transition-colors">
                   Discover Islands
                 </Link>
               </div>
@@ -60,4 +58,3 @@ const Header = () => {
     </>;
 };
 export default Header;
-
