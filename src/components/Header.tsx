@@ -43,9 +43,9 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - completely transparent */}
+        {/* Secondary Menu - absolutely transparent */}
         {!isMobile && (
-          <div className="bg-transparent backdrop-blur-sm border-t border-transparent">
+          <div className="absolute left-0 right-0 top-full z-50 bg-transparent backdrop-blur-none border-none">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
