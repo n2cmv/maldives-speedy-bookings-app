@@ -1,9 +1,11 @@
+
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import BookingTypeModal from "./BookingTypeModal";
+
 const Header = () => {
   const {
     t
@@ -12,6 +14,7 @@ const Header = () => {
   const location = useLocation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const isHomePage = location.pathname === '/';
+  
   return <>
       <header className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -36,8 +39,8 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - less transparent blurry glass effect */}
-        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 backdrop-blur-3xl border-t border-white/10 bg-transparent">
+        {/* Secondary Menu - glass effect */}
+        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 bg-white/31 backdrop-blur-[8.4px] border-t border-white/43 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
@@ -62,4 +65,5 @@ const Header = () => {
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
     </>;
 };
+
 export default Header;
