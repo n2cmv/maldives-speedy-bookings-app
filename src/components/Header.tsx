@@ -1,4 +1,3 @@
-
 import { Ship, Ticket } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -45,19 +44,19 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Narrower subnavigation with blur effect */}
+        {/* Narrower subnavigation with enhanced blur effect */}
         {!isMobile && (
-          <div className="backdrop-blur-md bg-white/50 border-t border-gray-100">
+          <div className="backdrop-blur-xl bg-white/30 border-t border-gray-100/30 shadow-sm">
             <div className="container mx-auto px-4 py-2">
               <div className="flex space-x-8 text-sm font-medium">
                 <Link to="/" className="text-[#005C99] hover:text-[#0AB3B8] transition-colors">
-                  Popular Speedboat Transfers
+                  {t("navigation.speedboatTransfers", "Popular Speedboat Transfers")}
                 </Link>
                 <Link to="/activities" className="text-[#005C99] hover:text-[#0AB3B8] transition-colors">
-                  Popular Activities
+                  {t("navigation.popularActivities", "Popular Activities")}
                 </Link>
                 <Link to="/islands" className="text-[#005C99] hover:text-[#0AB3B8] transition-colors">
-                  Discover Islands
+                  {t("navigation.discoverIslands", "Discover Islands")}
                 </Link>
               </div>
             </div>
