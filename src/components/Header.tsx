@@ -36,17 +36,17 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Narrower subnavigation with pink, glassy effect */}
-        {!isMobile && <div className="backdrop-blur-md border-t border-pink-100/30 bg-pink-50/20">
+        {/* Narrower subnavigation with blue, glassy effect */}
+        {!isMobile && <div className="backdrop-blur-md border-t border-blue-100/30 bg-blue-50/20">
             <div className="container mx-auto px-4 py-2">
               <div className="flex space-x-8 text-sm font-medium">
-                <Link to="/" className="text-pink-600 hover:text-pink-800 transition-colors">
+                <Link to="/" className="text-blue-600 hover:text-blue-800 transition-colors">
                   Popular Speedboat Transfers
                 </Link>
-                <Link to="/activities" className="text-pink-600 hover:text-pink-800 transition-colors">
+                <Link to="/activities" className="text-blue-600 hover:text-blue-800 transition-colors">
                   Popular Activities
                 </Link>
-                <Link to="/islands" className="text-pink-600 hover:text-pink-800 transition-colors">
+                <Link to="/islands" className="text-blue-600 hover:text-blue-800 transition-colors">
                   Discover Islands
                 </Link>
               </div>
