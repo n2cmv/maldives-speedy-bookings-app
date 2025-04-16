@@ -1,4 +1,3 @@
-
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -45,20 +44,20 @@ const Header = () => {
           </nav>
         </div>
         
-        {/* Secondary Menu - glassy/transparent effect */}
+        {/* Secondary Menu - more glassy/transparent effect */}
         {!isMobile && (
-          <div className="bg-blue-50/20 backdrop-blur-md border-t border-blue-100/30">
+          <div className="bg-white/10 backdrop-blur-lg border-t border-white/20">
             <div className="container mx-auto px-4 py-2">
-              <nav className="flex items-center space-x-8">
-                <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-blue-700 hover:text-blue-800 py-1 text-sm">
+              <nav className="flex items-start space-x-8">
+                <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
                   <Sailboat className="h-4 w-4" />
                   <span>Popular Speedboat Transfers</span>
                 </Link>
-                <Link to="/activities" className="flex items-center space-x-2 text-blue-700 hover:text-blue-800 py-1 text-sm">
+                <Link to="/activities" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
                   <Compass className="h-4 w-4" />
                   <span>Popular Activities</span>
                 </Link>
-                <Link to="/islands" className="flex items-center space-x-2 text-blue-700 hover:text-blue-800 py-1 text-sm">
+                <Link to="/islands" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
                   <Map className="h-4 w-4" />
                   <span>Discover Islands</span>
                 </Link>
