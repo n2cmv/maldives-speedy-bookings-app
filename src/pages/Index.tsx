@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import WelcomeSection from "@/components/WelcomeSection";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -52,7 +51,7 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main className="pt-16">
+        <main className="pt-24">
           <WelcomeSection />
         </main>
       </div>
@@ -74,4 +73,3 @@ const Index = () => {
 };
 
 export default Index;
-
