@@ -51,7 +51,7 @@ const Index = () => {
       
       <div className="relative z-10">
         <Header />
-        <main className="pt-24">
+        <main>  {/* Removed pt-24 */}
           <WelcomeSection />
         </main>
       </div>
