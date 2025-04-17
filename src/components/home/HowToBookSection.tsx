@@ -36,10 +36,10 @@ const HowToBookSection = () => {
   ];
 
   return (
-    <div className="py-16">
+    <div className="py-16 px-5 md:px-0">
       <h2 className="text-3xl font-semibold text-[#1D1D1F] mb-12 text-center">How to book a Speedboat?</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-5 md:mx-0">
         {steps.map((step) => (
           <BookingStep 
             key={step.number}
