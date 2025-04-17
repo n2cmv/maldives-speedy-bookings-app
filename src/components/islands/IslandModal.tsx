@@ -22,7 +22,7 @@ const IslandModal = ({ islandName, isOpen, onClose }: IslandModalProps) => {
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl">
+      <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-ocean-dark">Island Information</DialogTitle>
           <DialogClose asChild>

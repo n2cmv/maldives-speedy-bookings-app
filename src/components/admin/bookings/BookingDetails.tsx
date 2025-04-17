@@ -30,7 +30,7 @@ const BookingDetails = ({ booking }: BookingDetailsProps) => {
   const isActivityBooking = booking.is_activity_booking === true;
 
   return (
-    <DialogContent className="sm:max-w-md md:max-w-xl p-6">
+    <DialogContent className="sm:max-w-md md:max-w-xl p-6 max-h-[90vh] overflow-y-auto">
       <DialogHeader className="mb-4">
         <div className="flex items-center justify-between">
           <DialogTitle className="text-xl">Booking Details</DialogTitle>
