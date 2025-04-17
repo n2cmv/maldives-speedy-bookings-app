@@ -49,24 +49,28 @@ const ActivityCard = ({
 const ToursSection = () => {
   const activities = [{
     imageSrc: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80",
-    title: "Fishing",
-    description: "Cast your lines from island piers or venture out to the sea for fishing."
+    title: "Airport to Dhigurah",
+    description: "Direct speedboat transfer from Male' Airport to beautiful Dhigurah Island."
   }, {
     imageSrc: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2574&q=80",
-    title: "Whale Sharks",
-    description: "Encounter gentle whale sharks in Maldives' Baa and Ari Atolls year-round."
+    title: "Airport to Dhangethi",
+    description: "Convenient speedboat transfer from Male' Airport to charming Dhangethi Island."
   }, {
     imageSrc: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    title: "Sharks",
-    description: "Spot various sharks in Maldives—from docile nurse to thrilling tiger sharks."
+    title: "Dhigurah to Airport",
+    description: "Return transfer from Dhigurah Island back to Male' Airport."
   }, {
     imageSrc: "https://images.unsplash.com/photo-1513316564811-ee3c49558c8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    title: "Manta Rays",
-    description: "Visit a secluded atoll for a chance to swim with these majestic creatures."
+    title: "Dhangethi to Airport",
+    description: "Fast and reliable transfer from Dhangethi Island to Male' Airport."
   }, {
     imageSrc: "https://images.unsplash.com/photo-1582160540665-34914319be0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    title: "Turtles",
-    description: "Swim alongside gentle sea turtles in their natural habitat in crystal clear waters."
+    title: "Dhigurah to Male' City",
+    description: "Direct speedboat transfer from Dhigurah Island to Male' City."
+  }, {
+    imageSrc: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    title: "Male' City to Dhigurah",
+    description: "Comfortable speedboat service from Male' City to Dhigurah Island."
   }];
 
   const islands = [{
@@ -152,7 +156,7 @@ const ToursSection = () => {
           </div>
           
           <div className="flex justify-center mt-12">
-            <Link to="/activities">
+            <Link to="/speedboat-transfers">
               <Button className="bg-ocean hover:bg-ocean-dark text-white px-6 py-6 rounded-lg shadow-md flex items-center gap-2 text-base mx-auto">
                 <Anchor className="w-5 h-5" />
                 Explore Locations
