@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TreePalm, Ship, ChevronRight, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";  // Updated import path
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const Islands = () => {
