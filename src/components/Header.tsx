@@ -1,10 +1,12 @@
-import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
+import { Ship, Ticket, Compass, Map } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import BookingTypeModal from "./BookingTypeModal";
 import MobileBottomNav from "./MobileBottomNav";
+import SpeedboatIcon from "@/assets/icons/SpeedboatIcon";
+
 const Header = () => {
   const {
     t
@@ -42,7 +44,7 @@ const Header = () => {
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <Sailboat className="h-4 w-4" />
+                  <SpeedboatIcon className="h-4 w-4" />
                   <span>Popular Speedboat Transfers</span>
                 </Link>
                 <Link to="/activities" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
