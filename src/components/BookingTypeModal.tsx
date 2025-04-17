@@ -1,13 +1,12 @@
 
 import { Link } from "react-router-dom";
-import { Anchor } from "lucide-react";
+import { Anchor, Ship } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import SpeedboatIcon from "@/assets/icons/SpeedboatIcon";
 
 interface BookingTypeModalProps {
   isOpen: boolean;
@@ -31,7 +30,7 @@ const BookingTypeModal = ({ isOpen, onClose }: BookingTypeModalProps) => {
             onClick={onClose}
           >
             <div className="bg-[#0AB3B8]/10 p-4 rounded-full mb-4">
-              <SpeedboatIcon className="h-10 w-10 text-[#0AB3B8]" /> {/* Replace Sailboat with SpeedboatIcon */}
+              <Ship className="h-10 w-10 text-[#0AB3B8]" />
             </div>
             <div className="text-center">
               <h3 className="font-bold text-lg text-gray-900 mb-2">Speedboat Transfer</h3>
