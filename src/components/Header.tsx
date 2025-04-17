@@ -1,4 +1,4 @@
-import { Ship, Ticket, Compass, TreePalm } from "lucide-react";
+import { Ship, Ticket, Anchor, TreePalm } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -47,7 +47,7 @@ const Header = () => {
                   <span>Popular Speedboat Transfers</span>
                 </Link>
                 <Link to="/activities" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <Compass className="h-4 w-4" />
+                  <Anchor className="h-4 w-4" />
                   <span>Popular Activities</span>
                 </Link>
                 <Link to="/islands" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
@@ -61,10 +61,8 @@ const Header = () => {
       
       <div className={`h-${isMobile ? '16' : '24'}`}></div>
       
-      {/* Add mobile bottom navigation */}
       {isMobile && <MobileBottomNav />}
       
-      {/* Add bottom padding on mobile to account for bottom navigation */}
       {!isMobile && <div className="h-16 pb-safe"></div>}
       
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />

@@ -4,12 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
+
 type ActivityCardProps = {
   imageSrc: string;
   title: string;
   description: string;
   isFirst?: boolean;
 };
+
 const ActivityCard = ({
   imageSrc,
   title,
@@ -43,6 +45,7 @@ const ActivityCard = ({
       </div>
     </div>;
 };
+
 const ToursSection = () => {
   const activities = [{
     imageSrc: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80",
@@ -65,6 +68,7 @@ const ToursSection = () => {
     title: "Turtles",
     description: "Swim alongside gentle sea turtles in their natural habitat in crystal clear waters."
   }];
+
   const islands = [{
     imageSrc: "https://images.unsplash.com/photo-1512100356356-de1b84283e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1974&q=80",
     title: "Dhigurah",
@@ -86,10 +90,12 @@ const ToursSection = () => {
     title: "Thoddoo",
     description: "Famous for lush vegetation, fruit farms, and breathtaking beach views."
   }];
+
   const isMobile = useIsMobile();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [api, setApi] = useState<any>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+
   useEffect(() => {
     if (isMobile) {
       const timer = setTimeout(() => {
@@ -98,14 +104,16 @@ const ToursSection = () => {
       return () => clearTimeout(timer);
     }
   }, [isMobile]);
+
   const scrollPrev = () => {
     api?.scrollPrev();
   };
+
   const scrollNext = () => {
     api?.scrollNext();
   };
+
   return <div className="space-y-16">
-      {/* Island Exploration Section - Now moved to the top */}
       <div className="py-12 -mt-10">
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
@@ -155,7 +163,6 @@ const ToursSection = () => {
         </div>
       </div>
 
-      {/* Excursions Section */}
       <div className="py-12 -mt-10">
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
@@ -206,7 +213,6 @@ const ToursSection = () => {
         </div>
       </div>
       
-      {/* Discover Islands Section - New section added below */}
       <div className="py-12 -mt-10">
         <div className="bg-[#F8FCFA] rounded-3xl p-8 md:p-16 overflow-hidden"> 
           <div className="mb-12 max-w-md">
@@ -258,4 +264,5 @@ const ToursSection = () => {
       </div>
     </div>;
 };
+
 export default ToursSection;

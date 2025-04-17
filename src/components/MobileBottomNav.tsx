@@ -1,4 +1,4 @@
-import { Ship, Compass, TreePalm, Home } from "lucide-react";
+import { Ship, Anchor, TreePalm, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +41,7 @@ const MobileBottomNav = () => {
             isActive("/activities") ? "text-[#0AB3B8]" : "text-[#005C99]"
           )}
         >
-          <Compass className="h-5 w-5" />
+          <Anchor className="h-5 w-5" />
           <span className="text-xs mt-1">Activities</span>
         </Link>
         
