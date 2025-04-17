@@ -1,3 +1,4 @@
+
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import Islands pages
 import Islands from "./pages/Islands";
-import IslandDetailsPage from "./pages/Islands/IslandDetailsPage";
+import IslandDetailsPage from "./pages/Islands/IslandDetails";
 
 // Import i18n configuration
 import "./i18n/i18n";

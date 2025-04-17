@@ -7,7 +7,7 @@ import { IslandDetails } from '@/types/island';
 import { useToast } from "@/hooks/use-toast";
 
 const IslandDetailsPage = () => {
-  const { slug } = useParams();
+  const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
   const [islandData, setIslandData] = useState<IslandDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,30 +24,63 @@ const IslandDetailsPage = () => {
         if (error) throw error;
 
         if (data) {
-          setIslandData({
+          // Map the database fields to our IslandDetails type
+          const mappedData: IslandDetails = {
             name: data.name,
             tagline: data.tagline || "",
-            slug: data.slug || "",
-            fullDescription: data.full_description || "",
-            heroImage: data.hero_image || "",
-            galleryImages: data.gallery_images || [],
-            location: data.location || { atoll: "Unknown" },
-            travelInfo: data.travel_info || {
-              fromMale: "Contact for details",
-              bestWayToReach: "Contact for details"
+            slug: data.slug || slug || "",
+            fullDescription: data.full_description || data.description || "",
+            heroImage: data.hero_image || data.image_url || "",
+            galleryImages: Array.isArray(data.gallery_images) ? data.gallery_images : [],
+            location: {
+              atoll: typeof data.location === 'object' && data.location?.atoll ? data.location.atoll : "Maldives"
             },
-            activities: data.activities || [],
-            accommodation: data.accommodation || [],
-            dining: data.dining || [],
-            weather: data.weather || {
+            travelInfo: {
+              fromMale: typeof data.travel_info === 'object' && data.travel_info?.fromMale ? 
+                data.travel_info.fromMale : "Contact for details",
+              bestWayToReach: typeof data.travel_info === 'object' && data.travel_info?.bestWayToReach ? 
+                data.travel_info.bestWayToReach : "Speedboat transfer"
+            },
+            activities: Array.isArray(data.activities) ? data.activities.map((act: any) => ({
+              name: act.name || "",
+              description: act.description || "",
+              image: act.image || ""
+            })) : [],
+            accommodation: Array.isArray(data.accommodation) ? data.accommodation.map((acc: any) => ({
+              type: acc.type || "",
+              description: acc.description || "",
+              priceRange: acc.priceRange || ""
+            })) : [],
+            dining: Array.isArray(data.dining) ? data.dining.map((din: any) => ({
+              type: din.type || "",
+              description: din.description || ""
+            })) : [],
+            weather: typeof data.weather === 'object' ? {
+              bestTime: data.weather?.bestTime || "Year-round",
+              temperature: data.weather?.temperature || "25°C - 31°C",
+              rainfall: data.weather?.rainfall || "Varies by season"
+            } : {
               bestTime: "Year-round",
               temperature: "25°C - 31°C",
               rainfall: "Varies by season"
             },
-            essentialInfo: data.essential_info || [],
-            quickFacts: data.quick_facts || [],
-            faqs: data.faqs || []
-          });
+            essentialInfo: Array.isArray(data.essential_info) ? data.essential_info.map((info: any) => ({
+              title: info.title || "",
+              description: info.description || "",
+              icon: info.icon || ""
+            })) : [],
+            quickFacts: Array.isArray(data.quick_facts) ? data.quick_facts.map((fact: any) => ({
+              label: fact.label || "",
+              value: fact.value || "",
+              icon: fact.icon || "info"
+            })) : [],
+            faqs: Array.isArray(data.faqs) ? data.faqs.map((faq: any) => ({
+              question: faq.question || "",
+              answer: faq.answer || ""
+            })) : []
+          };
+          
+          setIslandData(mappedData);
         }
       } catch (error) {
         console.error('Error fetching island details:', error);
@@ -64,7 +97,7 @@ const IslandDetailsPage = () => {
     if (slug) {
       fetchIslandDetails();
     }
-  }, [slug]);
+  }, [slug, toast]);
 
   if (loading) {
     return (
