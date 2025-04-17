@@ -8,6 +8,11 @@ const SpeedboatIcon: React.FC<SpeedboatIconProps> = (props) => {
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="-5.0 -10.0 110.0 135.0" 
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...props}
     >
       <g>
