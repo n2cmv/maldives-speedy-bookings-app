@@ -4,7 +4,7 @@ import { useScrollToTop } from "@/hooks/use-scroll-top";
 import Header from "@/components/Header";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Ship, ChevronRight } from "lucide-react";
+import { TreePalm, Ship, ChevronRight } from "lucide-react";
 
 const Islands = () => {
   useScrollToTop();
@@ -176,10 +176,7 @@ const Islands = () => {
             
             <div className="bg-ocean/5 p-6 rounded-lg">
               <div className="bg-ocean text-white w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-                  <path d="M17 11l.5-1.5L19 9l-1.5-.5L17 7l-.5 1.5L15 9l1.5.5zM9 4l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"></path>
-                  <path d="M14 16.5l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path>
-                </svg>
+                <TreePalm className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold mb-3">Pristine Beaches</h3>
               <p className="text-gray-700">

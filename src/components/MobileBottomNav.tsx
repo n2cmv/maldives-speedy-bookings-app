@@ -1,5 +1,4 @@
-
-import { Ship, Compass, Map, Home } from "lucide-react";
+import { Ship, Compass, TreePalm, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -53,7 +52,7 @@ const MobileBottomNav = () => {
             isActive("/islands") ? "text-[#0AB3B8]" : "text-[#005C99]"
           )}
         >
-          <Map className="h-5 w-5" />
+          <TreePalm className="h-5 w-5" />
           <span className="text-xs mt-1">Islands</span>
         </Link>
       </div>
