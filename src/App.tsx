@@ -21,7 +21,7 @@ import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import Islands pages
 import Islands from "./pages/Islands";
-import DhigurahIsland from "./pages/Islands/DhigurahIsland";
+import IslandDetailsPage from "./pages/Islands/IslandDetailsPage";
 
 // Import i18n configuration
 import "./i18n/i18n";
@@ -84,7 +84,7 @@ const App = () => {
                 
                 {/* Islands routes */}
                 <Route path="/islands" element={<Islands />} />
-                <Route path="/islands/dhigurah" element={<DhigurahIsland />} />
+                <Route path="/islands/:slug" element={<IslandDetailsPage />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
