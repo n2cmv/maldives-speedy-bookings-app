@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import SpeedboatSection from "./SpeedboatSection";
 import ExcursionsSection from "./ExcursionsSection";
 import IslandsSection from "./IslandsSection";
 
@@ -20,7 +19,6 @@ const ToursSection = () => {
 
   return (
     <div className="space-y-16">
-      <SpeedboatSection />
       <ExcursionsSection />
       <IslandsSection />
     </div>
