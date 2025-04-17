@@ -1,47 +1,56 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
 import Header from "@/components/Header";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TreePalm, Ship, ChevronRight, MapPin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Island } from "@/types/island";
 
 const Islands = () => {
   useScrollToTop();
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [islands, setIslands] = useState<Island[]>([]);
+
+  useEffect(() => {
+    const fetchIslands = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('islands')
+          .select('*')
+          .order('name');
+        
+        if (error) {
+          throw error;
+        }
+        
+        setIslands(data || []);
+      } catch (error) {
+        console.error('Error fetching islands:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchIslands();
+  }, []);
   
-  const featuredIslands = [
-    {
-      name: "Dhigurah Island",
-      slug: "dhigurah",
-      image: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80",
-      description: "Famous for its pristine beaches, whale sharks, and stunning coral reefs.",
-      location: "South Ari Atoll",
-      travelTime: "1.5 hours by speedboat"
-    },
-    {
-      name: "Dhangethi Island",
-      slug: "dhangethi",
-      image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-      description: "A charming local island with rich cultural heritage and beautiful beaches.",
-      location: "Ari Atoll",
-      travelTime: "2 hours by speedboat"
-    }
-  ];
-  
-  const filteredIslands = featuredIslands.filter(island => 
-    island.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    island.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    island.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
+  const filteredIslands = islands.filter(island => {
+    if (!searchTerm) return true;
+    
+    const query = searchTerm.toLowerCase();
+    return (
+      island.name?.toLowerCase().includes(query) ||
+      island.description?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
       <div className="relative h-[50vh] overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80" 
@@ -91,66 +100,71 @@ const Islands = () => {
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Islands</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredIslands.map((island) => (
-              <Card key={island.name} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-lg">
-                <div className="relative h-64">
-                  <img
-                    src={island.image}
-                    alt={`${island.name}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4 bg-white/90 rounded-full py-1 px-3 flex items-center shadow-md">
-                    <Ship className="w-4 h-4 text-ocean mr-1" />
-                    <span className="text-xs font-medium text-ocean-dark">{island.travelTime}</span>
-                  </div>
-                </div>
-                
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-2xl font-bold text-gray-900">{island.name}</CardTitle>
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span>{island.location}, Maldives</span>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="py-2">
-                  <p className="text-gray-700">{island.description}</p>
-                </CardContent>
-                
-                <CardFooter className="pt-2">
-                  <Link 
-                    to={`/islands/${island.slug}`} 
-                    className="w-full"
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="h-12 w-12 border-4 border-t-ocean border-opacity-50 rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {filteredIslands.length > 0 ? (
+                filteredIslands.map((island) => (
+                  <Card key={island.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-lg">
+                    <div className="relative h-64">
+                      <img
+                        src={island.image_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb"}
+                        alt={island.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-4 left-4 bg-white/90 rounded-full py-1 px-3 flex items-center shadow-md">
+                        <Ship className="w-4 h-4 text-ocean mr-1" />
+                        <span className="text-xs font-medium text-ocean-dark">View Details</span>
+                      </div>
+                    </div>
+                    
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-2xl font-bold text-gray-900">{island.name}</CardTitle>
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span>Maldives</span>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="py-2">
+                      <p className="text-gray-700">{island.description}</p>
+                    </CardContent>
+                    
+                    <CardFooter className="pt-2">
+                      <Link 
+                        to={`/islands/${island.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="w-full"
+                      >
+                        <Button 
+                          className="w-full bg-ocean hover:bg-ocean-dark text-white flex items-center justify-center gap-2"
+                        >
+                          Explore Island
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-16 bg-gray-50 rounded-lg col-span-2">
+                  <h3 className="text-xl font-medium text-gray-700">No islands found matching your search</h3>
+                  <p className="text-gray-500 mt-2">Try different keywords or clear your search</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => setSearchTerm("")}
                   >
-                    <Button 
-                      className="w-full bg-ocean hover:bg-ocean-dark text-white flex items-center justify-center gap-2"
-                    >
-                      Explore Island
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-          
-          {filteredIslands.length === 0 && (
-            <div className="text-center py-16 bg-gray-50 rounded-lg">
-              <h3 className="text-xl font-medium text-gray-700">No islands found matching your search</h3>
-              <p className="text-gray-500 mt-2">Try different keywords or clear your search</p>
-              <Button 
-                variant="outline" 
-                className="mt-4"
-                onClick={() => setSearchTerm("")}
-              >
-                Clear Search
-              </Button>
+                    Clear Search
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
         
-        {/* Why Visit Section */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Why Visit Maldives Islands?</h2>
           
@@ -187,7 +201,6 @@ const Islands = () => {
           </div>
         </div>
         
-        {/* CTA Section */}
         <div className="bg-gradient-to-r from-ocean to-blue-700 text-white p-8 md:p-12 rounded-xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to explore paradise?</h2>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
@@ -205,4 +218,3 @@ const Islands = () => {
 };
 
 export default Islands;
-
