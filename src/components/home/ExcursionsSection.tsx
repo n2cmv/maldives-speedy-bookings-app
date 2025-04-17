@@ -42,7 +42,7 @@ const ExcursionsSection = () => {
       title="Beyond the Island"
       description="Explore marine life up close like never before. Set off from your island for a true secluded experience in the heart of the sea."
       items={activities}
-      ctaLink="/booking"
+      ctaLink="/activities"
       ctaText="Book Now"
       icon={<>
         <Ship className="w-5 h-5" />

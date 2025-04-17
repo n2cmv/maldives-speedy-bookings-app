@@ -11,7 +11,7 @@ const SpeedboatTransfersSection = () => {
         title="Popular Speedboat Transfers"
         description="Discover unique island landscapes and hidden gems. Experience the untouched beauty of the Maldivian archipelago."
         items={speedboatTransfers}
-        ctaLink="/activities"
+        ctaLink="/booking"
         ctaText="Book Now"
         icon={<>
           <Anchor className="w-5 h-5" />
