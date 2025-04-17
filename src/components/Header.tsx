@@ -1,11 +1,10 @@
-import { Ship, Ticket, Anchor, TreePalm } from "lucide-react";
+import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import BookingTypeModal from "./BookingTypeModal";
 import MobileBottomNav from "./MobileBottomNav";
-
 const Header = () => {
   const {
     t
@@ -15,8 +14,8 @@ const Header = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const isHomePage = location.pathname === '/';
   return <>
-      <header className="bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50 bg-slate-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between bg-slate-50">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-[#0AB3B8]/10 p-2 rounded-full group-hover:bg-[#0AB3B8]/20 transition-colors">
               <Ship className="h-6 w-6 text-[#0AB3B8]" />
@@ -39,19 +38,19 @@ const Header = () => {
         </div>
         
         {/* Secondary Menu - only visible on desktop */}
-        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 backdrop-blur-[8.4px] shadow-[0_4px_30px_rgba(0,0,0,0.1)] bg-slate-50">
+        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 bg-white/90 backdrop-blur-[8.4px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <Ship className="h-4 w-4" />
+                  <Sailboat className="h-4 w-4" />
                   <span>Popular Speedboat Transfers</span>
                 </Link>
                 <Link to="/activities" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <Anchor className="h-4 w-4" />
+                  <Compass className="h-4 w-4" />
                   <span>Popular Activities</span>
                 </Link>
                 <Link to="/islands" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <TreePalm className="h-4 w-4" />
+                  <Map className="h-4 w-4" />
                   <span>Discover Islands</span>
                 </Link>
               </nav>
@@ -61,8 +60,10 @@ const Header = () => {
       
       <div className={`h-${isMobile ? '16' : '24'}`}></div>
       
+      {/* Add mobile bottom navigation */}
       {isMobile && <MobileBottomNav />}
       
+      {/* Add bottom padding on mobile to account for bottom navigation */}
       {!isMobile && <div className="h-16 pb-safe"></div>}
       
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
