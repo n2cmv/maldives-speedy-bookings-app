@@ -5,16 +5,16 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 import BookingTypeModal from "./BookingTypeModal";
 import MobileBottomNav from "./MobileBottomNav";
-
 const Header = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const isHomePage = location.pathname === '/';
-  
   return <>
-      <header className="bg-white bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50">
+      <header className="bg-opacity-90 backdrop-blur-sm shadow-md fixed top-0 left-0 right-0 z-50 bg-slate-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-[#0AB3B8]/10 p-2 rounded-full group-hover:bg-[#0AB3B8]/20 transition-colors">
@@ -38,7 +38,7 @@ const Header = () => {
         </div>
         
         {/* Secondary Menu - only visible on desktop */}
-        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 bg-white/90 backdrop-blur-[8.4px] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+        {!isMobile && <div className="absolute left-0 right-0 top-full z-50 backdrop-blur-[8.4px] shadow-[0_4px_30px_rgba(0,0,0,0.1)] bg-slate-50">
             <div className="container mx-auto px-4 py-2">
               <nav className="flex items-start space-x-8">
                 <Link to="/speedboat-transfers" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
@@ -69,5 +69,4 @@ const Header = () => {
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
     </>;
 };
-
 export default Header;
