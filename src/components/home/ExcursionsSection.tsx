@@ -1,5 +1,5 @@
 
-import { Anchor, ChevronRight } from "lucide-react";
+import { Ship, ChevronRight } from "lucide-react";
 import ContentSection from "./ContentSection";
 
 const activities = [
@@ -42,10 +42,10 @@ const ExcursionsSection = () => {
       title="Beyond the Island"
       description="Explore marine life up close like never before. Set off from your island for a true secluded experience in the heart of the sea."
       items={activities}
-      ctaLink="/activities"
-      ctaText="Explore Activities"
+      ctaLink="/booking"
+      ctaText="Book Now"
       icon={<>
-        <Anchor className="w-5 h-5" />
+        <Ship className="w-5 h-5" />
         <ChevronRight className="w-4 h-4 ml-1" />
       </>}
     />
