@@ -161,28 +161,70 @@ export type Database = {
       }
       islands: {
         Row: {
+          accommodation: Json[] | null
+          activities: Json[] | null
           created_at: string
           description: string
+          dining: Json[] | null
+          essential_info: Json[] | null
+          faqs: Json[] | null
+          full_description: string | null
+          gallery_images: string[] | null
+          hero_image: string | null
           id: string
           image_url: string | null
+          location: Json | null
           name: string
+          quick_facts: Json[] | null
+          slug: string | null
+          tagline: string | null
+          travel_info: Json | null
           updated_at: string
+          weather: Json | null
         }
         Insert: {
+          accommodation?: Json[] | null
+          activities?: Json[] | null
           created_at?: string
           description: string
+          dining?: Json[] | null
+          essential_info?: Json[] | null
+          faqs?: Json[] | null
+          full_description?: string | null
+          gallery_images?: string[] | null
+          hero_image?: string | null
           id?: string
           image_url?: string | null
+          location?: Json | null
           name: string
+          quick_facts?: Json[] | null
+          slug?: string | null
+          tagline?: string | null
+          travel_info?: Json | null
           updated_at?: string
+          weather?: Json | null
         }
         Update: {
+          accommodation?: Json[] | null
+          activities?: Json[] | null
           created_at?: string
           description?: string
+          dining?: Json[] | null
+          essential_info?: Json[] | null
+          faqs?: Json[] | null
+          full_description?: string | null
+          gallery_images?: string[] | null
+          hero_image?: string | null
           id?: string
           image_url?: string | null
+          location?: Json | null
           name?: string
+          quick_facts?: Json[] | null
+          slug?: string | null
+          tagline?: string | null
+          travel_info?: Json | null
           updated_at?: string
+          weather?: Json | null
         }
         Relationships: []
       }
