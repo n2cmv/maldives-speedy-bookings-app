@@ -15,7 +15,7 @@ const Header = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const isHomePage = location.pathname === '/';
   return <>
-      <header className="bg-slate-100 shadow-md fixed top-0 left-0 right-0 z-50">
+      <header className="bg-slate-50 shadow-md fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-[#0AB3B8]/10 p-2 rounded-full group-hover:bg-[#0AB3B8]/20 transition-colors">
