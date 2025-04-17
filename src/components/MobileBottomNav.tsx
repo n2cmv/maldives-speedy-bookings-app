@@ -1,7 +1,8 @@
 
-import { Ship, Compass, Map, Sailboat, Home } from "lucide-react";
+import { Ship, Compass, Map, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import SpeedboatIcon from "@/assets/icons/SpeedboatIcon";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const MobileBottomNav = () => {
             isActive("/speedboat-transfers") ? "text-[#0AB3B8]" : "text-[#005C99]"
           )}
         >
-          <Sailboat className="h-5 w-5" />
+          <SpeedboatIcon className="h-5 w-5" />
           <span className="text-xs mt-1">Transfers</span>
         </Link>
         
@@ -62,3 +63,4 @@ const MobileBottomNav = () => {
 };
 
 export default MobileBottomNav;
+
