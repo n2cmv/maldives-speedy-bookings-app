@@ -18,6 +18,7 @@ const corsHeaders = {
 interface BookingEmailRequest {
   email: string;
   name: string;
+  isAdminNotification?: boolean;
   bookingDetails: {
     from?: string;
     to?: string;
@@ -49,6 +50,8 @@ interface BookingEmailRequest {
     passport?: string;
     email?: string;
     specialRequests?: string;
+    passengers?: number;
+    totalPrice?: number;
   };
 }
 
@@ -177,81 +180,85 @@ const handler = async (req: Request): Promise<Response> => {
           }
         );
       }
-    } else if (bookingDetails.isActivity) {
+    } else if (bookingDetails.activityName) {
       // This is an activity booking confirmation email
       console.log("[send-confirmation] Preparing activity booking confirmation email to:", email);
-      
-      // Generate QR code URL for the booking
-      const bookingLookupUrl = `${req.headers.get('origin') || 'https://your-site.lovable.app'}/booking-lookup?ref=${bookingDetails.paymentReference}`;
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(bookingLookupUrl)}`;
       
       try {
         console.log("[send-confirmation] Sending activity booking confirmation email");
         
-        const emailResponse = await resend.emails.send({
-          from: "Island Ferry Bookings <onboarding@resend.dev>",
-          to: [email],
-          subject: `Your Activity Booking: ${bookingDetails.activityName} Confirmation`,
-          html: `
+        // Prepare different email content based on whether this is for admin or user
+        let emailSubject, emailHtml;
+        
+        if (isAdminNotification) {
+          // Admin notification email with all booking details
+          emailSubject = `New Activity Booking: ${bookingDetails.activityName}`;
+          emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
               <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-                <h1 style="color: #0AB3B8;">Activity Booking Confirmation</h1>
+                <h1 style="color: #0AB3B8;">New Activity Booking</h1>
               </div>
               
               <div style="padding: 20px 0;">
-                <p>Dear ${name},</p>
-                <p>Thank you for booking with Island Ferry. Your activity booking has been confirmed!</p>
+                <p>A new activity booking has been received:</p>
                 
-                <div style="background-color: #fff4e4; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f0a500;">
-                  <h2 style="color: #d97705; margin-top: 0; margin-bottom: 15px;">Activity Details</h2>
-                  <p><strong>Activity:</strong> ${bookingDetails.activityName}</p>
-                  <p><strong>Date:</strong> ${bookingDetails.date}</p>
-                  <p><strong>Time:</strong> ${bookingDetails.time || 'As scheduled'}</p>
-                  <p><strong>Location:</strong> ${bookingDetails.activityLocation || 'Activity Location'}</p>
-                  ${bookingDetails.activityDuration ? `<p><strong>Duration:</strong> ${bookingDetails.activityDuration}</p>` : ''}
-                  ${bookingDetails.activityDescription ? `<p><strong>Description:</strong> ${bookingDetails.activityDescription}</p>` : ''}
-                  <p><strong>Participants:</strong> ${bookingDetails.passengerCount}</p>
-                </div>
-
                 <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
                   <h2 style="color: #0AB3B8; margin-top: 0; margin-bottom: 15px;">Booking Information</h2>
-                  <p><strong>Booking Reference:</strong> ${bookingDetails.paymentReference}</p>
-                  <p><strong>Total Price:</strong> ${typeof bookingDetails.totalPrice === 'number' ? `$${bookingDetails.totalPrice.toFixed(2)}` : bookingDetails.totalPrice}</p>
+                  <p><strong>Activity:</strong> ${bookingDetails.activityName || 'Not specified'}</p>
+                  <p><strong>Date:</strong> ${bookingDetails.date || 'Not specified'}</p>
+                  <p><strong>Number of Passengers:</strong> ${bookingDetails.passengers || 'Not specified'}</p>
+                  <p><strong>Total Amount:</strong> $${(bookingDetails.totalPrice || 0).toFixed(2)}</p>
                   
                   <div style="margin-top: 15px; border-top: 1px solid #eaeaea; padding-top: 15px;">
-                    <h3 style="color: #0AB3B8; margin-top: 0; font-size: 16px;">Contact Information</h3>
-                    <p><strong>Name:</strong> ${bookingDetails.fullName}</p>
-                    <p><strong>Email:</strong> ${bookingDetails.email}</p>
-                    <p><strong>Phone:</strong> ${bookingDetails.phone}</p>
-                    ${bookingDetails.passport ? `<p><strong>Passport/ID:</strong> ${bookingDetails.passport}</p>` : ''}
-                    ${bookingDetails.specialRequests ? `<p><strong>Special Requests:</strong> ${bookingDetails.specialRequests}</p>` : ''}
+                    <h3 style="color: #0AB3B8; margin-top: 0; font-size: 16px;">Customer Information</h3>
+                    <p><strong>Full Name:</strong> ${bookingDetails.fullName || 'Not provided'}</p>
+                    <p><strong>Email:</strong> ${bookingDetails.email || 'Not provided'}</p>
+                    <p><strong>Phone:</strong> ${bookingDetails.phone || 'Not provided'}</p>
+                    <p><strong>ID/Passport:</strong> ${bookingDetails.passport || 'Not provided'}</p>
                   </div>
                 </div>
-
-                <div style="text-align: center; margin: 30px 0;">
-                  <h3 style="color: #0AB3B8;">Your Booking QR Code</h3>
-                  <p>Scan this QR code to access your booking details</p>
-                  <img src="${qrCodeUrl}" alt="Booking QR Code" style="width: 150px; height: 150px; margin: 10px auto; display: block;">
-                  <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                    You can also access your booking at: ${bookingLookupUrl}
-                  </p>
-                </div>
                 
-                <p><strong>Important Instructions:</strong></p>
-                <ul>
-                  <li>Please arrive at the meeting point at least 15 minutes before the scheduled activity time.</li>
-                  <li>Bring a printed copy of this confirmation or have it available on your mobile device.</li>
-                  <li>Don't forget to bring appropriate gear, such as swimwear, sunscreen, and comfortable footwear.</li>
-                </ul>
-                
-                <p>If you need to make any changes to your booking or have any questions, please contact our customer service.</p>
+                <p>Please contact the customer to confirm their booking.</p>
               </div>
               
               <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
                 <p>Island Ferry Services &copy; ${new Date().getFullYear()}</p>
               </div>
             </div>
-          `,
+          `;
+        } else {
+          // User confirmation email - simple acknowledgment without details
+          emailSubject = `Your ${bookingDetails.activityName || 'Activity'} Inquiry Received`;
+          emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
+              <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                <h1 style="color: #0AB3B8;">Activity Inquiry Received</h1>
+              </div>
+              
+              <div style="padding: 20px 0;">
+                <p>Dear ${name},</p>
+                <p>Thank you for your interest in our ${bookingDetails.activityName || 'activity'} booking.</p>
+                <p>We have received your inquiry and our team will contact you as soon as possible to confirm the details and provide next steps.</p>
+                
+                <div style="background-color: #f0f7ff; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #0AB3B8;">
+                  <p style="margin: 0;">If you have any urgent questions, please feel free to contact us directly.</p>
+                </div>
+                
+                <p>We look forward to helping you enjoy your time in the Maldives!</p>
+              </div>
+              
+              <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+                <p>Island Ferry Services &copy; ${new Date().getFullYear()}</p>
+              </div>
+            </div>
+          `;
+        }
+
+        const emailResponse = await resend.emails.send({
+          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          to: [email],
+          subject: emailSubject,
+          html: emailHtml,
         });
 
         console.log("[send-confirmation] Activity booking email sent successfully. Resend response:", JSON.stringify(emailResponse));

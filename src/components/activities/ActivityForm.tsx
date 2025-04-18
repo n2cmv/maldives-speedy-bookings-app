@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Send } from "lucide-react";
@@ -117,7 +118,8 @@ const ActivityForm = ({ isSubmitting }: ActivityFormProps) => {
         name: formData.fullName,
         isAdminNotification: false,
         bookingDetails: {
-          activityName: formData.activity?.name
+          activityName: formData.activity?.name,
+          date: formData.date ? new Date(formData.date).toLocaleDateString() : ""
         }
       };
 
