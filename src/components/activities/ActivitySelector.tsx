@@ -4,7 +4,7 @@ import { Activity } from "./ActivityForm";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { 
-  Anchor,  // Replace Fish with Anchor 
+  Anchor, 
   Sailboat, 
   Turtle, 
   Umbrella, 
@@ -166,7 +166,10 @@ const ActivitySelector = ({
           value={passengers.toString()} 
           onValueChange={(value) => onPassengerChange(parseInt(value))}
         >
-          <SelectTrigger id="passengers" className="w-full">
+          <SelectTrigger 
+            id="passengers" 
+            className="w-full bg-white" // Added explicit white background
+          >
             <SelectValue placeholder="Select number of passengers" />
           </SelectTrigger>
           <SelectContent>
