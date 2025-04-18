@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log("[send-confirmation] Sending OTP email with code:", bookingDetails.otpCode);
         
         const emailResponse = await resend.emails.send({
-          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          from: "Retour Maldives <onboarding@resend.dev>",
           to: [email],
           subject: "Your Island Ferry Verification Code",
           html: `
@@ -257,7 +257,7 @@ const handler = async (req: Request): Promise<Response> => {
         emailHtml = emailHtml.replace(/Island Ferry Services/g, 'Retour Maldives');
 
         const emailResponse = await resend.emails.send({
-          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          from: "Retour Maldives <onboarding@resend.dev>",
           to: [email],
           subject: emailSubject,
           html: emailHtml,
@@ -345,7 +345,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         // Attempt to send the email
         const emailResponse = await resend.emails.send({
-          from: "Island Ferry Bookings <onboarding@resend.dev>",
+          from: "Retour Maldives <onboarding@resend.dev>",
           to: [email],
           subject: "Your Island Ferry Booking Confirmation",
           html: `
