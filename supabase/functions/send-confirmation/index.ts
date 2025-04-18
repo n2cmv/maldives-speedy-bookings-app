@@ -88,7 +88,12 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
     
-    const { email, name, bookingDetails }: BookingEmailRequest = requestData;
+    const { email, name, isAdminNotification, bookingDetails }: {
+      email: string;
+      name: string;
+      isAdminNotification: boolean;
+      bookingDetails: any;
+    } = requestData;
 
     if (!email || !name) {
       console.error("[send-confirmation] Missing required email data:", { email, name });

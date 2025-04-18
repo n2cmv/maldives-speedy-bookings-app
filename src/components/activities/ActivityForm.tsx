@@ -96,8 +96,36 @@ const ActivityForm = ({ isSubmitting }: ActivityFormProps) => {
       const { error: dbError } = await saveActivityBookingToDatabase(formData);
       if (dbError) throw new Error(dbError.message);
       
-      const { success: emailSent, error: emailError } = await sendActivityConfirmationEmail(formData);
-      if (emailError) throw new Error(emailError);
+      const adminEmailData = {
+        email: "natteynattson@gmail.com",
+        name: "Admin",
+        isAdminNotification: true,
+        bookingDetails: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: `${formData.countryCode} ${formData.phone}`,
+          passport: formData.passportNumber,
+          activityName: formData.activity?.name,
+          passengers: formData.passengers,
+          totalPrice: formData.totalPrice,
+          date: formData.date ? new Date(formData.date).toLocaleDateString() : "",
+        }
+      };
+
+      const userEmailData = {
+        email: formData.email,
+        name: formData.fullName,
+        isAdminNotification: false,
+        bookingDetails: {
+          activityName: formData.activity?.name
+        }
+      };
+
+      const { success: adminEmailSent, error: adminEmailError } = await sendActivityConfirmationEmail(adminEmailData);
+      if (adminEmailError) console.error("Error sending admin email:", adminEmailError);
+
+      const { success: userEmailSent, error: userEmailError } = await sendActivityConfirmationEmail(userEmailData);
+      if (userEmailError) throw new Error(userEmailError);
       
       const whatsappMessage = `*New Activity Booking*\n\n` +
         `Activity: ${formData.activity?.name}\n` +

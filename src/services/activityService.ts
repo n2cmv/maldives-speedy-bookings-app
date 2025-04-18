@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Function to save activity booking to database
@@ -42,51 +41,18 @@ export async function saveActivityBookingToDatabase(booking: any): Promise<{ dat
   }
 }
 
-export async function sendActivityConfirmationEmail(booking: any): Promise<{ 
+export async function sendActivityConfirmationEmail(emailData: any): Promise<{ 
   success: boolean; 
   error?: any; 
   emailSentTo?: string 
 }> {
   try {
-    if (!booking.email) {
+    if (!emailData.email) {
       console.error("No email provided for activity confirmation");
       return { success: false, error: "No email address provided" };
     }
     
-    console.log("Attempting to send activity confirmation email to:", booking.email);
-    
-    // Get current domain from window for QR code generation
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    
-    // Enhanced activity details for the email
-    const emailData = {
-      email: booking.email.trim().toLowerCase(),
-      name: booking.fullName,
-      bookingDetails: {
-        activityName: booking.activity.name,
-        activityPrice: booking.activity.price,
-        activityDescription: booking.activity.description || "",
-        activityDuration: booking.activity.duration || "",
-        activityLocation: booking.activity.location || "Activity Location",
-        date: booking.date ? new Date(booking.date).toLocaleDateString() : "",
-        time: booking.time || "As scheduled",
-        passengers: booking.passengers,
-        totalPrice: booking.totalPrice,
-        paymentReference: booking.paymentReference || "Unknown",
-        origin: origin, // Add origin for QR code generation
-        // Passenger information
-        fullName: booking.fullName,
-        passport: booking.passportNumber,
-        phone: `${booking.countryCode} ${booking.phone}`,
-        email: booking.email,
-        // Special requests if available
-        specialRequests: booking.specialRequests || "",
-        // Flag to identify this as an activity booking
-        isActivity: true
-      }
-    };
-    
-    console.log("Preparing activity email payload:", JSON.stringify(emailData));
+    console.log("Attempting to send activity confirmation email to:", emailData.email);
     
     const response = await supabase.functions.invoke("send-confirmation", {
       body: emailData
@@ -99,7 +65,7 @@ export async function sendActivityConfirmationEmail(booking: any): Promise<{
       return { 
         success: false, 
         error: typeof response.error === 'object' ? JSON.stringify(response.error) : String(response.error),
-        emailSentTo: booking.email
+        emailSentTo: emailData.email
       };
     }
 
@@ -108,21 +74,21 @@ export async function sendActivityConfirmationEmail(booking: any): Promise<{
       return { 
         success: false, 
         error: response.data.error,
-        emailSentTo: booking.email
+        emailSentTo: emailData.email
       };
     }
 
-    console.log("Activity confirmation email sent successfully to:", booking.email, "Response:", response.data);
+    console.log("Activity confirmation email sent successfully to:", emailData.email);
     return { 
       success: true,
-      emailSentTo: booking.email 
+      emailSentTo: emailData.email 
     };
   } catch (error) {
     console.error("Exception sending activity confirmation email:", error);
     return { 
       success: false, 
       error: typeof error === 'object' ? JSON.stringify(error) : String(error),
-      emailSentTo: booking.email
+      emailSentTo: emailData.email
     };
   }
 }
