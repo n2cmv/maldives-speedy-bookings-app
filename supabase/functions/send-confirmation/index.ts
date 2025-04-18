@@ -254,6 +254,8 @@ const handler = async (req: Request): Promise<Response> => {
           `;
         }
 
+        emailHtml = emailHtml.replace(/Island Ferry Services/g, 'Retour Maldives');
+
         const emailResponse = await resend.emails.send({
           from: "Island Ferry Bookings <onboarding@resend.dev>",
           to: [email],
@@ -434,6 +436,24 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   }
+
+  // Update in regular ferry booking confirmation email
+  const footer = `
+    <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
+      <p>Retour Maldives &copy; ${new Date().getFullYear()}</p>
+    </div>
+  `;
+
+  // Replace the Island Ferry Services footer with the Retour Maldives footer
+  const responseHtml = (await new Response(emailHtml).text()).replace(/<div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">\s*<p>Island Ferry Services &copy; 2025<\/p>\s*<\/div>/g, footer);
+
+  return new Response(responseHtml, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      ...corsHeaders,
+    },
+  });
 };
 
 // Enhanced email validation function
