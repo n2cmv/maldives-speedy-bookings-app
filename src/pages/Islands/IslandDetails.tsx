@@ -33,13 +33,17 @@ const IslandDetailsPage = () => {
             heroImage: data.hero_image || data.image_url || "",
             galleryImages: Array.isArray(data.gallery_images) ? data.gallery_images : [],
             location: {
-              atoll: typeof data.location === 'object' && data.location?.atoll ? data.location.atoll : "Maldives"
+              atoll: typeof data.location === 'object' && data.location !== null && !Array.isArray(data.location) && 'atoll' in data.location 
+                ? String(data.location.atoll) 
+                : "Maldives"
             },
             travelInfo: {
-              fromMale: typeof data.travel_info === 'object' && data.travel_info?.fromMale ? 
-                data.travel_info.fromMale : "Contact for details",
-              bestWayToReach: typeof data.travel_info === 'object' && data.travel_info?.bestWayToReach ? 
-                data.travel_info.bestWayToReach : "Speedboat transfer"
+              fromMale: typeof data.travel_info === 'object' && data.travel_info !== null && !Array.isArray(data.travel_info) && 'fromMale' in data.travel_info
+                ? String(data.travel_info.fromMale)
+                : "Contact for details",
+              bestWayToReach: typeof data.travel_info === 'object' && data.travel_info !== null && !Array.isArray(data.travel_info) && 'bestWayToReach' in data.travel_info
+                ? String(data.travel_info.bestWayToReach)
+                : "Speedboat transfer"
             },
             activities: Array.isArray(data.activities) ? data.activities.map((act: any) => ({
               name: act.name || "",
@@ -55,10 +59,10 @@ const IslandDetailsPage = () => {
               type: din.type || "",
               description: din.description || ""
             })) : [],
-            weather: typeof data.weather === 'object' ? {
-              bestTime: data.weather?.bestTime || "Year-round",
-              temperature: data.weather?.temperature || "25°C - 31°C",
-              rainfall: data.weather?.rainfall || "Varies by season"
+            weather: typeof data.weather === 'object' && data.weather !== null && !Array.isArray(data.weather) ? {
+              bestTime: 'bestTime' in data.weather ? String(data.weather.bestTime) : "Year-round",
+              temperature: 'temperature' in data.weather ? String(data.weather.temperature) : "25°C - 31°C",
+              rainfall: 'rainfall' in data.weather ? String(data.weather.rainfall) : "Varies by season"
             } : {
               bestTime: "Year-round",
               temperature: "25°C - 31°C",
