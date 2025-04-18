@@ -1,39 +1,14 @@
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import HeaderExtras from "@/components/HeaderExtras";
 import ActivityForm from "@/components/activities/ActivityForm";
-import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
 
 const Activities = () => {
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Use the new scroll-to-top hook
   useScrollToTop();
-
-  const handleSubmit = (formData: any) => {
-    setIsSubmitting(true);
-    
-    // Store the activity booking data in sessionStorage for the payment page
-    sessionStorage.setItem("activityBooking", JSON.stringify(formData));
-    
-    toast.info("Redirecting to payment", {
-      description: "Please complete your payment to confirm your booking"
-    });
-    
-    // Navigate to payment page with the activity booking data
-    setTimeout(() => {
-      navigate("/payment", { 
-        state: {
-          ...formData,
-          isActivityBooking: true
-        }
-      });
-    }, 1000);
-  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
@@ -60,7 +35,7 @@ const Activities = () => {
             </p>
           </div>
           
-          <ActivityForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+          <ActivityForm isSubmitting={isSubmitting} />
         </motion.div>
       </main>
     </div>

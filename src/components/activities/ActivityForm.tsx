@@ -1,12 +1,12 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import ActivitySelector from "./ActivitySelector";
 import PersonalInfoForm from "./PersonalInfoForm";
 import ActivitySummary from "./ActivitySummary";
+import { saveActivityBookingToDatabase, sendActivityConfirmationEmail } from "@/services/activityService";
 
 export interface Activity {
   id: string;
@@ -32,7 +32,7 @@ const defaultFormData: ActivityBookingForm = {
   fullName: "",
   email: "",
   phone: "",
-  countryCode: "+960", // Default to Maldives
+  countryCode: "+960",
   passportNumber: "",
   date: null,
   passengers: 1,
@@ -40,32 +40,26 @@ const defaultFormData: ActivityBookingForm = {
 };
 
 interface ActivityFormProps {
-  onSubmit: (data: ActivityBookingForm) => void;
   isSubmitting: boolean;
 }
 
-const ActivityForm = ({ onSubmit, isSubmitting }: ActivityFormProps) => {
+const ActivityForm = ({ isSubmitting }: ActivityFormProps) => {
   const [formData, setFormData] = useState<ActivityBookingForm>(defaultFormData);
   const [step, setStep] = useState<number>(1);
+  const [isSending, setIsSending] = useState(false);
   
   const updateFormData = (data: Partial<ActivityBookingForm>) => {
     setFormData(prev => {
       const updated = { ...prev, ...data };
       
-      // Calculate total price whenever activity or passengers change
       if (data.activity || data.passengers) {
         const activityPrice = updated.activity?.price || 0;
         
-        // For resort transfer, each way is charged separately
         if (updated.activity?.id === "resort_transfer") {
           updated.totalPrice = activityPrice * (updated.passengers || 1);
-        } 
-        // For sandbank trip, it's a flat fee for the trip
-        else if (updated.activity?.id === "sandbank_trip") {
+        } else if (updated.activity?.id === "sandbank_trip") {
           updated.totalPrice = activityPrice;
-        } 
-        // For all other activities, it's per person
-        else {
+        } else {
           updated.totalPrice = activityPrice * (updated.passengers || 1);
         }
       }
@@ -86,7 +80,7 @@ const ActivityForm = ({ onSubmit, isSubmitting }: ActivityFormProps) => {
     setStep(prev => prev - 1);
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.fullName || 
         !formData.email || 
         !formData.phone || 
@@ -96,7 +90,44 @@ const ActivityForm = ({ onSubmit, isSubmitting }: ActivityFormProps) => {
       return;
     }
     
-    onSubmit(formData);
+    setIsSending(true);
+    
+    try {
+      const { error: dbError } = await saveActivityBookingToDatabase(formData);
+      if (dbError) throw new Error(dbError.message);
+      
+      const { success: emailSent, error: emailError } = await sendActivityConfirmationEmail(formData);
+      if (emailError) throw new Error(emailError);
+      
+      const whatsappMessage = `*New Activity Booking*\n\n` +
+        `Activity: ${formData.activity?.name}\n` +
+        `Date: ${formData.date ? new Date(formData.date).toLocaleDateString() : 'Not specified'}\n` +
+        `Passengers: ${formData.passengers}\n` +
+        `Total Price: $${formData.totalPrice}\n\n` +
+        `Customer Details:\n` +
+        `Name: ${formData.fullName}\n` +
+        `Email: ${formData.email}\n` +
+        `Phone: ${formData.countryCode} ${formData.phone}\n` +
+        `Passport/ID: ${formData.passportNumber}`;
+      
+      const whatsappUrl = `https://wa.me/9609999999?text=${encodeURIComponent(whatsappMessage)}`;
+      window.open(whatsappUrl, '_blank');
+      
+      toast.success("Booking sent successfully!", {
+        description: "We'll contact you shortly to confirm your booking."
+      });
+      
+      setFormData(defaultFormData);
+      setStep(1);
+      
+    } catch (error) {
+      console.error('Booking error:', error);
+      toast.error("Failed to send booking", {
+        description: error instanceof Error ? error.message : "Please try again or contact us directly."
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
   
   return (
@@ -130,7 +161,7 @@ const ActivityForm = ({ onSubmit, isSubmitting }: ActivityFormProps) => {
               type="button" 
               variant="outline" 
               onClick={handleBack}
-              disabled={isSubmitting}
+              disabled={isSending}
             >
               Back
             </Button>
@@ -149,16 +180,19 @@ const ActivityForm = ({ onSubmit, isSubmitting }: ActivityFormProps) => {
               <Button 
                 type="button" 
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSending}
                 className="bg-ocean hover:bg-ocean-dark text-white"
               >
-                {isSubmitting ? (
+                {isSending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing
+                    Sending
                   </>
                 ) : (
-                  "Book Now"
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Booking
+                  </>
                 )}
               </Button>
             )}

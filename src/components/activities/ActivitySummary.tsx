@@ -111,7 +111,8 @@ const ActivitySummary = ({ booking }: ActivitySummaryProps) => {
       </div>
 
       <p className="text-sm text-gray-500">
-        By clicking "Book Now", you agree to our booking terms and conditions. You will be redirected to our secure payment gateway to complete your booking.
+        By clicking "Send Booking", your booking details will be sent to our team. 
+        We will contact you shortly to confirm your booking and arrange payment details.
       </p>
     </div>
   );
