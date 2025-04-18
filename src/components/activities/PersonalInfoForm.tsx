@@ -43,6 +43,7 @@ const PersonalInfoForm = ({ formData, onChange }: PersonalInfoFormProps) => {
             placeholder="Enter your full name"
             value={formData.fullName}
             onChange={(e) => onChange({ fullName: e.target.value })}
+            className="bg-white" // Added white background
             required
           />
         </div>
@@ -55,6 +56,7 @@ const PersonalInfoForm = ({ formData, onChange }: PersonalInfoFormProps) => {
             placeholder="Enter your email"
             value={formData.email}
             onChange={(e) => onChange({ email: e.target.value })}
+            className="bg-white" // Added white background
             required
           />
         </div>
@@ -74,7 +76,7 @@ const PersonalInfoForm = ({ formData, onChange }: PersonalInfoFormProps) => {
               placeholder="Phone number"
               value={formData.phone}
               onChange={(e) => onChange({ phone: e.target.value })}
-              className="flex-grow"
+              className="flex-grow bg-white" // Added white background
               required
             />
           </div>
@@ -87,6 +89,7 @@ const PersonalInfoForm = ({ formData, onChange }: PersonalInfoFormProps) => {
             placeholder="Enter your ID or passport number"
             value={formData.passportNumber}
             onChange={(e) => onChange({ passportNumber: e.target.value })}
+            className="bg-white" // Added white background
             required
           />
         </div>
@@ -99,7 +102,7 @@ const PersonalInfoForm = ({ formData, onChange }: PersonalInfoFormProps) => {
                 id="date"
                 variant={"outline"}
                 className={cn(
-                  "w-full justify-start text-left font-normal",
+                  "w-full justify-start text-left font-normal bg-white", // Added white background
                   !formData.date && "text-muted-foreground"
                 )}
               >
