@@ -32,6 +32,9 @@ const IslandFormDialog = ({
   onSubmit,
   onCancel,
 }: IslandFormDialogProps) => {
+  // Check if required fields are filled
+  const isFormValid = islandForm.name && islandForm.description;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -51,7 +54,7 @@ const IslandFormDialog = ({
               htmlFor="name"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Island Name
+              Island Name <span className="text-red-500">*</span>
             </label>
             <Input
               id="name"
@@ -59,14 +62,18 @@ const IslandFormDialog = ({
               value={islandForm.name}
               onChange={onFormChange}
               placeholder="Island name"
+              required
             />
+            {!islandForm.name && (
+              <p className="text-xs text-red-500">Name is required</p>
+            )}
           </div>
           <div className="space-y-2">
             <label
               htmlFor="description"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
             <Textarea
               id="description"
@@ -75,7 +82,11 @@ const IslandFormDialog = ({
               onChange={onFormChange}
               placeholder="Describe the island"
               rows={4}
+              required
             />
+            {!islandForm.description && (
+              <p className="text-xs text-red-500">Description is required</p>
+            )}
           </div>
           <div className="space-y-2">
             <label
@@ -97,7 +108,12 @@ const IslandFormDialog = ({
           <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={onSubmit}>Save</Button>
+          <Button 
+            onClick={onSubmit} 
+            disabled={!isFormValid}
+          >
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

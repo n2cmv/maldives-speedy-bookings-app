@@ -25,7 +25,7 @@ const IslandsManager = () => {
   const [islandToDelete, setIslandToDelete] = useState<string | null>(null);
   const [islandForm, setIslandForm] = useState<Island>({
     name: "",
-    description: "",
+    description: "", // Ensure this is always initialized
     image_url: "",
   });
 
@@ -49,6 +49,11 @@ const IslandsManager = () => {
   };
 
   const handleFormSubmit = async () => {
+    // Validate required fields before submitting
+    if (!islandForm.name || !islandForm.description) {
+      return; // Don't submit if required fields are missing
+    }
+    
     const success = await handleSubmit(islandForm, currentIsland?.id);
     if (success) {
       setIsIslandFormOpen(false);

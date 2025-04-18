@@ -64,11 +64,24 @@ export const useIslandManager = () => {
 
   const handleSubmit = async (islandData: Partial<Island>, currentIslandId?: string) => {
     try {
+      // Ensure description is always provided, as it's required by the database schema
+      if (islandData.description === undefined) {
+        throw new Error("Island description is required");
+      }
+
       if (currentIslandId) {
         // Update existing island
         const { error } = await supabase
           .from("islands")
-          .update(islandData)
+          .update({
+            name: islandData.name,
+            description: islandData.description,
+            image_url: islandData.image_url,
+            // Only include other fields if they are defined
+            ...(islandData.slug && { slug: islandData.slug }),
+            ...(islandData.tagline && { tagline: islandData.tagline }),
+            ...(islandData.hero_image && { hero_image: islandData.hero_image }),
+          })
           .eq("id", currentIslandId);
 
         if (error) {
@@ -83,7 +96,11 @@ export const useIslandManager = () => {
         // Create new island
         const { error } = await supabase
           .from("islands")
-          .insert(islandData);
+          .insert({
+            name: islandData.name as string,
+            description: islandData.description as string,
+            image_url: islandData.image_url,
+          });
 
         if (error) {
           throw error;
@@ -101,7 +118,9 @@ export const useIslandManager = () => {
       console.error("Error saving island:", error);
       toast({
         title: "Error",
-        description: "Failed to save island",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? String(error.message) 
+          : "Failed to save island",
         variant: "destructive",
       });
       return false;
