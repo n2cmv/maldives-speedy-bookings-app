@@ -90,7 +90,7 @@ const SpeedboatInfo = ({ form }: SpeedboatInfoProps) => {
                 value={field.value || ''}
                 onChange={(e) => field.onChange(e.target.value || null)}
               />
-            </Control>
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
