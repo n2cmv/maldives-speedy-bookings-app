@@ -15,7 +15,10 @@ const IslandDetailsPage = () => {
 
   useEffect(() => {
     const fetchIslandDetails = async () => {
-      if (!slug) return;
+      if (!slug) {
+        setLoading(false);
+        return;
+      }
       
       try {
         // First try with exact slug
@@ -25,22 +28,47 @@ const IslandDetailsPage = () => {
           .eq('slug', slug)
           .maybeSingle();
 
-        // If not found, try with slug conversion (handle cases like "a.dh-dhigurah" -> "dhigurah")
-        if (!data && error?.code === 'PGRST116') {
+        // If not found, try with lowercase slug
+        if (!data) {
+          const { data: dataByLowerSlug, error: errorByLowerSlug } = await supabase
+            .from('islands')
+            .select('*')
+            .eq('slug', slug.toLowerCase())
+            .maybeSingle();
+            
+          if (dataByLowerSlug) {
+            data = dataByLowerSlug;
+            error = null;
+          }
+        }
+        
+        // If still not found, try with a partial match
+        if (!data) {
           // Extract simplified slug - e.g., "dhigurah" from "a.dh-dhigurah"
-          const simplifiedSlug = slug.toLowerCase().split('-').pop();
+          const simplifiedSlug = slug.toLowerCase().split(/[-_.]/)[slug.toLowerCase().split(/[-_.]/).length - 1]; // Split by common separators
           
-          if (simplifiedSlug) {
-            const { data: dataBySimpleSlug, error: errorBySimpleSlug } = await supabase
+          if (simplifiedSlug && simplifiedSlug.length > 3) {
+            const { data: dataByPartialSlug } = await supabase
               .from('islands')
               .select('*')
-              .ilike('slug', `%${simplifiedSlug}%`)
-              .maybeSingle();
+              .ilike('slug', `%${simplifiedSlug}%`);
               
-            if (dataBySimpleSlug) {
-              data = dataBySimpleSlug;
+            if (dataByPartialSlug && dataByPartialSlug.length > 0) {
+              data = dataByPartialSlug[0];
               error = null;
             }
+          }
+        }
+        
+        // Last resort, just fetch any island if nothing found and we're using a placeholder slug
+        if (!data && (slug === ':slug' || slug === 'undefined')) {
+          const { data: anyIsland } = await supabase
+            .from('islands')
+            .select('*')
+            .limit(1);
+            
+          if (anyIsland && anyIsland.length > 0) {
+            data = anyIsland[0];
           }
         }
 
@@ -48,8 +76,9 @@ const IslandDetailsPage = () => {
           // Use the mapping function to properly convert database data to Island type
           const mappedData = mapDatabaseIslandToIslandType(data);
           setIslandData(mappedData);
+          console.log('Island found and mapped:', mappedData.name);
         } else {
-          console.error('Island not found:', slug);
+          console.error('Island not found for slug:', slug);
         }
       } catch (error) {
         console.error('Error fetching island details:', error);
@@ -63,9 +92,7 @@ const IslandDetailsPage = () => {
       }
     };
 
-    if (slug) {
-      fetchIslandDetails();
-    }
+    fetchIslandDetails();
   }, [slug, toast]);
 
   if (loading) {
