@@ -6,15 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TreePalm, Ship, ChevronRight, MapPin, Activity, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Island } from "@/types/island";
+import { Island, mapDatabaseIslandToIslandType } from "@/types/island";
 import { useToast } from "@/hooks/use-toast";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const Islands = () => {
   useScrollToTop();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [islands, setIslands] = useState<Island[]>([]);
@@ -24,12 +22,12 @@ const Islands = () => {
   useEffect(() => {
     const fetchIslands = async () => {
       try {
-        const {
-          data,
-          error
-        } = await supabase.from('islands').select('*').order('name');
+        const { data, error } = await supabase.from('islands').select('*').order('name');
         if (error) throw error;
-        setIslands(data || []);
+        
+        // Map database results to our Island type
+        const mappedIslands = data ? data.map(island => mapDatabaseIslandToIslandType(island)) : [];
+        setIslands(mappedIslands);
       } catch (error) {
         console.error('Error fetching islands:', error);
         toast({
@@ -50,10 +48,12 @@ const Islands = () => {
     }, payload => {
       switch (payload.eventType) {
         case 'INSERT':
-          setIslands(prev => [...prev, payload.new as Island]);
+          setIslands(prev => [...prev, mapDatabaseIslandToIslandType(payload.new as any)]);
           break;
         case 'UPDATE':
-          setIslands(prev => prev.map(island => island.id === payload.new.id ? payload.new as Island : island));
+          setIslands(prev => prev.map(island => 
+            island.id === payload.new.id ? mapDatabaseIslandToIslandType(payload.new as any) : island
+          ));
           break;
         case 'DELETE':
           setIslands(prev => prev.filter(island => island.id !== payload.old.id));

@@ -54,6 +54,9 @@ export interface Island {
   updated_at?: string;
 }
 
+// Adding IslandDetails type that was missing
+export type IslandDetails = Island;
+
 // Type guard function to safely convert database island objects to our Island type
 export function mapDatabaseIslandToIslandType(dbIsland: any): Island {
   return {
@@ -67,45 +70,45 @@ export function mapDatabaseIslandToIslandType(dbIsland: any): Island {
     heroImage: dbIsland.hero_image,
     galleryImages: Array.isArray(dbIsland.gallery_images) ? dbIsland.gallery_images : [],
     activities: Array.isArray(dbIsland.activities) ? dbIsland.activities.map((act: any) => ({
-      name: act.name || '',
-      description: act.description || '',
-      image: act.image
+      name: typeof act === 'object' && act !== null ? act.name || '' : '',
+      description: typeof act === 'object' && act !== null ? act.description || '' : '',
+      image: typeof act === 'object' && act !== null ? act.image : undefined
     })) : [],
     accommodation: Array.isArray(dbIsland.accommodation) ? dbIsland.accommodation.map((acc: any) => ({
-      type: acc.type || '',
-      description: acc.description || '',
-      priceRange: acc.priceRange
+      type: typeof acc === 'object' && acc !== null ? acc.type || '' : '',
+      description: typeof acc === 'object' && acc !== null ? acc.description || '' : '',
+      priceRange: typeof acc === 'object' && acc !== null ? acc.priceRange : undefined
     })) : [],
     dining: Array.isArray(dbIsland.dining) ? dbIsland.dining.map((din: any) => ({
-      type: din.type || '',
-      description: din.description || ''
+      type: typeof din === 'object' && din !== null ? din.type || '' : '',
+      description: typeof din === 'object' && din !== null ? din.description || '' : ''
     })) : [],
-    location: dbIsland.location ? {
+    location: typeof dbIsland.location === 'object' && dbIsland.location !== null ? {
       atoll: dbIsland.location.atoll || '',
       coordinates: dbIsland.location.coordinates
     } : undefined,
-    travelInfo: dbIsland.travel_info ? {
+    travelInfo: typeof dbIsland.travel_info === 'object' && dbIsland.travel_info !== null ? {
       fromMale: dbIsland.travel_info.fromMale || '',
       bestWayToReach: dbIsland.travel_info.bestWayToReach || ''
     } : undefined,
-    weather: dbIsland.weather ? {
+    weather: typeof dbIsland.weather === 'object' && dbIsland.weather !== null ? {
       bestTime: dbIsland.weather.bestTime || '',
       temperature: dbIsland.weather.temperature || '',
       rainfall: dbIsland.weather.rainfall || ''
     } : undefined,
     essentialInfo: Array.isArray(dbIsland.essential_info) ? dbIsland.essential_info.map((info: any) => ({
-      title: info.title || '',
-      description: info.description || '',
-      icon: info.icon
+      title: typeof info === 'object' && info !== null ? info.title || '' : '',
+      description: typeof info === 'object' && info !== null ? info.description || '' : '',
+      icon: typeof info === 'object' && info !== null ? info.icon : undefined
     })) : [],
     quickFacts: Array.isArray(dbIsland.quick_facts) ? dbIsland.quick_facts.map((fact: any) => ({
-      label: fact.label || '',
-      value: fact.value || '',
-      icon: fact.icon || ''
+      label: typeof fact === 'object' && fact !== null ? fact.label || '' : '',
+      value: typeof fact === 'object' && fact !== null ? fact.value || '' : '',
+      icon: typeof fact === 'object' && fact !== null ? fact.icon || '' : ''
     })) : [],
     faqs: Array.isArray(dbIsland.faqs) ? dbIsland.faqs.map((faq: any) => ({
-      question: faq.question || '',
-      answer: faq.answer || ''
+      question: typeof faq === 'object' && faq !== null ? faq.question || '' : '',
+      answer: typeof faq === 'object' && faq !== null ? faq.answer || '' : ''
     })) : [],
     created_at: dbIsland.created_at,
     updated_at: dbIsland.updated_at
