@@ -28,7 +28,7 @@ const activities = [
     description: "Experience traditional Maldivian line fishing as the sun sets."
   },
   {
-    imageSrc: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2068&q=80",
+    imageSrc: "/lovable-uploads/d4d0c569-2079-4d9b-9a1a-4ceb17a607a9.png",
     title: "Scuba Diving",
     description: "Dive into the deep blue and discover the underwater treasures of the Maldives."
   }
