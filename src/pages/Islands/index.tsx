@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
 import Header from "@/components/Header";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TreePalm, Ship, ChevronRight, MapPin } from "lucide-react";
+import { TreePalm, Ship, ChevronRight, MapPin, Activity, Compass } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Island } from "@/types/island";
-import { useToast } from "@/hooks/use-toast"; // Updated import path
+import { useToast } from "@/hooks/use-toast";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+
 const Islands = () => {
   useScrollToTop();
   const {
@@ -19,6 +20,7 @@ const Islands = () => {
   const [islands, setIslands] = useState<Island[]>([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 6;
+
   useEffect(() => {
     const fetchIslands = async () => {
       try {
@@ -41,7 +43,6 @@ const Islands = () => {
     };
     fetchIslands();
 
-    // Set up real-time subscription
     const channel = supabase.channel('public:islands').on('postgres_changes', {
       event: '*',
       schema: 'public',
@@ -60,20 +61,20 @@ const Islands = () => {
       }
     }).subscribe();
 
-    // Cleanup subscription
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
   const filteredIslands = islands.filter(island => {
     if (!searchTerm) return true;
     const query = searchTerm.toLowerCase();
     return island.name?.toLowerCase().includes(query) || island.description?.toLowerCase().includes(query);
   });
 
-  // Pagination logic
   const paginatedIslands = filteredIslands.slice((page - 1) * itemsPerPage, page * itemsPerPage);
   const totalPages = Math.ceil(filteredIslands.length / itemsPerPage);
+
   return <div className="min-h-screen bg-white">
       <Header />
       
@@ -108,37 +109,52 @@ const Islands = () => {
           {isLoading ? <div className="flex justify-center py-8">
               <div className="h-12 w-12 border-4 border-t-ocean border-opacity-50 rounded-full animate-spin"></div>
             </div> : <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {paginatedIslands.length > 0 ? paginatedIslands.map(island => <Card key={island.id} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-lg">
-                      <div className="relative h-64">
-                        <img src={island.image_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb"} alt={island.name} className="w-full h-full object-cover" />
-                        <div className="absolute top-4 left-4 bg-white/90 rounded-full py-1 px-3 flex items-center shadow-md">
-                          <Ship className="w-4 h-4 text-ocean mr-1" />
-                          <span className="text-xs font-medium text-ocean-dark">View Details</span>
-                        </div>
-                      </div>
-                      
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-2xl font-bold text-gray-900">{island.name}</CardTitle>
-                        <div className="flex items-center text-gray-500 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedIslands.length > 0 ? paginatedIslands.map(island => (
+                  <Card key={island.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+                    <div className="relative h-48">
+                      <img 
+                        src={island.image_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb"} 
+                        alt={island.name} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <h3 className="text-xl font-bold text-white mb-1">{island.name}</h3>
+                        <div className="flex items-center text-white/90 text-sm">
                           <MapPin className="w-4 h-4 mr-1" />
                           <span>Maldives</span>
                         </div>
-                      </CardHeader>
+                      </div>
+                    </div>
+                    
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-600 line-clamp-2">{island.description}</p>
+                        </div>
+                      </div>
                       
-                      <CardContent className="py-2">
-                        <p className="text-gray-700">{island.description}</p>
-                      </CardContent>
-                      
-                      <CardFooter className="pt-2">
-                        <Link to={`/islands/${island.name.toLowerCase().replace(/\s+/g, '-')}`} className="w-full">
-                          <Button className="w-full bg-ocean hover:bg-ocean-dark text-white flex items-center justify-center gap-2">
-                            Explore Island
-                            <ChevronRight className="h-4 w-4" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-2">
+                          <span className="inline-flex items-center gap-1 text-xs bg-ocean/10 text-ocean px-2 py-1 rounded-full">
+                            <Compass className="w-3 h-3" />
+                            Activities
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs bg-ocean/10 text-ocean px-2 py-1 rounded-full">
+                            <Ship className="w-3 h-3" />
+                            Ferry
+                          </span>
+                        </div>
+                        <Link to={`/islands/${island.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                          <Button variant="ghost" size="sm" className="text-ocean hover:text-ocean-dark">
+                            View <ChevronRight className="w-4 h-4 ml-1" />
                           </Button>
                         </Link>
-                      </CardFooter>
-                    </Card>) : <div className="text-center py-16 bg-gray-50 rounded-lg col-span-2">
+                      </div>
+                    </CardContent>
+                  </Card>
+                )) : <div className="text-center py-16 bg-gray-50 rounded-lg col-span-full">
                     <h3 className="text-xl font-medium text-gray-700">No islands found matching your search</h3>
                     <p className="text-gray-500 mt-2">Try different keywords or clear your search</p>
                     <Button variant="outline" className="mt-4" onClick={() => setSearchTerm("")}>
@@ -226,4 +242,5 @@ const Islands = () => {
       </main>
     </div>;
 };
+
 export default Islands;
