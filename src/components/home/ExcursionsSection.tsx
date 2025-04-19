@@ -39,7 +39,7 @@ const ExcursionsSection = () => {
   return (
     <ContentSection
       tagline="MARINE ADVENTURES"
-      title="Beyond the Island"
+      title="Ocean Escapes: Discover the Extraordinary"
       description="Explore marine life up close like never before. Set off from your island for a true secluded experience in the heart of the sea."
       items={activities}
       ctaLink="/activities"
