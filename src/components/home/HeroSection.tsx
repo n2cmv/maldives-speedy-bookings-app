@@ -35,7 +35,7 @@ const HeroSection = () => {
   };
   
   return (
-    <div className="relative w-full h-[80vh] overflow-hidden mb-16">
+    <div className="relative w-full h-[90vh] overflow-hidden mb-16">
       <div className="absolute inset-0 w-full h-full">
         {isLoading ? (
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
