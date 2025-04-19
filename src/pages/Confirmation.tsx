@@ -1,266 +1,101 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { BookingInfo } from "@/types/booking";
-import { toast } from "sonner";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { CheckCircle, AlertTriangle, Home, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
-import ConfirmationHeader from "@/components/confirmation/ConfirmationHeader";
-import TripDetails from "@/components/confirmation/TripDetails";
-import PassengerInfo from "@/components/confirmation/PassengerInfo";
-import SpeedboatInfo from "@/components/confirmation/SpeedboatInfo";
-import PaymentInfo from "@/components/confirmation/PaymentInfo";
-import ConfirmationFooter from "@/components/confirmation/ConfirmationFooter";
-import QrCodeDisplay from "@/components/confirmation/QrCodeDisplay";
-import HeaderExtras from "@/components/HeaderExtras";
-import { saveBookingToLocalStorage } from "@/services/bookingStorage";
-import { 
-  saveBookingToDatabase, 
-  sendBookingConfirmationEmail, 
-  getRouteDetails 
-} from "@/services/bookingService";
-import { RouteData } from "@/types/database";
-import ActivityConfirmation from "@/components/activities/ActivityConfirmation";
-import { saveActivityBookingToDatabase, sendActivityConfirmationEmail } from "@/services/activityService";
+import { useTranslation } from "react-i18next";
+import { getBooking } from "@/services/apiBookings";
+import { format } from 'date-fns';
+import { useQuery } from "@tanstack/react-query";
+import { Booking } from "@/types/booking";
 
 const Confirmation = () => {
-  const location = useLocation();
+  const { reference } = useParams<{ reference: string }>();
   const navigate = useNavigate();
-  const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
-  const [activityBooking, setActivityBooking] = useState<any>(null);
-  const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
-  const [outboundSpeedboatDetails, setOutboundSpeedboatDetails] = useState<RouteData | null>(null);
-  const [returnSpeedboatDetails, setReturnSpeedboatDetails] = useState<RouteData | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
-  
-  useEffect(() => {
-    if (location.state?.isActivityBooking) {
-      const activityData = location.state;
-      if (!activityData) {
-        navigate("/");
-        return;
-      }
-      setActivityBooking(activityData);
-      
-      if (activityData.paymentComplete && activityData.paymentReference && !isEmailSent) {
-        saveActivityBookingAndSendConfirmation(activityData);
-      }
-    } else {
-      const booking = location.state as BookingInfo | null;
-      if (!booking || !booking.paymentComplete) {
-        navigate("/");
-        return;
-      }
-      
-      setBookingInfo(booking);
-      
-      saveBookingToLocalStorage(booking);
-      
-      fetchRouteDetails(booking);
-      
-      if (booking.paymentComplete && booking.paymentReference && !isEmailSent) {
-        saveBookingAndSendConfirmation(booking);
-      }
-    }
-  }, [location.state, navigate, isEmailSent]);
-  
-  const saveActivityBookingAndSendConfirmation = async (booking: any) => {
-    try {
-      const { data, error } = await saveActivityBookingToDatabase(booking);
-      
-      if (error) {
-        console.error("Error saving activity booking:", error);
-        toast.error("Error processing your booking", { 
-          description: "Please contact support with your booking reference." 
-        });
-        return;
-      }
-      
-      const emailResult = await sendActivityConfirmationEmail(booking);
-      
-      if (emailResult.success) {
-        setIsEmailSent(true);
-        toast.success("Booking confirmation sent", {
-          description: `We've sent a confirmation email to ${emailResult.emailSentTo}`
-        });
-      } else if (emailResult.error) {
-        setEmailError(emailResult.error);
-        toast.error("Could not send confirmation email", {
-          description: "Please check your email address or try again later."
-        });
-      }
-    } catch (error) {
-      console.error("Error processing activity booking confirmation:", error);
-      toast.error("Error processing your booking", { 
-        description: "Please contact support with your booking reference." 
-      });
-    }
-  };
-  
-  const saveBookingAndSendConfirmation = async (booking: BookingInfo) => {
-    try {
-      const { data, error } = await saveBookingToDatabase(booking);
-      
-      if (error) {
-        console.error("Error saving booking:", error);
-        toast.error("Error processing your booking", { 
-          description: "Please contact support with your booking reference." 
-        });
-        return;
-      }
-      
-      const enrichedBooking = {
-        ...booking,
-        outboundSpeedboatDetails,
-        returnSpeedboatDetails
-      };
-      
-      const emailResult = await sendBookingConfirmationEmail(enrichedBooking);
-      
-      if (emailResult.success) {
-        setIsEmailSent(true);
-        toast.success("Booking confirmation sent", {
-          description: `We've sent a confirmation email to ${emailResult.emailSentTo}`
-        });
-      } else if (emailResult.error) {
-        setEmailError(emailResult.error);
-        toast.error("Could not send confirmation email", {
-          description: "Please check your email address or try again later."
-        });
-      }
-    } catch (error) {
-      console.error("Error processing booking confirmation:", error);
-      toast.error("Error processing your booking", { 
-        description: "Please contact support with your booking reference." 
-      });
-    }
-  };
-  
-  const fetchRouteDetails = async (booking: BookingInfo) => {
-    if (!booking) return;
-    
-    try {
-      const { data: outboundData } = await getRouteDetails(booking.from, booking.island);
-      if (outboundData) {
-        setOutboundSpeedboatDetails(outboundData);
-      }
-      
-      if (booking.returnTrip && booking.returnTripDetails) {
-        const { data: returnData } = await getRouteDetails(
-          booking.returnTripDetails.from, 
-          booking.returnTripDetails.island
-        );
-        if (returnData) {
-          setReturnSpeedboatDetails(returnData);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching route details:", error);
-    }
-  };
+  const { t } = useTranslation();
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  const handleFinish = () => {
-    navigate("/");
-  };
+  useEffect(() => {
+    if (reference) {
+      setIsLoading(true);
+      getBooking(reference)
+        .then(data => {
+          setBooking(data);
+          setError(null);
+        })
+        .catch(err => {
+          setError(err);
+          setBooking(null);
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [reference]);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
-      <div className="absolute top-4 right-4 z-20">
-        <HeaderExtras />
-      </div>
+    <div className="min-h-screen bg-white">
+      <div className="h-16 pb-safe"></div>
       
       <Header />
       
-      <div className="pt-24 pb-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <ConfirmationHeader />
-          
-          <div className="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100 mt-8">
-            {activityBooking ? (
-              <ActivityConfirmation 
-                booking={activityBooking}
-                emailError={emailError}
-              />
-            ) : bookingInfo && (
-              <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-                  <div className="space-y-6">
-                    {bookingInfo.from && bookingInfo.island && (
-                      <TripDetails 
-                        title="Outbound Journey"
-                        from={bookingInfo.from}
-                        to={bookingInfo.island}
-                        time={bookingInfo.time}
-                        date={bookingInfo.date}
-                        isOutbound={true}
-                        speedboatName={outboundSpeedboatDetails?.speedboat_name || null}
-                        speedboatImageUrl={outboundSpeedboatDetails?.speedboat_image_url || null}
-                        pickupLocation={outboundSpeedboatDetails?.pickup_location || null}
-                        pickupMapUrl={outboundSpeedboatDetails?.pickup_map_url || null}
-                      />
-                    )}
-                    
-                    <QrCodeDisplay 
-                      bookingReference={bookingInfo.paymentReference || ""}
-                    />
-                    
-                    <div className="hidden lg:block">
-                      <PaymentInfo 
-                        paymentReference={bookingInfo.paymentReference || ""}
-                        paymentMethod={bookingInfo.paymentMethod}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {(outboundSpeedboatDetails || returnSpeedboatDetails) && (
-                      <div>
-                        <h3 className="font-medium mb-4">Speedboat Information</h3>
-                        {outboundSpeedboatDetails && (
-                          <SpeedboatInfo 
-                            speedboatName={outboundSpeedboatDetails.speedboat_name || null}
-                            speedboatImageUrl={outboundSpeedboatDetails.speedboat_image_url || null}
-                            pickupLocation={outboundSpeedboatDetails.pickup_location || null}
-                            pickupMapUrl={outboundSpeedboatDetails.pickup_map_url || null}
-                          />
-                        )}
-                        
-                        {returnSpeedboatDetails && (
-                          <SpeedboatInfo 
-                            speedboatName={returnSpeedboatDetails.speedboat_name || null}
-                            speedboatImageUrl={returnSpeedboatDetails.speedboat_image_url || null}
-                            pickupLocation={returnSpeedboatDetails.pickup_location || null}
-                            pickupMapUrl={returnSpeedboatDetails.pickup_map_url || null}
-                            isReturn={true}
-                          />
-                        )}
-                      </div>
-                    )}
-                    
-                    <PassengerInfo 
-                      seats={bookingInfo.seats} 
-                      passengers={bookingInfo.passengers}
-                    />
-                    
-                    <div className="lg:hidden">
-                      <PaymentInfo 
-                        paymentReference={bookingInfo.paymentReference || ""}
-                        paymentMethod={bookingInfo.paymentMethod}
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <ConfirmationFooter 
-                  island={bookingInfo.island || "your destination"}
-                  isReturnTrip={Boolean(bookingInfo.returnTrip)}
-                  onFinish={handleFinish}
-                />
-              </>
-            )}
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-24 flex flex-col items-center justify-center">
+        {isLoading && <div className="text-center">
+            <div className="h-12 w-12 border-4 border-t-ocean border-opacity-50 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">{t("confirmation.loading", "Loading your booking...")}</p>
+          </div>}
+
+        {error && <div className="text-center">
+            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-red-500 mb-2">{t("confirmation.errorTitle", "Booking Not Found")}</h2>
+            <p className="text-gray-600 mb-4">{t("confirmation.errorDescription", "We couldn't find a booking with the reference provided.")}</p>
+            <Button onClick={() => navigate("/")} className="bg-ocean hover:bg-ocean-dark text-white">
+              <Home className="h-4 w-4 mr-2" />
+              {t("common.returnHome", "Return Home")}
+            </Button>
+          </div>}
+
+        {booking && <div className="text-center">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-3xl font-semibold text-ocean-dark mb-2">{t("confirmation.successTitle", "Booking Confirmed!")}</h2>
+            <p className="text-gray-600 mb-8">{t("confirmation.successDescription", "Thank you! Your booking has been successfully processed.")}</p>
+
+            <div className="bg-gray-50 rounded-lg p-6 mb-6 w-full max-w-md">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("confirmation.bookingDetails", "Booking Details")}</h3>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-700">{t("confirmation.reference", "Reference")}:</span>
+                <span className="font-medium text-gray-800">{booking.reference}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-700">{t("confirmation.date", "Date")}:</span>
+                <span className="font-medium text-gray-800">{format(new Date(booking.date), 'PPP')}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-700">{t("confirmation.time", "Time")}:</span>
+                <span className="font-medium text-gray-800">{booking.time}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-gray-200">
+                <span className="text-gray-700">{t("confirmation.destination", "Destination")}:</span>
+                <span className="font-medium text-gray-800">{booking.destination}</span>
+              </div>
+              <div className="flex justify-between py-2">
+                <span className="text-gray-700">{t("confirmation.total", "Total")}:</span>
+                <span className="font-medium text-gray-800">MVR {booking.totalPrice}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => navigate("/")} className="bg-ocean hover:bg-ocean-dark text-white">
+                <Home className="h-4 w-4 mr-2" />
+                {t("common.returnHome", "Return Home")}
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/my-bookings")} className="text-ocean hover:bg-ocean/5">
+                <Search className="h-4 w-4 mr-2" />
+                {t("common.myBookings", "My Bookings")}
+              </Button>
+            </div>
+          </div>}
       </div>
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

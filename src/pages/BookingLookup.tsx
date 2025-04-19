@@ -10,13 +10,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search, Loader2, Shield, Eye } from "lucide-react";
 import Header from "@/components/Header";
+import HeaderExtras from "@/components/HeaderExtras";
 import { useTranslation } from "react-i18next";
 import { getBookingByReference } from "@/services/bookingService";
 import { BookingInfo } from "@/types/booking";
 import TripSummaryCard from "@/components/TripSummaryCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Form validation schema
 const formSchema = z.object({
   reference: z.string().min(1, "Reference number is required")
 });
@@ -162,9 +162,15 @@ const BookingLookup = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      <div className="h-16 pb-safe"></div>
+      
+      <div className="absolute top-4 right-4 z-20">
+        <HeaderExtras />
+      </div>
+      
       <Header />
       
-      <main className="container mx-auto pt-28 pb-12 px-4">
+      <main className="container mx-auto px-4 py-16 max-w-2xl">
         <div className="max-w-lg mx-auto">
           <Card className="shadow-md border-ocean-light/30">
             <CardHeader>
@@ -229,8 +235,6 @@ const BookingLookup = () => {
           )}
         </div>
       </main>
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

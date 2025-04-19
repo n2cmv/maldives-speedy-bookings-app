@@ -18,6 +18,8 @@ const BookingForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      <div className="h-16 pb-safe"></div>
+      
       <div className="absolute top-4 right-4 z-20">
         <HeaderExtras />
       </div>
@@ -34,8 +36,6 @@ const BookingForm = () => {
       </motion.div>
       
       <BookingSection preSelectedIsland={preSelectedIsland} />
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

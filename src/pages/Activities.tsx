@@ -12,6 +12,8 @@ const Activities = () => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
+      <div className="h-16 pb-safe"></div>
+      
       <div className="absolute top-4 right-4 z-20">
         <HeaderExtras />
       </div>
@@ -38,8 +40,6 @@ const Activities = () => {
           <ActivityForm isSubmitting={isSubmitting} />
         </motion.div>
       </main>
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

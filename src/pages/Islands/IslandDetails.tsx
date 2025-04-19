@@ -135,10 +135,11 @@ const IslandDetailsPage = () => {
   };
 
   return (
-    <>
-      {islandData ? <IslandPageTemplate islandData={safeIslandData} /> : null}
+    <div>
       <div className="h-16 pb-safe"></div>
-    </>
+      
+      {islandData ? <IslandPageTemplate islandData={safeIslandData} /> : null}
+    </div>
   );
 };
 

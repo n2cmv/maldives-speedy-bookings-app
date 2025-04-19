@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,8 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      <div className="h-16 pb-safe"></div>
+      
       <Header />
       
       <div className="container mx-auto px-4 py-32 flex flex-col items-center justify-center text-center">
@@ -75,8 +76,6 @@ const NotFound = () => {
           </Button>
         </motion.div>
       </div>
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };
