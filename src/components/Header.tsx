@@ -1,3 +1,4 @@
+
 import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -7,13 +8,12 @@ import BookingTypeModal from "./BookingTypeModal";
 import MobileBottomNav from "./MobileBottomNav";
 
 const Header = () => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const isHomePage = location.pathname === '/';
+  
   return <>
       <header className="bg-slate-50 shadow-md fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -58,11 +58,7 @@ const Header = () => {
           </div>}
       </header>
       
-      <div className={`h-${isMobile ? '16' : '24'}`}></div>
-      
       {isMobile && <MobileBottomNav />}
-      
-      {!isMobile && <div className="h-16 pb-safe"></div>}
       
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
     </>;
