@@ -64,7 +64,22 @@ const IslandDetailsPage = () => {
     );
   }
 
-  return <IslandPageTemplate islandData={islandData} />;
+  // Ensure all required nested objects exist to prevent errors
+  const safeIslandData: IslandDetails = {
+    ...islandData,
+    location: islandData.location || { atoll: 'Unknown' },
+    travelInfo: islandData.travelInfo || { fromMale: '', bestWayToReach: '' },
+    weather: islandData.weather || { bestTime: '', temperature: '', rainfall: '' },
+    activities: islandData.activities || [],
+    accommodation: islandData.accommodation || [],
+    dining: islandData.dining || [],
+    essentialInfo: islandData.essentialInfo || [],
+    quickFacts: islandData.quickFacts || [],
+    galleryImages: islandData.galleryImages || [],
+    faqs: islandData.faqs || []
+  };
+
+  return <IslandPageTemplate islandData={safeIslandData} />;
 };
 
 export default IslandDetailsPage;
