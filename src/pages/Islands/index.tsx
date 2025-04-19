@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
@@ -87,7 +86,7 @@ const Islands = () => {
           alt="Maldives Islands Aerial View" 
           className="w-full h-full object-cover" 
         />
-        <div className="absolute inset-0 bg-black/40 flex items-center">
+        <div className="absolute inset-0 bg-black/20 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
               <h1 className="text-4xl font-bold mb-4 text-slate-50 md:text-6xl">
