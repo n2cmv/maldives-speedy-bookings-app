@@ -61,10 +61,8 @@ const Header = () => {
       
       <div className={`h-${isMobile ? '16' : '24'}`}></div>
       
-      {/* Add mobile bottom navigation */}
       {isMobile && <MobileBottomNav />}
       
-      {/* Add bottom padding on mobile to account for bottom navigation */}
       {!isMobile && <div className="h-16 pb-safe"></div>}
       
       <BookingTypeModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} />
