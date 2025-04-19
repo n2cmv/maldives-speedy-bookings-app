@@ -1,14 +1,13 @@
-
 export const islands = [
   {
     imageSrc: "/lovable-uploads/95d209a2-202e-4061-a6a8-9a238b3a2806.png",
     title: "A.Dh Dhigurah",
-    description: "Famous for its pristine beaches and stunning coral reefs. Perfect for snorkeling enthusiasts."
+    description: "A 3-kilometer stretch of pristine white sandy beach surrounded by crystal clear waters."
   },
   {
     imageSrc: "/lovable-uploads/3be604d5-175c-4437-9bf5-44374b951515.png",
     title: "A.Dh Dhangethi",
-    description: "A tranquil island with rich cultural heritage and traditional Maldivian lifestyle."
+    description: "A tranquil island offering an authentic Maldivian cultural experience with breathtaking coastal views."
   }
 ];
 
