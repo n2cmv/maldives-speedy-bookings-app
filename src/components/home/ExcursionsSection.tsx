@@ -1,3 +1,4 @@
+
 import { Anchor, ChevronRight } from "lucide-react";
 import ContentSection from "./ContentSection";
 
@@ -37,7 +38,7 @@ const activities = [
 const ExcursionsSection = () => {
   return (
     <ContentSection
-      tagline="EXCURSIONS"
+      tagline="MARINE ADVENTURES"
       title="Beyond the Island"
       description="Explore marine life up close like never before. Set off from your island for a true secluded experience in the heart of the sea."
       items={activities}
