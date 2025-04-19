@@ -1,3 +1,4 @@
+
 export const speedboatTransfers = [
   {
     imageSrc: "/lovable-uploads/bc334610-3fe7-4efb-9cce-8bbfa1885f4c.png",
@@ -5,7 +6,7 @@ export const speedboatTransfers = [
     description: "Direct speedboat transfer from Male' Airport to beautiful Dhigurah Island."
   }, 
   {
-    imageSrc: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2574&q=80",
+    imageSrc: "/lovable-uploads/3be604d5-175c-4437-9bf5-44374b951515.png",
     title: "Airport to Dhangethi",
     description: "Convenient speedboat transfer from Male' Airport to charming Dhangethi Island."
   }, 
