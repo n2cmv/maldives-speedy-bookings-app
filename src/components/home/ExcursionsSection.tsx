@@ -13,7 +13,7 @@ const activities = [
     description: "Enjoy an evening cruise watching playful dolphins in the sunset."
   },
   {
-    imageSrc: "https://images.unsplash.com/photo-1582160540665-34914319be0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/3d2bf820-e6f5-4202-99a3-331f42903cd8.png",
     title: "Snorkeling Adventure",
     description: "Explore vibrant coral reefs and diverse marine life up close."
   },
