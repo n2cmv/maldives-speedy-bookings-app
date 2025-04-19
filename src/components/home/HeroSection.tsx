@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -32,6 +33,21 @@ const HeroSection = () => {
     
     fetchVideo();
   }, []);
+
+  // New timeout logic for video loading
+  useEffect(() => {
+    if (videoUrl) {
+      const videoLoadTimeout = setTimeout(() => {
+        const videoElement = document.querySelector('video');
+        if (videoElement && videoElement.readyState < 2) {
+          // If video hasn't loaded enough to play (readyState < 2), set error
+          setVideoError(true);
+        }
+      }, 5000); // 5 seconds timeout
+
+      return () => clearTimeout(videoLoadTimeout);
+    }
+  }, [videoUrl]);
 
   const handleScrollDown = () => {
     window.scrollTo({
