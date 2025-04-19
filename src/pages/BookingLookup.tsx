@@ -229,6 +229,8 @@ const BookingLookup = () => {
           )}
         </div>
       </main>
+      
+      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

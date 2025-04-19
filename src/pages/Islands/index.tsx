@@ -75,7 +75,8 @@ const Islands = () => {
   const paginatedIslands = filteredIslands.slice((page - 1) * itemsPerPage, page * itemsPerPage);
   const totalPages = Math.ceil(filteredIslands.length / itemsPerPage);
 
-  return <div className="min-h-screen bg-white">
+  return (
+    <div className="min-h-screen bg-white">
       <Header />
       
       <div className="relative h-[50vh] overflow-hidden">
@@ -240,7 +241,10 @@ const Islands = () => {
           </Link>
         </div>
       </main>
-    </div>;
+      
+      <div className="h-16 pb-safe"></div>
+    </div>
+  );
 };
 
 export default Islands;

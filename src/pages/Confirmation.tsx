@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -260,6 +259,8 @@ const Confirmation = () => {
           </div>
         </div>
       </div>
+      
+      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

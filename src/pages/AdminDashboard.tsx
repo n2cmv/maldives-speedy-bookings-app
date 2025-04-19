@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +37,6 @@ const AdminDashboard = () => {
           return;
         }
         
-        // Check if the authenticated user is in admin_users table
         const { data, error } = await supabase
           .from('admin_users')
           .select('*')
@@ -56,7 +54,6 @@ const AdminDashboard = () => {
           return;
         }
         
-        // Get booking statistics
         await fetchBookingSummary();
         
         console.log("Admin access verified");
@@ -77,12 +74,10 @@ const AdminDashboard = () => {
 
   const fetchBookingSummary = async () => {
     try {
-      // Get total bookings
       const { count: totalCount, error: totalError } = await supabase
         .from('bookings')
         .select('*', { count: 'exact', head: true });
       
-      // Get activity bookings
       const { count: activityCount, error: activityError } = await supabase
         .from('bookings')
         .select('*', { count: 'exact', head: true })
@@ -120,7 +115,6 @@ const AdminDashboard = () => {
           <h1 className="text-3xl font-bold text-ocean-dark">Admin Dashboard</h1>
         </div>
         
-        {/* Dashboard Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
             <CardHeader className="py-4">
@@ -192,6 +186,8 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

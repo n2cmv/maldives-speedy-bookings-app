@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
@@ -135,7 +134,12 @@ const IslandDetailsPage = () => {
     faqs: islandData.faqs || []
   };
 
-  return <IslandPageTemplate islandData={safeIslandData} />;
+  return (
+    <>
+      {islandData ? <IslandPageTemplate islandData={safeIslandData} /> : null}
+      <div className="h-16 pb-safe"></div>
+    </>
+  );
 };
 
 export default IslandDetailsPage;

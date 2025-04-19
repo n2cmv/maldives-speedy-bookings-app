@@ -75,6 +75,8 @@ const NotFound = () => {
           </Button>
         </motion.div>
       </div>
+      
+      <div className="h-16 pb-safe"></div>
     </div>
   );
 };

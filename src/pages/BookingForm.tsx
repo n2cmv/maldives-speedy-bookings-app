@@ -34,6 +34,8 @@ const BookingForm = () => {
       </motion.div>
       
       <BookingSection preSelectedIsland={preSelectedIsland} />
+      
+      <div className="h-16 pb-safe"></div>
     </div>
   );
 };
