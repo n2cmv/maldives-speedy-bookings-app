@@ -6,14 +6,20 @@ interface GalleryTabProps {
 }
 
 const GalleryTab = ({ islandData }: GalleryTabProps) => {
+  // Create a gallery from both heroImage and galleryImages, filtering out any null values
+  const images = [
+    islandData.heroImage, 
+    ...(islandData.galleryImages || [])
+  ].filter(Boolean);
+  
   return (
     <div className="pt-8">
-      {(islandData.galleryImages && islandData.galleryImages.length > 0) || islandData.heroImage ? (
+      {images.length > 0 ? (
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Photo Gallery</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[islandData.heroImage, ...(islandData.galleryImages || [])].filter(Boolean).map((image, index) => (
+            {images.map((image, index) => (
               <div key={index} className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                 <img 
                   src={image} 

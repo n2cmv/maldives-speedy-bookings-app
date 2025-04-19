@@ -7,10 +7,14 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ islandData }: HeroSectionProps) => {
+  // Default hero image if one is not provided
+  const heroImage = islandData.heroImage || 
+    "https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?q=80&w=3433&auto=format&fit=crop";
+
   return (
     <div className="relative h-[70vh] overflow-hidden">
       <img 
-        src={islandData.heroImage} 
+        src={heroImage} 
         alt={islandData.name} 
         className="w-full h-full object-cover"
       />
