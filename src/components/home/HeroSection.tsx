@@ -9,16 +9,23 @@ const HeroSection = () => {
   const { t } = useTranslation();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   
   useEffect(() => {
     const fetchVideo = async () => {
-      const { data } = await supabase.storage
-        .from('videos')
-        .getPublicUrl('maldives-background.mp4');
-        
-      if (data?.publicUrl) {
-        setVideoUrl(data.publicUrl);
+      try {
+        const { data } = await supabase.storage
+          .from('videos')
+          .getPublicUrl('maldives-background.mp4');
+          
+        if (data?.publicUrl) {
+          setVideoUrl(data.publicUrl);
+        } else {
+          setVideoError(true);
+        }
+      } catch (error) {
+        setVideoError(true);
       }
       setIsLoading(false);
     };
@@ -40,7 +47,7 @@ const HeroSection = () => {
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
             <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : videoUrl ? (
+        ) : videoUrl && !videoError ? (
           <video
             autoPlay
             muted
@@ -55,32 +62,17 @@ const HeroSection = () => {
               minWidth: '100%',
               minHeight: '100%'
             }}
+            onError={() => setVideoError(true)}
           >
             <source src={videoUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         ) : (
-          <iframe 
-            src="https://www.youtube.com/embed/Voytv2JfdCc?autoplay=1&mute=1&loop=1&playlist=Voytv2JfdCc&controls=0&showinfo=0" 
-            title="Experience the Maldives" 
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowFullScreen
-            frameBorder="0"
-            style={{ 
-              pointerEvents: 'none',
-              width: '300vw',
-              height: '300vh',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%) scale(2)',
-              minWidth: '300%',
-              minHeight: '300%',
-            }}
-          ></iframe>
+          <img
+            src="/lovable-uploads/8a691bc7-4569-4e6b-ae20-72ea264d4c45.png"
+            alt="Maldives Aerial View"
+            className="w-full h-full object-cover"
+          />
         )}
       </div>
       
