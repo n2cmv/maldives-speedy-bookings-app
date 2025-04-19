@@ -25,7 +25,7 @@ const IslandsManager = () => {
   const [islandToDelete, setIslandToDelete] = useState<string | null>(null);
   const [islandForm, setIslandForm] = useState<Island>({
     name: "",
-    description: "", // Ensure this is always initialized
+    description: "",
     image_url: "",
   });
 
@@ -34,9 +34,19 @@ const IslandsManager = () => {
   const handleEdit = (island: Island) => {
     setCurrentIsland(island);
     setIslandForm({
-      name: island.name,
-      description: island.description,
-      image_url: island.image_url || "",
+      ...island,
+      // Ensure all array fields are initialized
+      activities: island.activities || [],
+      accommodation: island.accommodation || [],
+      dining: island.dining || [],
+      galleryImages: island.galleryImages || [],
+      essentialInfo: island.essentialInfo || [],
+      quickFacts: island.quickFacts || [],
+      faqs: island.faqs || [],
+      // Ensure all object fields are initialized
+      location: island.location || { atoll: "", coordinates: "" },
+      travelInfo: island.travelInfo || { fromMale: "", bestWayToReach: "" },
+      weather: island.weather || { bestTime: "", temperature: "", rainfall: "" }
     });
     setIsIslandFormOpen(true);
   };
@@ -46,6 +56,30 @@ const IslandsManager = () => {
   ) => {
     const { name, value } = e.target;
     setIslandForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleArrayItemAdd = (field: keyof Island, item: any) => {
+    setIslandForm((prev) => ({
+      ...prev,
+      [field]: [...(prev[field] as any[] || []), item]
+    }));
+  };
+
+  const handleArrayItemRemove = (field: keyof Island, index: number) => {
+    setIslandForm((prev) => ({
+      ...prev,
+      [field]: (prev[field] as any[] || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleNestedFieldChange = (parentField: keyof Island, key: string, value: any) => {
+    setIslandForm((prev) => ({
+      ...prev,
+      [parentField]: {
+        ...(prev[parentField] as object || {}),
+        [key]: value
+      }
+    }));
   };
 
   const handleFormSubmit = async () => {
@@ -88,7 +122,23 @@ const IslandsManager = () => {
         onSearchChange={setSearchQuery}
         onAddClick={() => {
           setCurrentIsland(null);
-          setIslandForm({ name: "", description: "", image_url: "" });
+          setIslandForm({ 
+            name: "", 
+            description: "", 
+            image_url: "",
+            // Initialize empty arrays for array fields
+            activities: [],
+            accommodation: [],
+            dining: [],
+            galleryImages: [],
+            essentialInfo: [],
+            quickFacts: [],
+            faqs: [],
+            // Initialize empty objects for object fields
+            location: { atoll: "", coordinates: "" },
+            travelInfo: { fromMale: "", bestWayToReach: "" },
+            weather: { bestTime: "", temperature: "", rainfall: "" }
+          });
           setIsIslandFormOpen(true);
         }}
       />
@@ -119,6 +169,9 @@ const IslandsManager = () => {
           setIsIslandFormOpen(false);
           setCurrentIsland(null);
         }}
+        onArrayItemAdd={handleArrayItemAdd}
+        onArrayItemRemove={handleArrayItemRemove}
+        onNestedFieldChange={handleNestedFieldChange}
       />
 
       <AlertDialog
