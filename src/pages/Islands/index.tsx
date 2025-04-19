@@ -25,7 +25,6 @@ const Islands = () => {
         const { data, error } = await supabase.from('islands').select('*').order('name');
         if (error) throw error;
         
-        // Map database results to our Island type
         const mappedIslands = data ? data.map(island => mapDatabaseIslandToIslandType(island)) : [];
         setIslands(mappedIslands);
       } catch (error) {
@@ -78,6 +77,8 @@ const Islands = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header />
+      
+      <div className="h-16 pb-safe"></div>
       
       <div className="relative h-[50vh] overflow-hidden">
         <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80" alt="Maldives Islands" className="w-full h-full object-cover" />
@@ -241,8 +242,6 @@ const Islands = () => {
           </Link>
         </div>
       </main>
-      
-      <div className="h-16 pb-safe"></div>
     </div>
   );
 };
