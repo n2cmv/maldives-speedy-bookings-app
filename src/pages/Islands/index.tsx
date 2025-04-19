@@ -83,7 +83,7 @@ const Islands = () => {
       
       <div className="relative h-[50vh] overflow-hidden">
         <img 
-          src="/lovable-uploads/07f3e6c0-41c2-47a5-815d-57805cc634a6.png" 
+          src="/lovable-uploads/7ca126ff-87a4-49a0-a405-f45484c64dbe.png" 
           alt="Maldives Islands Aerial View" 
           className="w-full h-full object-cover" 
         />
