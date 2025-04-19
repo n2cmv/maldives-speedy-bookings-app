@@ -121,9 +121,11 @@ const Islands = () => {
                   <Card key={island.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
                     <div className="relative h-48">
                       <img 
-                        src={island.name === "A.Dh Dhangethi" 
-                          ? "/lovable-uploads/b72749c4-7068-4513-969d-21e3e99ad078.png" 
-                          : (island.image_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb")} 
+                        src={island.name === "A.Dh Dhigurah" 
+                          ? "/lovable-uploads/125dc6dd-4147-48d6-8647-6e58d133ba76.png" 
+                          : (island.name === "A.Dh Dhangethi" 
+                            ? "/lovable-uploads/b72749c4-7068-4513-969d-21e3e99ad078.png" 
+                            : (island.image_url || "https://images.unsplash.com/photo-1506744038136-46273834b3fb"))} 
                         alt={island.name} 
                         className="w-full h-full object-cover"
                       />
@@ -254,4 +256,3 @@ const Islands = () => {
 };
 
 export default Islands;
-
