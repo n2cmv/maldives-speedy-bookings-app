@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Island } from "@/types/island";
+import { Island, mapDatabaseIslandToIslandType } from "@/types/island";
 import { Time } from "@/types/booking";
 import { toast } from "sonner";
 import { allTimes, fallbackIslands } from "./booking/constants";
@@ -66,8 +67,11 @@ const BookingSection = ({ preSelectedIsland }: BookingSectionProps = {}) => {
       }
       
       if (data && data.length > 0) {
+        // Map database results to Island type
+        const mappedIslands = data.map(dbIsland => mapDatabaseIslandToIslandType(dbIsland));
+        
         // Sort islands according to route display order if possible
-        const sortedIslands = [...data];
+        const sortedIslands = [...mappedIslands];
         if (uniqueIslands.size > 0) {
           sortedIslands.sort((a, b) => {
             // If island is in routes, sort by route order

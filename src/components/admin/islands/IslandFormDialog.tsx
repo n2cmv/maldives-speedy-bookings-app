@@ -1,7 +1,9 @@
+
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -10,11 +12,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
 } from "@/components/ui/dialog";
+import { 
+  Tabs, 
+  TabsList, 
+  TabsTrigger, 
+  TabsContent 
+} from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Island } from "@/types/island";
 
@@ -74,12 +78,13 @@ const IslandFormDialog = ({
         } as React.ChangeEvent<HTMLInputElement>);
       } else {
         const currentImages = islandForm.galleryImages || [];
+        // Using as unknown as first to avoid type errors
         onFormChange({
           target: { 
             name: 'galleryImages', 
             value: [...currentImages, publicUrl] 
           }
-        } as React.ChangeEvent<HTMLInputElement>);
+        } as unknown as React.ChangeEvent<HTMLInputElement>);
       }
 
       toast({
@@ -373,9 +378,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updatedActivities = [...(islandForm.activities || [])];
                         updatedActivities[index] = { ...activity, name: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'activities', value: updatedActivities }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Activity Name"
                       className="mb-2"
@@ -385,9 +391,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updatedActivities = [...(islandForm.activities || [])];
                         updatedActivities[index] = { ...activity, description: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'activities', value: updatedActivities }
-                        } as React.ChangeEvent<HTMLTextAreaElement>);
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }}
                       placeholder="Activity Description"
                       rows={2}
@@ -398,9 +405,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updatedActivities = [...(islandForm.activities || [])];
                         updatedActivities[index] = { ...activity, image: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'activities', value: updatedActivities }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Activity Image URL"
                     />
@@ -440,9 +448,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
                         updated[index] = { ...item, type: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Accommodation Type"
                       className="mb-2"
@@ -452,9 +461,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
                         updated[index] = { ...item, description: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
-                        } as React.ChangeEvent<HTMLTextAreaElement>);
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }}
                       placeholder="Description"
                       rows={2}
@@ -465,9 +475,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
                         updated[index] = { ...item, priceRange: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Price Range"
                     />
@@ -507,9 +518,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.dining || [])];
                         updated[index] = { ...item, type: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'dining', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Dining Type"
                       className="mb-2"
@@ -519,9 +531,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.dining || [])];
                         updated[index] = { ...item, description: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'dining', value: updated }
-                        } as React.ChangeEvent<HTMLTextAreaElement>);
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }}
                       placeholder="Description"
                       rows={2}
@@ -598,9 +611,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.essentialInfo || [])];
                         updated[index] = { ...item, title: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'essentialInfo', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Title"
                       className="mb-2"
@@ -610,9 +624,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.essentialInfo || [])];
                         updated[index] = { ...item, description: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'essentialInfo', value: updated }
-                        } as React.ChangeEvent<HTMLTextAreaElement>);
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }}
                       placeholder="Description"
                       rows={2}
@@ -623,9 +638,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.essentialInfo || [])];
                         updated[index] = { ...item, icon: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'essentialInfo', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Icon name (e.g., 'wifi', 'clock')"
                     />
@@ -668,9 +684,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.quickFacts || [])];
                         updated[index] = { ...fact, label: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'quickFacts', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Label"
                       className="mb-2"
@@ -680,9 +697,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.quickFacts || [])];
                         updated[index] = { ...fact, value: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'quickFacts', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Value"
                       className="mb-2"
@@ -692,9 +710,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.quickFacts || [])];
                         updated[index] = { ...fact, icon: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'quickFacts', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Icon name (e.g., 'map-pin', 'users')"
                     />
@@ -734,9 +753,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.faqs || [])];
                         updated[index] = { ...faq, question: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'faqs', value: updated }
-                        } as React.ChangeEvent<HTMLInputElement>);
+                        } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
                       placeholder="Question"
                       className="mb-2"
@@ -746,9 +766,10 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.faqs || [])];
                         updated[index] = { ...faq, answer: e.target.value };
+                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'faqs', value: updated }
-                        } as React.ChangeEvent<HTMLTextAreaElement>);
+                        } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
                       }}
                       placeholder="Answer"
                       rows={3}

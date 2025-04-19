@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Island } from "@/types/island";
 import IslandTable from "./islands/IslandTable";

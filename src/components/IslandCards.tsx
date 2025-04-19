@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Ship, Calendar, Users, ChevronRight, Info } from "lucide-react";
-import { Island } from "@/types/island";
+import { Island, mapDatabaseIslandToIslandType } from "@/types/island";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -51,7 +51,9 @@ const IslandCards = ({ onSelectDestination }: IslandCardsProps) => {
         }
         
         if (data && data.length > 0) {
-          setIslandsData(data);
+          // Map database results to Island type
+          const mappedIslands = data.map(dbIsland => mapDatabaseIslandToIslandType(dbIsland));
+          setIslandsData(mappedIslands);
         }
       } catch (error) {
         console.error('Error fetching islands:', error);
