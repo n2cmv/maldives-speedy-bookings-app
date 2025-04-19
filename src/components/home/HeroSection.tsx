@@ -85,9 +85,7 @@ const HeroSection = () => {
         )}
       </div>
       
-      <div className="absolute inset-0 bg-black/50"></div>
-      
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0AB3B8]/30 via-[#005C99]/30 to-[#0AB3B8]/30 animate-gradient-x"></div>
+      {/* Removed the black/50 and gradient filters */}
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
@@ -129,3 +127,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
