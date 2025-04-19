@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
@@ -81,7 +82,11 @@ const Islands = () => {
       <div className="h-16 pb-safe"></div>
       
       <div className="relative h-[50vh] overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80" alt="Maldives Islands" className="w-full h-full object-cover" />
+        <img 
+          src="/lovable-uploads/07f3e6c0-41c2-47a5-815d-57805cc634a6.png" 
+          alt="Maldives Islands Aerial View" 
+          className="w-full h-full object-cover" 
+        />
         <div className="absolute inset-0 bg-black/40 flex items-center">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl">
