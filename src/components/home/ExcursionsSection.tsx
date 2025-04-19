@@ -18,7 +18,7 @@ const activities = [
     description: "Explore vibrant coral reefs and diverse marine life up close."
   },
   {
-    imageSrc: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/62af84cd-6d65-4501-aeaf-6eaeb7e0e378.png",
     title: "Sandbank Picnic",
     description: "Enjoy a private picnic on a pristine sandbank in the middle of the ocean."
   },
