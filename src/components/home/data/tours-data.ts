@@ -1,4 +1,3 @@
-
 export const speedboatTransfers = [
   {
     imageSrc: "/lovable-uploads/bc334610-3fe7-4efb-9cce-8bbfa1885f4c.png",
@@ -21,12 +20,12 @@ export const speedboatTransfers = [
     description: "Return transfer from Dhigurah Island back to Male' Airport."
   }, 
   {
-    imageSrc: "https://images.unsplash.com/photo-1582160540665-34914319be0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/a5d87012-949b-4005-a490-f24d36992f31.png",
     title: "Dhigurah to Male' City",
     description: "Direct speedboat transfer from Dhigurah Island to Male' City."
   }, 
   {
-    imageSrc: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/a5d87012-949b-4005-a490-f24d36992f31.png",
     title: "Male' City to Dhigurah",
     description: "Comfortable speedboat service from Male' City to Dhigurah Island."
   }
