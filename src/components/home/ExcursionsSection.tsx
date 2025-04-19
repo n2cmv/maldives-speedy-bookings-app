@@ -23,7 +23,7 @@ const activities = [
     description: "Enjoy a private picnic on a pristine sandbank in the middle of the ocean."
   },
   {
-    imageSrc: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2574&q=80",
+    imageSrc: "/lovable-uploads/96956a23-2383-45ab-b32a-505d1e3d40fd.png",
     title: "Sunset Fishing",
     description: "Experience traditional Maldivian line fishing as the sun sets."
   },
