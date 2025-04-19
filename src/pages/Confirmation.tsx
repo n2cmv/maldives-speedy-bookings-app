@@ -1,29 +1,53 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { CheckCircle, AlertTriangle, Home, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useTranslation } from "react-i18next";
-import { getBooking } from "@/services/apiBookings";
+import { getBookingByReference } from "@/services/bookingService";
 import { format } from 'date-fns';
 import { useQuery } from "@tanstack/react-query";
-import { Booking } from "@/types/booking";
+import { BookingInfo } from "@/types/booking";
 
 const Confirmation = () => {
   const { reference } = useParams<{ reference: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [booking, setBooking] = useState<Booking | null>(null);
+  const [booking, setBooking] = useState<BookingInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (reference) {
       setIsLoading(true);
-      getBooking(reference)
-        .then(data => {
-          setBooking(data);
-          setError(null);
+      getBookingByReference(reference)
+        .then(response => {
+          if (response.data) {
+            // Convert database format to BookingInfo format
+            const bookingInfo: BookingInfo = {
+              from: response.data.from_location || '',
+              island: response.data.to_location || '',
+              time: response.data.departure_time || '',
+              seats: response.data.passenger_count || 0,
+              date: response.data.departure_date ? new Date(response.data.departure_date) : undefined,
+              returnTrip: response.data.return_trip || false,
+              returnTripDetails: response.data.return_trip ? {
+                from: response.data.return_from_location || '',
+                island: response.data.return_to_location || '',
+                time: response.data.return_time || '',
+                date: response.data.return_date ? new Date(response.data.return_date) : undefined
+              } : undefined,
+              passengers: response.data.passenger_info || [],
+              paymentComplete: response.data.payment_complete || false,
+              paymentReference: response.data.payment_reference || '',
+              id: response.data.id
+            };
+            setBooking(bookingInfo);
+            setError(null);
+          } else {
+            throw new Error(response.error || "Booking not found");
+          }
         })
         .catch(err => {
           setError(err);
@@ -64,11 +88,11 @@ const Confirmation = () => {
               <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("confirmation.bookingDetails", "Booking Details")}</h3>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-700">{t("confirmation.reference", "Reference")}:</span>
-                <span className="font-medium text-gray-800">{booking.reference}</span>
+                <span className="font-medium text-gray-800">{booking.paymentReference}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-700">{t("confirmation.date", "Date")}:</span>
-                <span className="font-medium text-gray-800">{format(new Date(booking.date), 'PPP')}</span>
+                <span className="font-medium text-gray-800">{booking.date ? format(new Date(booking.date), 'PPP') : ''}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-700">{t("confirmation.time", "Time")}:</span>
@@ -76,11 +100,11 @@ const Confirmation = () => {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-700">{t("confirmation.destination", "Destination")}:</span>
-                <span className="font-medium text-gray-800">{booking.destination}</span>
+                <span className="font-medium text-gray-800">{booking.island}</span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-gray-700">{t("confirmation.total", "Total")}:</span>
-                <span className="font-medium text-gray-800">MVR {booking.totalPrice}</span>
+                <span className="font-medium text-gray-800">MVR {/* We don't have totalPrice in BookingInfo */}</span>
               </div>
             </div>
 
