@@ -70,17 +70,13 @@ export const useIslandManager = () => {
       }
 
       if (currentIslandId) {
-        // Update existing island
+        // Update existing island - only include fields that exist in our Island type
         const { error } = await supabase
           .from("islands")
           .update({
             name: islandData.name,
             description: islandData.description,
             image_url: islandData.image_url,
-            // Only include other fields if they are defined
-            ...(islandData.slug && { slug: islandData.slug }),
-            ...(islandData.tagline && { tagline: islandData.tagline }),
-            ...(islandData.hero_image && { hero_image: islandData.hero_image }),
           })
           .eq("id", currentIslandId);
 
