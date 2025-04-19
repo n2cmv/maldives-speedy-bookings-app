@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -85,7 +84,7 @@ const HeroSection = () => {
         )}
       </div>
       
-      {/* Removed the black/50 and gradient filters */}
+      <div className="absolute inset-0 bg-black/20"></div>
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
@@ -127,4 +126,3 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
-
