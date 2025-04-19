@@ -11,13 +11,13 @@ export const speedboatTransfers = [
   }, 
   {
     imageSrc: "/lovable-uploads/8d718aed-2bdc-4d07-827a-52efd4617835.png",
-    title: "Dhigurah to Airport",
-    description: "Return transfer from Dhigurah Island back to Male' Airport."
+    title: "Dhangethi to Airport",
+    description: "Fast and reliable transfer from Dhangethi Island to Male' Airport."
   }, 
   {
     imageSrc: "https://images.unsplash.com/photo-1513316564811-ee3c49558c8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    title: "Dhangethi to Airport",
-    description: "Fast and reliable transfer from Dhangethi Island to Male' Airport."
+    title: "Dhigurah to Airport",
+    description: "Return transfer from Dhigurah Island back to Male' Airport."
   }, 
   {
     imageSrc: "https://images.unsplash.com/photo-1582160540665-34914319be0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
