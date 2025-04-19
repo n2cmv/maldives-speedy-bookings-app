@@ -1,4 +1,3 @@
-
 import { Anchor, ChevronRight } from "lucide-react";
 import ContentSection from "./ContentSection";
 
@@ -9,7 +8,7 @@ const activities = [
     description: "Swim alongside magnificent whale sharks in their natural habitat."
   },
   {
-    imageSrc: "https://images.unsplash.com/photo-1513316564811-ee3c49558c8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/4a16a25b-4f38-429c-a0d8-d70234b02187.png",
     title: "Dolphin Cruise",
     description: "Enjoy an evening cruise watching playful dolphins in the sunset."
   },
@@ -53,4 +52,3 @@ const ExcursionsSection = () => {
 };
 
 export default ExcursionsSection;
-
