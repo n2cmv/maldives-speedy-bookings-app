@@ -5,6 +5,7 @@ import { IslandDetails } from '@/types/island';
 
 const islandData: IslandDetails = {
   name: "A.Dh Dhigurah",
+  description: "A beautiful 3-kilometer stretch of white sandy beach surrounded by crystal clear waters.",
   tagline: "Where Nature Meets Paradise",
   slug: "dhigurah",
   fullDescription: "Dhigurah, meaning 'long island' in Dhivehi, is a stunning 3-kilometer stretch of white sandy beach surrounded by crystal clear waters. Known for its incredible marine life, particularly whale sharks, this island offers a perfect blend of local Maldivian culture and natural beauty.",

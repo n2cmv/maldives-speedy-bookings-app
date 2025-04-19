@@ -54,7 +54,7 @@ export interface Island {
   updated_at?: string;
 }
 
-// Adding IslandDetails type that was missing
+// IslandDetails type is the same as Island type
 export type IslandDetails = Island;
 
 // Type guard function to safely convert database island objects to our Island type
@@ -62,7 +62,7 @@ export function mapDatabaseIslandToIslandType(dbIsland: any): Island {
   return {
     id: dbIsland.id,
     name: dbIsland.name,
-    description: dbIsland.description,
+    description: dbIsland.description || "Beautiful island in the Maldives", // Ensure description is always present
     image_url: dbIsland.image_url,
     tagline: dbIsland.tagline,
     slug: dbIsland.slug,
