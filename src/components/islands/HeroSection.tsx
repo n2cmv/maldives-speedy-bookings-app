@@ -1,0 +1,38 @@
+
+import { Star } from "lucide-react";
+import { IslandDetails } from "@/types/island";
+
+interface HeroSectionProps {
+  islandData: IslandDetails;
+}
+
+const HeroSection = ({ islandData }: HeroSectionProps) => {
+  return (
+    <div className="relative h-[70vh] overflow-hidden">
+      <img 
+        src={islandData.heroImage} 
+        alt={islandData.name} 
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/30 flex items-end">
+        <div className="container mx-auto px-4 pb-12">
+          <div className="flex flex-col items-center text-center md:text-left md:items-start text-white max-w-4xl">
+            <div className="bg-ocean px-4 py-1 rounded-full text-sm font-medium mb-4">
+              {islandData.location?.atoll || 'Maldives'}
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-yellow-400">
+              {islandData.name}
+            </h1>
+            <div className="flex mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HeroSection;
