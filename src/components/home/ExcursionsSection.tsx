@@ -4,7 +4,7 @@ import ContentSection from "./ContentSection";
 
 const activities = [
   {
-    imageSrc: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    imageSrc: "/lovable-uploads/d4c89786-07eb-4efc-9bdc-c3520c8c1231.png",
     title: "Whale Shark Spotting",
     description: "Swim alongside magnificent whale sharks in their natural habitat."
   },
@@ -53,3 +53,4 @@ const ExcursionsSection = () => {
 };
 
 export default ExcursionsSection;
+
