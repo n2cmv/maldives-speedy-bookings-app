@@ -1,5 +1,8 @@
-
-import React from "react";
+import React, { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -7,13 +10,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Island } from "@/types/island";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Island } from "@/types/island";
 
 interface IslandFormDialogProps {
   isOpen: boolean;
@@ -40,6 +43,61 @@ const IslandFormDialog = ({
   onArrayItemRemove,
   onNestedFieldChange,
 }: IslandFormDialogProps) => {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (file: File, type: 'heroImage' | 'galleryImage') => {
+    if (!file) return null;
+
+    try {
+      setIsUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('island-images')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('island-images')
+        .getPublicUrl(filePath);
+
+      if (type === 'heroImage') {
+        onFormChange({
+          target: { 
+            name: 'heroImage', 
+            value: publicUrl 
+          }
+        } as React.ChangeEvent<HTMLInputElement>);
+      } else {
+        const currentImages = islandForm.galleryImages || [];
+        onFormChange({
+          target: { 
+            name: 'galleryImages', 
+            value: [...currentImages, publicUrl] 
+          }
+        } as React.ChangeEvent<HTMLInputElement>);
+      }
+
+      toast({
+        title: "Image Uploaded",
+        description: "Image uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Upload Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Check if required fields are filled
   const isFormValid = islandForm.name && islandForm.description;
 
@@ -184,40 +242,56 @@ const IslandFormDialog = ({
                 htmlFor="hero_image"
                 className="text-sm font-medium leading-none"
               >
-                Hero Image URL
+                Hero Image Upload
               </label>
               <Input
-                id="hero_image"
-                name="heroImage"
-                value={islandForm.heroImage || ""}
-                onChange={onFormChange}
-                placeholder="https://example.com/hero.jpg"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file, 'heroImage');
+                }}
+                disabled={isUploading}
               />
+              {islandForm.heroImage && (
+                <img 
+                  src={islandForm.heroImage} 
+                  alt="Hero" 
+                  className="mt-2 max-h-48 object-cover" 
+                />
+              )}
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none block mb-2">
-                Gallery Images (One URL per line)
+                Gallery Images Upload
               </label>
-              <Textarea
-                name="galleryImagesText"
-                value={(islandForm.galleryImages || []).join('\n')}
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
                 onChange={(e) => {
-                  const urls = e.target.value.split('\n').filter(url => url.trim() !== '');
-                  // Update the form directly with the array of URLs
-                  onFormChange({
-                    target: {
-                      name: 'galleryImages',
-                      value: urls
-                    }
-                  } as React.ChangeEvent<HTMLTextAreaElement>);
+                  const files = e.target.files;
+                  if (files) {
+                    Array.from(files).forEach(file => 
+                      handleImageUpload(file, 'galleryImage')
+                    );
+                  }
                 }}
-                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                rows={4}
+                disabled={isUploading}
               />
-              <p className="text-xs text-muted-foreground">
-                Enter each image URL on a new line
-              </p>
+              {islandForm.galleryImages && islandForm.galleryImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {islandForm.galleryImages.map((imageUrl, index) => (
+                    <img 
+                      key={index} 
+                      src={imageUrl} 
+                      alt={`Gallery ${index + 1}`} 
+                      className="h-24 w-24 object-cover rounded"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -1,137 +1,63 @@
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Island } from "@/types/island";
+const handleSubmit = async (islandData: Partial<Island>, currentIslandId?: string) => {
+  try {
+    // Include all new fields in the submission
+    const submissionData = {
+      name: islandData.name,
+      description: islandData.description,
+      image_url: islandData.image_url,
+      tagline: islandData.tagline,
+      slug: islandData.slug,
+      full_description: islandData.fullDescription,
+      hero_image: islandData.heroImage,
+      gallery_images: islandData.galleryImages,
+      activities: islandData.activities,
+      accommodation: islandData.accommodation,
+      dining: islandData.dining,
+      location: islandData.location,
+      travel_info: islandData.travelInfo,
+      weather: islandData.weather,
+      essential_info: islandData.essentialInfo,
+      quick_facts: islandData.quickFacts,
+      faqs: islandData.faqs
+    };
 
-export const useIslandManager = () => {
-  const { toast } = useToast();
-  const [islands, setIslands] = useState<Island[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const fetchIslands = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("islands")
-        .select("*")
-        .order("name");
-
-      if (error) {
-        throw error;
-      }
-
-      setIslands(data || []);
-    } catch (error) {
-      console.error("Error fetching islands:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch islands",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (islandId: string) => {
-    try {
+    if (currentIslandId) {
       const { error } = await supabase
         .from("islands")
-        .delete()
-        .eq("id", islandId);
+        .update(submissionData)
+        .eq("id", currentIslandId);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      setIslands(islands.filter((island) => island.id !== islandId));
       toast({
         title: "Success",
-        description: "Island has been deleted",
+        description: "Island has been updated",
       });
-      return true;
-    } catch (error) {
-      console.error("Error deleting island:", error);
+    } else {
+      const { error } = await supabase
+        .from("islands")
+        .insert(submissionData);
+
+      if (error) throw error;
+
       toast({
-        title: "Error",
-        description: "Failed to delete island",
-        variant: "destructive",
+        title: "Success",
+        description: "Island has been created",
       });
-      return false;
     }
-  };
 
-  const handleSubmit = async (islandData: Partial<Island>, currentIslandId?: string) => {
-    try {
-      // Ensure description is always provided, as it's required by the database schema
-      if (islandData.description === undefined) {
-        throw new Error("Island description is required");
-      }
-
-      if (currentIslandId) {
-        // Update existing island - only include fields that exist in our Island type
-        const { error } = await supabase
-          .from("islands")
-          .update({
-            name: islandData.name,
-            description: islandData.description,
-            image_url: islandData.image_url,
-          })
-          .eq("id", currentIslandId);
-
-        if (error) {
-          throw error;
-        }
-
-        toast({
-          title: "Success",
-          description: "Island has been updated",
-        });
-      } else {
-        // Create new island
-        const { error } = await supabase
-          .from("islands")
-          .insert({
-            name: islandData.name as string,
-            description: islandData.description as string,
-            image_url: islandData.image_url,
-          });
-
-        if (error) {
-          throw error;
-        }
-
-        toast({
-          title: "Success",
-          description: "Island has been created",
-        });
-      }
-
-      await fetchIslands();
-      return true;
-    } catch (error) {
-      console.error("Error saving island:", error);
-      toast({
-        title: "Error",
-        description: typeof error === 'object' && error !== null && 'message' in error 
-          ? String(error.message) 
-          : "Failed to save island",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  useEffect(() => {
-    fetchIslands();
-  }, []);
-
-  return {
-    islands,
-    isLoading,
-    handleDelete,
-    handleSubmit,
-    fetchIslands
-  };
+    await fetchIslands();
+    return true;
+  } catch (error) {
+    console.error("Error saving island:", error);
+    toast({
+      title: "Error",
+      description: typeof error === 'object' && error !== null && 'message' in error 
+        ? String(error.message) 
+        : "Failed to save island",
+      variant: "destructive",
+    });
+    return false;
+  }
 };
