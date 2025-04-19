@@ -1,4 +1,3 @@
-
 import React from 'react';
 import IslandPageTemplate from '@/components/islands/IslandPageTemplate';
 import { IslandDetails } from '@/types/island';
@@ -11,7 +10,7 @@ const islandData: IslandDetails = {
   fullDescription: "Dhigurah, meaning 'long island' in Dhivehi, is a stunning 3-kilometer stretch of white sandy beach surrounded by crystal clear waters. Known for its incredible marine life, particularly whale sharks, this island offers a perfect blend of local Maldivian culture and natural beauty.",
   heroImage: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
   galleryImages: [
-    "https://images.unsplash.com/photo-1540202404-1b927e27fa8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2026&q=80",
+    "https://images.unsplash.com/photo-1540202404-1b927e27fa8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fA%3D%3D&auto=format&fit=crop&w=2026&q=80",
     "https://images.unsplash.com/photo-1586500036706-41963de24d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2127&q=80",
     "https://images.unsplash.com/photo-1589979481223-deb893043163?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2060&q=80"
   ],
@@ -27,7 +26,7 @@ const islandData: IslandDetails = {
     {
       name: "Whale Shark Watching",
       description: "Experience the majestic whale sharks in their natural habitat. Dhigurah is famous for year-round whale shark sightings.",
-      image: "https://images.unsplash.com/photo-1595153838579-49190646dedb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
+      image: "/lovable-uploads/d4c89786-07eb-4efc-9bdc-c3520c8c1231.png"
     },
     {
       name: "Snorkeling",
