@@ -15,21 +15,25 @@ const ActivitiesTab = ({ islandData }: ActivitiesTabProps) => {
         <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6">Things to Do in {islandData.name}</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {islandData.activities.map((activity, index) => (
-              <div key={index} className="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <div 
+                key={index} 
+                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+              >
                 {activity.image && (
-                  <div className="h-48">
+                  <div className="relative h-52 overflow-hidden">
                     <img 
                       src={activity.image} 
                       alt={activity.name} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 )}
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{activity.name}</h3>
-                  <p className="text-sm text-gray-700 line-clamp-3">{activity.description}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-ocean transition-colors duration-300">{activity.name}</h3>
+                  <p className="mt-2 text-sm text-gray-600 line-clamp-2 leading-relaxed">{activity.description}</p>
                 </div>
               </div>
             ))}
