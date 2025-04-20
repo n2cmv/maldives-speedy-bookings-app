@@ -24,23 +24,23 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
             {islandData.accommodation.map((option, index) => (
               <div 
                 key={index} 
-                className="group aspect-square overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+                className="group overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
               >
                 {option.image && (
-                  <div className="relative w-full h-full overflow-hidden">
+                  <div className="relative w-full aspect-square overflow-hidden">
                     <img 
                       src={option.image} 
                       alt={option.type} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
                   </div>
                 )}
-                <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
-                  <h3 className="text-lg font-semibold mb-2">
+                
+                <div className="p-4 bg-white">
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">
                     {option.type}
                   </h3>
-                  <p className="text-sm text-white/90 line-clamp-3 leading-relaxed">
+                  <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed">
                     {option.description}
                   </p>
                 </div>
