@@ -12,6 +12,10 @@ Allow: /islands/
 Allow: /booking
 Allow: /activities
 
+# Specifically allow important island pages
+Allow: /islands/dhigurah
+Allow: /islands/dhangethi
+
 # Allow search engines to crawl images
 Allow: /*.jpg$
 Allow: /*.jpeg$
