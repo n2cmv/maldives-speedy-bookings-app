@@ -1,9 +1,8 @@
 
 import { Ship, Users, Bed, CalendarDays, MapPin, LucideProps } from "lucide-react";
 import { IslandDetails } from "@/types/island";
-import dynamic from 'next/dynamic';
-import { createElement } from 'react';
-import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import { lazy, Suspense } from 'react';
+import * as lucideIcons from "lucide-react";
 
 interface QuickFactsSectionProps {
   quickFacts: IslandDetails['quickFacts'];
@@ -14,10 +13,16 @@ const QuickFactsSection = ({ quickFacts }: QuickFactsSectionProps) => {
   
   const renderIcon = (iconName: string) => {
     // Convert to kebab case for matching lucide icon names
-    const normalizedIconName = iconName.toLowerCase().replace(/\s+/g, '-');
+    const normalizedIconName = iconName
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      // Convert to PascalCase for accessing from lucideIcons
+      .split('-')
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
     
     // First try with direct imports for common icons (faster loading)
-    switch (normalizedIconName) {
+    switch (iconName.toLowerCase()) {
       case "ship":
         return <Ship className="h-6 w-6 mx-auto" />;
       case "users":
@@ -33,10 +38,10 @@ const QuickFactsSection = ({ quickFacts }: QuickFactsSectionProps) => {
         return <MapPin className="h-6 w-6 mx-auto" />;
     }
 
-    // Check if the icon exists in lucide's dynamic imports
-    if (normalizedIconName in dynamicIconImports) {
-      const IconComponent = dynamic(dynamicIconImports[normalizedIconName as keyof typeof dynamicIconImports]);
-      return createElement(IconComponent, { className: "h-6 w-6 mx-auto" });
+    // Check if the icon exists in lucide icons
+    if (normalizedIconName in lucideIcons) {
+      const IconComponent = lucideIcons[normalizedIconName as keyof typeof lucideIcons];
+      return <IconComponent className="h-6 w-6 mx-auto" />;
     }
 
     // Fallback to ship icon if not found
