@@ -17,6 +17,7 @@ export interface Island {
     type: string;
     description: string;
     priceRange?: string;
+    image?: string;
   }>;
   dining?: Array<{
     type: string;
@@ -76,7 +77,8 @@ export function mapDatabaseIslandToIslandType(dbIsland: any): Island {
     accommodation: Array.isArray(dbIsland.accommodation) ? dbIsland.accommodation.map((acc: any) => ({
       type: typeof acc === 'object' && acc !== null ? acc.type || '' : '',
       description: typeof acc === 'object' && acc !== null ? acc.description || '' : '',
-      priceRange: typeof acc === 'object' && acc !== null ? acc.priceRange : undefined
+      priceRange: typeof acc === 'object' && acc !== null ? acc.priceRange : undefined,
+      image: typeof acc === 'object' && acc !== null ? acc.image : undefined
     })) : [],
     dining: Array.isArray(dbIsland.dining) ? dbIsland.dining.map((din: any) => ({
       type: typeof din === 'object' && din !== null ? din.type || '' : '',

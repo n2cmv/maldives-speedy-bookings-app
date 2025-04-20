@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -448,7 +447,6 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
                         updated[index] = { ...item, type: e.target.value };
-                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
                         } as unknown as React.ChangeEvent<HTMLInputElement>);
@@ -461,7 +459,6 @@ const IslandFormDialog = ({
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
                         updated[index] = { ...item, description: e.target.value };
-                        // Using as unknown as to avoid type errors
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
                         } as unknown as React.ChangeEvent<HTMLTextAreaElement>);
@@ -471,16 +468,15 @@ const IslandFormDialog = ({
                       className="mb-2"
                     />
                     <Input
-                      value={item.priceRange || ""}
+                      value={item.image || ""}
                       onChange={(e) => {
                         const updated = [...(islandForm.accommodation || [])];
-                        updated[index] = { ...item, priceRange: e.target.value };
-                        // Using as unknown as to avoid type errors
+                        updated[index] = { ...item, image: e.target.value };
                         onFormChange({
                           target: { name: 'accommodation', value: updated }
                         } as unknown as React.ChangeEvent<HTMLInputElement>);
                       }}
-                      placeholder="Price Range"
+                      placeholder="Image URL"
                     />
                   </div>
                 </div>
@@ -489,7 +485,7 @@ const IslandFormDialog = ({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => onArrayItemAdd('accommodation', { type: '', description: '', priceRange: '' })}
+                onClick={() => onArrayItemAdd('accommodation', { type: '', description: '', image: '' })}
                 className="w-full"
               >
                 Add Accommodation

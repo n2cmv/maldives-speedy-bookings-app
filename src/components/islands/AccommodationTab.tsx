@@ -16,20 +16,34 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
             <h2 className="text-3xl font-bold text-gray-900">Where to Stay</h2>
           </div>
           <p className="text-gray-700 mb-8 max-w-4xl">
-            {islandData.name} offers a variety of accommodation options to suit different budgets and preferences, 
+            {islandData.name} offers a variety of accommodation options to suit different preferences, 
             from cozy guesthouses to boutique hotels and private beach villas.
           </p>
           
-          <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {islandData.accommodation.map((option, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{option.type}</h3>
-                <p className="text-gray-700 mb-3">{option.description}</p>
-                {option.priceRange && (
-                  <div className="inline-flex items-center bg-gray-100 px-3 py-1 rounded-full">
-                    <span className="text-sm font-medium">Price range: {option.priceRange}</span>
+              <div 
+                key={index} 
+                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+              >
+                {option.image && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={option.image} 
+                      alt={option.type} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 )}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-ocean transition-colors duration-300">
+                    {option.type}
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                    {option.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
