@@ -20,14 +20,14 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
             from cozy guesthouses to boutique hotels and private beach villas.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {islandData.accommodation.map((option, index) => (
               <div 
                 key={index} 
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+                className="group aspect-square overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
               >
                 {option.image && (
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative w-full h-full overflow-hidden">
                     <img 
                       src={option.image} 
                       alt={option.type} 
@@ -36,13 +36,10 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 )}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-ocean transition-colors duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white">
+                  <h3 className="text-sm font-semibold line-clamp-2">
                     {option.type}
                   </h3>
-                  <p className="mt-2 text-sm text-gray-600 line-clamp-3 leading-relaxed">
-                    {option.description}
-                  </p>
                 </div>
               </div>
             ))}
@@ -58,4 +55,3 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
 };
 
 export default AccommodationTab;
-
