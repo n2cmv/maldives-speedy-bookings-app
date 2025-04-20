@@ -1,7 +1,6 @@
 
 import { Ship, Users, Bed, CalendarDays, MapPin, LucideProps } from "lucide-react";
 import { IslandDetails } from "@/types/island";
-import { lazy, Suspense } from 'react';
 import * as lucideIcons from "lucide-react";
 
 interface QuickFactsSectionProps {
@@ -40,8 +39,16 @@ const QuickFactsSection = ({ quickFacts }: QuickFactsSectionProps) => {
 
     // Check if the icon exists in lucide icons
     if (normalizedIconName in lucideIcons) {
+      // Safely check if the imported value is a valid React component
       const IconComponent = lucideIcons[normalizedIconName as keyof typeof lucideIcons];
-      return <IconComponent className="h-6 w-6 mx-auto" />;
+      
+      // Check if IconComponent is a valid React component before rendering
+      if (typeof IconComponent === 'function' || 
+          (typeof IconComponent === 'object' && IconComponent !== null)) {
+        // TypeScript needs this cast to treat it as a valid JSX element type
+        const ValidIcon = IconComponent as React.ComponentType<LucideProps>;
+        return <ValidIcon className="h-6 w-6 mx-auto" />;
+      }
     }
 
     // Fallback to ship icon if not found
