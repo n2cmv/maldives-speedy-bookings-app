@@ -1,12 +1,19 @@
 
 import { Bed } from "lucide-react";
 import { IslandDetails } from "@/types/island";
+import { Button } from "@/components/ui/button";
 
 interface AccommodationTabProps {
   islandData: IslandDetails;
 }
 
 const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
+  const handleBookNow = (accommodationType: string, description: string) => {
+    const message = `Hi! I'm interested in booking ${accommodationType} in ${islandData.name}.\n\nDetails: ${description}`;
+    const whatsappUrl = `https://wa.me/9607772564?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
     <div className="pt-8">
       {islandData.accommodation && islandData.accommodation.length > 0 ? (
@@ -20,7 +27,7 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
             from cozy guesthouses to boutique hotels and private beach villas.
           </p>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {islandData.accommodation.map((option, index) => (
               <div 
                 key={index} 
@@ -40,9 +47,15 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
                   <h3 className="text-lg font-semibold mb-2 text-gray-900">
                     {option.type}
                   </h3>
-                  <p className="text-sm text-gray-700 line-clamp-3 leading-relaxed">
+                  <p className="text-sm text-gray-700 mb-4 line-clamp-3 leading-relaxed">
                     {option.description}
                   </p>
+                  <Button 
+                    onClick={() => handleBookNow(option.type, option.description)}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Book on WhatsApp
+                  </Button>
                 </div>
               </div>
             ))}
