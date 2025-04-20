@@ -52,9 +52,9 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
                   </p>
                   <Button 
                     onClick={() => handleBookNow(option.type, option.description)}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                    className="w-full ocean-button"
                   >
-                    Book on WhatsApp
+                    Book Now
                   </Button>
                 </div>
               </div>
