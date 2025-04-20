@@ -16,12 +16,15 @@ Allow: /activities
 Allow: /islands/dhigurah
 Allow: /islands/dhangethi
 
-# Allow search engines to crawl images
+# Allow search engines to crawl images and assets
 Allow: /*.jpg$
 Allow: /*.jpeg$
 Allow: /*.gif$
 Allow: /*.png$
 Allow: /*.webp$
+Allow: /*.svg$
+Allow: /*.css$
+Allow: /*.js$
 
 # Crawl delays and limits
 Crawl-delay: 10
