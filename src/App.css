@@ -1,3 +1,4 @@
+
 /* Fix for layout shifts */
 html {
   width: 100%;
@@ -8,6 +9,15 @@ body {
   width: 100%;
   overflow-x: hidden;
   position: relative;
+  min-height: 100vh;
+  padding-top: env(safe-area-inset-top); /* For devices with notches */
+}
+
+/* Header and navigation fixes */
+header {
+  width: 100%;
+  z-index: 50;
+  background-color: white;
 }
 
 /* Prevent layout shifts for selectors */
@@ -22,6 +32,11 @@ header,
 .select-content {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* Base padding for content to prevent overlap with fixed header */
+main {
+  min-height: calc(100vh - 76px); /* Account for header height */
 }
 
 .passenger-picker {
@@ -53,6 +68,14 @@ header,
     padding-left: 1rem;
     padding-right: 1rem;
   }
+  
+  main {
+    padding-bottom: 80px; /* Account for bottom nav */
+  }
+  
+  body {
+    padding-bottom: env(safe-area-inset-bottom); /* For devices with home indicators */
+  }
 }
 
 /* Admin dialogs - make them more compact */
@@ -73,4 +96,54 @@ header,
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Blog styles */
+.prose {
+  max-width: 65ch;
+  color: #374151;
+  line-height: 1.75;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+  margin-top: 0;
+  margin-bottom: 0.8em;
+  line-height: 1.1;
+}
+
+.prose h2 {
+  font-size: 1.5em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.3;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose ul {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.625em;
+  list-style-type: disc;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose .lead {
+  font-size: 1.25em;
+  line-height: 1.6;
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+}
+
+/* Account for fixed header when clicking anchor links */
+html {
+  scroll-padding-top: 100px;
 }

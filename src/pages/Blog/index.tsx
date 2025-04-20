@@ -50,7 +50,7 @@ const BlogPage = () => {
 
       <Header />
       
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-32 pb-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold mb-2">Travel Guides</h1>
           <p className="text-gray-600 mb-8">Discover everything you need to know about traveling to Maldives local islands</p>
