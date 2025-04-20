@@ -1,6 +1,6 @@
 
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import WelcomeSection from '@/components/WelcomeSection';
 import BookingForm from '@/pages/BookingForm';
@@ -17,17 +17,6 @@ import i18n from './i18n/i18n';
 import BlogPage from "@/pages/Blog/index";
 import MaleToDhigurahGuide from "@/pages/Blog/MaleToDhigurah";
 import MaleToDhangethiGuide from "@/pages/Blog/MaleToDhangethi";
-
-// Create ScrollToTop component since it's being imported but doesn't exist
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  
-  return null;
-};
 
 const App = () => {
   return (
