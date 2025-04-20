@@ -1,13 +1,24 @@
+
 /* Fix for layout shifts */
 html {
   width: 100%;
   overflow-x: hidden;
+  height: 100%;
 }
 
 body {
   width: 100%;
   overflow-x: hidden;
   position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Prevent layout shifts for selectors */

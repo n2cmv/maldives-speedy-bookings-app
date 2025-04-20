@@ -206,10 +206,10 @@ const MyBookings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
       
-      <div className="pt-24 pb-12 px-4">
+      <div className="flex-grow pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <Button 
             variant="outline" 
