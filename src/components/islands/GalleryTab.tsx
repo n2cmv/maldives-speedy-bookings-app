@@ -1,6 +1,6 @@
 
 import { IslandDetails } from "@/types/island";
-import { Gallery } from "lucide-react";
+import { GalleryHorizontal } from "lucide-react";
 
 interface GalleryTabProps {
   islandData: IslandDetails;
@@ -18,7 +18,7 @@ const GalleryTab = ({ islandData }: GalleryTabProps) => {
       {images.length > 0 ? (
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-8">
-            <Gallery className="h-6 w-6 text-ocean" />
+            <GalleryHorizontal className="h-6 w-6 text-ocean" />
             <h2 className="text-3xl font-bold text-gray-900">Photo Gallery</h2>
           </div>
           
@@ -39,7 +39,7 @@ const GalleryTab = ({ islandData }: GalleryTabProps) => {
         </div>
       ) : (
         <div className="text-center py-8">
-          <Gallery className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <GalleryHorizontal className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <p className="text-gray-500">No gallery images available for this island yet.</p>
         </div>
       )}
