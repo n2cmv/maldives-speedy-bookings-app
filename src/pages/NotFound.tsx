@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,7 @@ const NotFound = () => {
           </Button>
           
           <Button
-            onClick={() => navigate("/booking-lookup")}
+            onClick={() => navigate("/my-bookings")}
             variant="outline"
             className="flex items-center gap-2"
           >
