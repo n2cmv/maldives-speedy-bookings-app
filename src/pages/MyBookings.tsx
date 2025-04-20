@@ -213,7 +213,7 @@ const MyBookings = () => {
           <Button 
             variant="outline" 
             onClick={handleGoBack}
-            className="mb-10 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20" {/* Increased bottom margin from mb-8 to mb-10 */}
+            className="mb-10 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20" /* Increased bottom margin from mb-8 to mb-10 */
           >
             <ChevronLeft className="h-4 w-4" />
             Back to Home
