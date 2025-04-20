@@ -1,14 +1,15 @@
+
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import WelcomeSection from '@/components/WelcomeSection';
-import BookingPage from '@/pages/BookingPage';
-import IslandsPage from '@/pages/Islands/IslandsPage';
+import BookingForm from '@/pages/BookingForm';
+import Islands from '@/pages/Islands/index';
 import IslandDetailsPage from '@/pages/Islands/IslandDetails';
-import ActivitiesPage from '@/pages/ActivitiesPage';
-import PaymentConfirmation from '@/pages/PaymentConfirmation';
-import MyBookingsPage from '@/pages/MyBookingsPage';
-import AdminPanel from '@/pages/AdminPanel';
+import Activities from '@/pages/Activities';
+import Confirmation from '@/pages/Confirmation';
+import MyBookings from '@/pages/MyBookings';
+import AdminDashboard from '@/pages/AdminDashboard';
 import { Toaster } from 'sonner';
 import ScrollToTop from '@/components/ScrollToTop';
 import { useTranslation } from 'react-i18next';
@@ -17,19 +18,31 @@ import BlogPage from "@/pages/Blog/index";
 import MaleToDhigurahGuide from "@/pages/Blog/MaleToDhigurah";
 import MaleToDhangethiGuide from "@/pages/Blog/MaleToDhangethi";
 
+// Create ScrollToTop component since it's being imported but doesn't exist
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+};
+
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <HelmetProvider>
         <Toaster />
         <Routes>
           <Route path="/" element={<WelcomeSection />} />
-          <Route path="/booking" element={<BookingPage />} />
-          <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
-          <Route path="/my-bookings" element={<MyBookingsPage />} />
-          <Route path="/activities" element={<ActivitiesPage />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/islands" element={<IslandsPage />} />
+          <Route path="/booking" element={<BookingForm />} />
+          <Route path="/payment-confirmation" element={<Confirmation />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/activities" element={<Activities />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/islands" element={<Islands />} />
           <Route path="/islands/:slug" element={<IslandDetailsPage />} />
           
           {/* Blog Routes */}
