@@ -1,5 +1,4 @@
-
-import { Ship, Anchor, TreePalm, BookOpen, Home } from "lucide-react";
+import { Ship, Anchor, TreePalm, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -7,10 +6,7 @@ const MobileBottomNav = () => {
   const location = useLocation();
   
   const isActive = (path: string) => {
-    if (path === '/blog') {
-      return location.pathname === '/blog' || location.pathname.startsWith('/blog/');
-    }
-    return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+    return location.pathname === path;
   };
 
   return (
@@ -28,10 +24,10 @@ const MobileBottomNav = () => {
         </Link>
         
         <Link 
-          to="/booking" 
+          to="/speedboat-transfers" 
           className={cn(
             "flex flex-col items-center p-2 rounded-md",
-            isActive("/booking") ? "text-[#0AB3B8]" : "text-[#005C99]"
+            isActive("/speedboat-transfers") ? "text-[#0AB3B8]" : "text-[#005C99]"
           )}
         >
           <Ship className="h-5 w-5" />
@@ -58,17 +54,6 @@ const MobileBottomNav = () => {
         >
           <TreePalm className="h-5 w-5" />
           <span className="text-xs mt-1">Islands</span>
-        </Link>
-        
-        <Link 
-          to="/blog" 
-          className={cn(
-            "flex flex-col items-center p-2 rounded-md",
-            isActive("/blog") ? "text-[#0AB3B8]" : "text-[#005C99]"
-          )}
-        >
-          <BookOpen className="h-5 w-5" />
-          <span className="text-xs mt-1">Guides</span>
         </Link>
       </div>
     </div>

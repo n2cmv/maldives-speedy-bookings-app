@@ -30,15 +30,13 @@ const Index = () => {
     }
   }, [location.search, navigate]);
 
-  return (
-    <div className="min-h-screen bg-[#F5F5F7] overflow-hidden relative">
+  return <div className="min-h-screen bg-[#F5F5F7] overflow-hidden relative">
       <div className="absolute top-20 right-10 w-60 h-60 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-80 h-80 bg-[#A2D2FF]/10 rounded-full blur-3xl" />
       
       <div className="relative z-10">
         <Header />
-        
-        <main className="pt-24 md:pt-32">
+        <main>
           <WelcomeSection />
         </main>
       </div>
@@ -52,8 +50,6 @@ const Index = () => {
       </div>
       
       <WhatsAppButton phoneNumber="+960 7443777" welcomeMessage="Hello! I'm interested in booking a speedboat transfer with Retour Maldives." />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
