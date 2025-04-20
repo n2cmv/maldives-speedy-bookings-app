@@ -20,7 +20,6 @@ import {
   TabsContent 
 } from "@/components/ui/tabs";
 import { Island } from "@/types/island";
-import { Form } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -175,7 +174,7 @@ const IslandFormDialog = ({
             
             {/* Basic Information Tab */}
             <TabsContent value="basic" className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 bg-white">
                 {renderFieldHeader("Essential Details")}
                 
                 <div className="space-y-4">
@@ -188,7 +187,7 @@ const IslandFormDialog = ({
                       value={islandForm.name || ""}
                       onChange={onFormChange}
                       placeholder="Enter island name"
-                      className="w-full"
+                      className="w-full bg-white"
                     />
                   </div>
 
@@ -202,6 +201,7 @@ const IslandFormDialog = ({
                       onChange={onFormChange}
                       placeholder="Brief description of the island"
                       rows={3}
+                      className="bg-white"
                     />
                   </div>
 
@@ -214,6 +214,7 @@ const IslandFormDialog = ({
                       value={islandForm.tagline || ""}
                       onChange={onFormChange}
                       placeholder="A catchy tagline for the island"
+                      className="bg-white"
                     />
                   </div>
 
@@ -226,7 +227,7 @@ const IslandFormDialog = ({
                       value={islandForm.slug || ""}
                       onChange={onFormChange}
                       placeholder="island-name"
-                      className="font-mono"
+                      className="font-mono bg-white"
                     />
                     <p className="text-sm text-gray-500 mt-1">
                       Used in URL: /islands/your-slug
@@ -238,7 +239,7 @@ const IslandFormDialog = ({
 
             {/* Media & Location Tab */}
             <TabsContent value="details" className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 bg-white">
                 {renderFieldHeader("Media")}
                 
                 <div className="space-y-6">
@@ -337,11 +338,13 @@ const IslandFormDialog = ({
                           value={islandForm.location?.atoll || ""}
                           onChange={(e) => onNestedFieldChange('location', 'atoll', e.target.value)}
                           placeholder="Atoll (e.g., North Malé Atoll)"
+                          className="bg-white"
                         />
                         <Input
                           value={islandForm.location?.coordinates || ""}
                           onChange={(e) => onNestedFieldChange('location', 'coordinates', e.target.value)}
                           placeholder="Coordinates"
+                          className="bg-white"
                         />
                       </div>
                     </div>
@@ -355,11 +358,13 @@ const IslandFormDialog = ({
                           value={islandForm.travelInfo?.fromMale || ""}
                           onChange={(e) => onNestedFieldChange('travelInfo', 'fromMale', e.target.value)}
                           placeholder="Distance from Malé"
+                          className="bg-white"
                         />
                         <Input
                           value={islandForm.travelInfo?.bestWayToReach || ""}
                           onChange={(e) => onNestedFieldChange('travelInfo', 'bestWayToReach', e.target.value)}
                           placeholder="Best way to reach"
+                          className="bg-white"
                         />
                       </div>
                     </div>
@@ -370,7 +375,7 @@ const IslandFormDialog = ({
 
             {/* Features Tab */}
             <TabsContent value="features" className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 bg-white">
                 {renderFieldHeader("Activities & Accommodation")}
                 
                 <div className="space-y-6">
@@ -390,7 +395,7 @@ const IslandFormDialog = ({
                     
                     <div className="space-y-4">
                       {(islandForm.activities || []).map((activity, index) => (
-                        <Card key={index} className="p-4 relative">
+                        <Card key={index} className="p-4 relative bg-white">
                           <Button
                             type="button"
                             variant="ghost"
@@ -411,6 +416,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Activity name"
+                              className="bg-white"
                             />
                             <Textarea
                               value={activity.description || ""}
@@ -423,6 +429,7 @@ const IslandFormDialog = ({
                               }}
                               placeholder="Activity description"
                               rows={2}
+                              className="bg-white"
                             />
                             <Input
                               value={activity.image || ""}
@@ -434,6 +441,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Activity image URL"
+                              className="bg-white"
                             />
                           </div>
                         </Card>
@@ -459,7 +467,7 @@ const IslandFormDialog = ({
                     
                     <div className="space-y-4">
                       {(islandForm.accommodation || []).map((item, index) => (
-                        <Card key={index} className="p-4 relative">
+                        <Card key={index} className="p-4 relative bg-white">
                           <Button
                             type="button"
                             variant="ghost"
@@ -480,6 +488,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Accommodation type"
+                              className="bg-white"
                             />
                             <Textarea
                               value={item.description || ""}
@@ -492,6 +501,7 @@ const IslandFormDialog = ({
                               }}
                               placeholder="Description"
                               rows={2}
+                              className="bg-white"
                             />
                             <Input
                               value={item.image || ""}
@@ -503,6 +513,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Image URL"
+                              className="bg-white"
                             />
                           </div>
                         </Card>
@@ -515,7 +526,7 @@ const IslandFormDialog = ({
 
             {/* FAQ & Quick Facts Tab */}
             <TabsContent value="faq" className="space-y-6">
-              <Card className="p-6">
+              <Card className="p-6 bg-white">
                 {renderFieldHeader("Quick Facts & FAQs")}
                 
                 <div className="space-y-6">
@@ -535,7 +546,7 @@ const IslandFormDialog = ({
                     
                     <div className="space-y-4">
                       {(islandForm.quickFacts || []).map((fact, index) => (
-                        <Card key={index} className="p-4 relative">
+                        <Card key={index} className="p-4 relative bg-white">
                           <Button
                             type="button"
                             variant="ghost"
@@ -556,6 +567,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Label"
+                              className="bg-white"
                             />
                             <Input
                               value={fact.value || ""}
@@ -567,6 +579,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Value"
+                              className="bg-white"
                             />
                             <Input
                               value={fact.icon || ""}
@@ -578,6 +591,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Icon name"
+                              className="bg-white"
                             />
                           </div>
                         </Card>
@@ -603,7 +617,7 @@ const IslandFormDialog = ({
                     
                     <div className="space-y-4">
                       {(islandForm.faqs || []).map((faq, index) => (
-                        <Card key={index} className="p-4 relative">
+                        <Card key={index} className="p-4 relative bg-white">
                           <Button
                             type="button"
                             variant="ghost"
@@ -624,6 +638,7 @@ const IslandFormDialog = ({
                                 } as unknown as React.ChangeEvent<HTMLInputElement>);
                               }}
                               placeholder="Question"
+                              className="bg-white"
                             />
                             <Textarea
                               value={faq.answer || ""}
@@ -636,6 +651,7 @@ const IslandFormDialog = ({
                               }}
                               placeholder="Answer"
                               rows={3}
+                              className="bg-white"
                             />
                           </div>
                         </Card>
@@ -666,3 +682,4 @@ const IslandFormDialog = ({
 };
 
 export default IslandFormDialog;
+
