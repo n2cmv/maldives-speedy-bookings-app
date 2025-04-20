@@ -33,13 +33,16 @@ const AccommodationTab = ({ islandData }: AccommodationTabProps) => {
                       alt={option.type} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
                   </div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white">
-                  <h3 className="text-sm font-semibold line-clamp-2">
+                <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
+                  <h3 className="text-lg font-semibold mb-2">
                     {option.type}
                   </h3>
+                  <p className="text-sm text-white/90 line-clamp-3 leading-relaxed">
+                    {option.description}
+                  </p>
                 </div>
               </div>
             ))}
