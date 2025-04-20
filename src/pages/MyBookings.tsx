@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -207,12 +208,12 @@ const MyBookings = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-teal-50">
       <Header />
       
-      <div className="flex-grow pt-24 pb-12 px-4">
-        <div className="max-w-4xl mx-auto space-y-12">
+      <div className="flex-grow pt-36 pb-12 px-4"> {/* Increased top padding from pt-24 to pt-36 */}
+        <div className="max-w-4xl mx-auto space-y-16"> {/* Increased vertical spacing from space-y-12 to space-y-16 */}
           <Button 
             variant="outline" 
             onClick={handleGoBack}
-            className="mb-8 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
+            className="mb-10 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20" {/* Increased bottom margin from mb-8 to mb-10 */}
           >
             <ChevronLeft className="h-4 w-4" />
             Back to Home
