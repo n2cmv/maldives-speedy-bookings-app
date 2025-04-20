@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -48,7 +47,6 @@ const MyBookings = () => {
     setLoading(true);
     
     try {
-      // Make sure we're using the correct URL format for the function invocation
       const { data, error } = await supabase.functions.invoke("process-booking-otp", {
         body: { email }
       });
@@ -210,11 +208,11 @@ const MyBookings = () => {
       <Header />
       
       <div className="flex-grow pt-24 pb-12 px-4">
-        <div className="max-w-4xl mx-auto space-y-8"> {/* Added space-y-8 to add vertical spacing */}
+        <div className="max-w-4xl mx-auto space-y-12">
           <Button 
             variant="outline" 
             onClick={handleGoBack}
-            className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
+            className="mb-8 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
           >
             <ChevronLeft className="h-4 w-4" />
             Back to Home
