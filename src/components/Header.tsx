@@ -1,5 +1,5 @@
 
-import { Ship, Ticket, Compass, Map, Sailboat } from "lucide-react";
+import { Ship, Ticket, Compass, Map, Sailboat, BookOpen } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,7 +54,7 @@ const Header = () => {
                   <span>Discover Islands</span>
                 </Link>
                 <Link to="/blog" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
-                  <Map className="h-4 w-4" />
+                  <BookOpen className="h-4 w-4" />
                   <span>Travel Guides</span>
                 </Link>
               </nav>

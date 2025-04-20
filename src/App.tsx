@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import WelcomeSection from '@/components/WelcomeSection';
+import Index from '@/pages/Index';
 import BookingForm from '@/pages/BookingForm';
 import Islands from '@/pages/Islands/index';
 import IslandDetailsPage from '@/pages/Islands/IslandDetails';
@@ -12,8 +12,6 @@ import MyBookings from '@/pages/MyBookings';
 import AdminDashboard from '@/pages/AdminDashboard';
 import { Toaster } from 'sonner';
 import ScrollToTop from '@/components/ScrollToTop';
-import { useTranslation } from 'react-i18next';
-import i18n from './i18n/i18n';
 import BlogPage from "@/pages/Blog/index";
 import MaleToDhigurahGuide from "@/pages/Blog/MaleToDhigurah";
 import MaleToDhangethiGuide from "@/pages/Blog/MaleToDhangethi";
@@ -25,7 +23,7 @@ const App = () => {
       <HelmetProvider>
         <Toaster />
         <Routes>
-          <Route path="/" element={<WelcomeSection />} />
+          <Route path="/" element={<Index />} />
           <Route path="/booking" element={<BookingForm />} />
           <Route path="/payment-confirmation" element={<Confirmation />} />
           <Route path="/my-bookings" element={<MyBookings />} />
