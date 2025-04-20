@@ -1,4 +1,3 @@
-
 export interface Island {
   id?: string;
   name: string;

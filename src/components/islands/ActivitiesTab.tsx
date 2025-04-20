@@ -14,16 +14,12 @@ const ActivitiesTab = ({ islandData }: ActivitiesTabProps) => {
       {islandData.activities && islandData.activities.length > 0 ? (
         <div className="mb-12">
           <h2 className="text-3xl font-bold mb-6">Things to Do in {islandData.name}</h2>
-          <p className="text-gray-700 mb-8 max-w-4xl">
-            {islandData.name} offers a variety of activities for nature lovers and adventure seekers. 
-            From marine excursions to relaxing beach experiences, there's something for everyone.
-          </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {islandData.activities.map((activity, index) => (
-              <div key={index} className="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-md">
+              <div key={index} className="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 {activity.image && (
-                  <div className="h-64">
+                  <div className="h-48">
                     <img 
                       src={activity.image} 
                       alt={activity.name} 
@@ -31,9 +27,9 @@ const ActivitiesTab = ({ islandData }: ActivitiesTabProps) => {
                     />
                   </div>
                 )}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{activity.name}</h3>
-                  <p className="text-gray-700">{activity.description}</p>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{activity.name}</h3>
+                  <p className="text-sm text-gray-700 line-clamp-3">{activity.description}</p>
                 </div>
               </div>
             ))}
