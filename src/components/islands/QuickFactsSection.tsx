@@ -1,6 +1,9 @@
 
-import { Ship, Users, Bed, CalendarDays, MapPin } from "lucide-react";
+import { Ship, Users, Bed, CalendarDays, MapPin, LucideProps } from "lucide-react";
 import { IslandDetails } from "@/types/island";
+import dynamic from 'next/dynamic';
+import { createElement } from 'react';
+import dynamicIconImports from 'lucide-react/dynamicIconImports';
 
 interface QuickFactsSectionProps {
   quickFacts: IslandDetails['quickFacts'];
@@ -9,21 +12,36 @@ interface QuickFactsSectionProps {
 const QuickFactsSection = ({ quickFacts }: QuickFactsSectionProps) => {
   if (!quickFacts || quickFacts.length === 0) return null;
   
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
+  const renderIcon = (iconName: string) => {
+    // Convert to kebab case for matching lucide icon names
+    const normalizedIconName = iconName.toLowerCase().replace(/\s+/g, '-');
+    
+    // First try with direct imports for common icons (faster loading)
+    switch (normalizedIconName) {
       case "ship":
         return <Ship className="h-6 w-6 mx-auto" />;
       case "users":
         return <Users className="h-6 w-6 mx-auto" />;
       case "home":
+      case "bed":
         return <Bed className="h-6 w-6 mx-auto" />;
       case "clock":
+      case "calendar-days":
         return <CalendarDays className="h-6 w-6 mx-auto" />;
       case "map":
+      case "map-pin":
         return <MapPin className="h-6 w-6 mx-auto" />;
-      default:
-        return <Ship className="h-6 w-6 mx-auto" />;
     }
+
+    // Check if the icon exists in lucide's dynamic imports
+    if (normalizedIconName in dynamicIconImports) {
+      const IconComponent = dynamic(dynamicIconImports[normalizedIconName as keyof typeof dynamicIconImports]);
+      return createElement(IconComponent, { className: "h-6 w-6 mx-auto" });
+    }
+
+    // Fallback to ship icon if not found
+    console.warn(`Icon "${iconName}" not found, using default ship icon`);
+    return <Ship className="h-6 w-6 mx-auto" />;
   };
   
   return (
@@ -33,7 +51,7 @@ const QuickFactsSection = ({ quickFacts }: QuickFactsSectionProps) => {
           {quickFacts.map((fact, index) => (
             <div key={index} className="flex flex-col items-center justify-center py-4 px-2 text-center">
               <div className="text-ocean mb-1">
-                {getIcon(fact.icon)}
+                {renderIcon(fact.icon)}
               </div>
               <p className="text-sm text-gray-500">{fact.label}</p>
               <p className="font-semibold">{fact.value}</p>
