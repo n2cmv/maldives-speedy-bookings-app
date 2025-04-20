@@ -85,40 +85,6 @@ const OverviewTab = ({ islandData, setActiveTab }: OverviewTabProps) => {
         </div>
       </div>
       
-      {islandData.activities && islandData.activities.length > 0 && (
-        <div>
-          <h2 className="text-3xl font-bold mb-6">Top Activities</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {islandData.activities.slice(0, 4).map((activity, index) => (
-              <div key={index} className="overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div className="h-48 overflow-hidden">
-                  {activity.image && (
-                    <img 
-                      src={activity.image} 
-                      alt={activity.name} 
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  )}
-                </div>
-                <div className="p-4 bg-white">
-                  <h3 className="font-medium text-lg text-gray-900 mb-1">{activity.name}</h3>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 text-center">
-            <Button
-              variant="outline"
-              className="text-ocean hover:text-ocean-dark border-ocean hover:bg-ocean/5"
-              onClick={() => setActiveTab("activities")}
-            >
-              Explore All Activities →
-            </Button>
-          </div>
-        </div>
-      )}
-      
       <div className="flex justify-center py-8">
         <Link to="/booking">
           <Button 
