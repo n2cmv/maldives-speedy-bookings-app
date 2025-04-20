@@ -210,7 +210,7 @@ const MyBookings = () => {
       <Header />
       
       <div className="flex-grow pt-24 pb-12 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-8"> {/* Added space-y-8 to add vertical spacing */}
           <Button 
             variant="outline" 
             onClick={handleGoBack}
