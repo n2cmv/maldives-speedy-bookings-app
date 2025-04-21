@@ -8,17 +8,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// BML merchant details
+// BML merchant details - Using the provided credentials
 const BML_MERCHANT_DETAILS = {
-  applicationId: Deno.env.get('BML_APPLICATION_ID'),
-  merchantId: Deno.env.get('BML_MERCHANT_ID'),
+  applicationId: Deno.env.get('BML_APPLICATION_ID') || "dcd72b0c-19c8-4dd9-adde-737732f2141b",
+  merchantId: Deno.env.get('BML_MERCHANT_ID') || "8633129903",
   currency: "USD",
   domain: "https://visitdhigurah.com", // Website URL from your BML configuration
-  publicKey: Deno.env.get('BML_PUBLIC_KEY')
+  publicKey: Deno.env.get('BML_PUBLIC_KEY') || "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmRtbHphWFJrYUdsbmRYSmhhQzVqYjIwaUxDSmhJam9pWkdOa056SmlNR010TVRsak9DMDBaR1E1TFdGa1pHVXROek0zTnpNeVpqSXhOREZpSWl3aWRYRWlPaUptTldJMk1XRTBOeTAwT0RjMUxUUmpNVE10T1dReFpDMWpZemRtWWpnNVpUYzRaVGNpTENKcFlYUWlPakUzTkRVeU5qWXdORGNzSW1WNGNDSTZORGt3TURrek9UWTBOMzAuZnNWdUtKYWt1aW42cm5zOTIyLWt3OFFEcXE2Rll3VDBZUHhXZWRCUmZrSQ=="
 };
 
-// BML API key from environment
-const BML_API_KEY = Deno.env.get('BML_API_KEY');
+// BML API key from environment - Using the provided API key
+const BML_API_KEY = Deno.env.get('BML_API_KEY') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRjZDcyYjBjLTE5YzgtNGRkOS1hZGRlLTczNzczMmYyMTQxYiIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NTI2NjA0NywiZXhwIjo0OTAwOTM5NjQ3fQ.Nv1QncJb-pMvZHgsFBoifch-mimHD8RWKg3zxYQYypQ";
 
 // BML API endpoints
 const BML_CONNECT_API = {
@@ -68,17 +68,20 @@ async function createPayment(req: Request) {
     // Create a unique reference if none is provided
     const merchantReference = paymentPayload.paymentReference || `RTM-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
+    // Override merchantId from payload if provided, otherwise use the configuration value
+    const merchantId = paymentPayload.merchantId || BML_MERCHANT_DETAILS.merchantId;
+
     const bmlRequestPayload = {
       amount: paymentPayload.amount,
       currency: BML_MERCHANT_DETAILS.currency,
       redirectUrl: paymentPayload.redirectUrl || `${BML_MERCHANT_DETAILS.domain}/payment-confirmation`,
       customerReference: paymentPayload.customerReference || "Booking Payment",
       merchantReference,
-      merchantId: BML_MERCHANT_DETAILS.merchantId
+      merchantId
     };
 
     console.log('Prepared BML request payload:', JSON.stringify(bmlRequestPayload));
-    console.log('Using API key:', BML_API_KEY ? 'Present (hidden for security)' : 'Missing');
+    console.log('Using API key:', BML_API_KEY ? 'Present (first 10 chars: ' + BML_API_KEY.substring(0, 10) + '...)' : 'Missing');
     console.log('Using Application ID:', BML_MERCHANT_DETAILS.applicationId);
 
     try {

@@ -36,7 +36,9 @@ export const bmlPaymentService = {
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference,
         redirectUrl: confirmationBaseUrl,
-        appVersion: "RetourMaldives_1.0"
+        appVersion: "RetourMaldives_1.0",
+        // Adding merchant ID directly from your provided details
+        merchantId: "8633129903"
       };
       
       console.log("Creating BML payment with payload:", paymentPayload);
@@ -57,7 +59,8 @@ export const bmlPaymentService = {
       }
       
       if (data && data.missingVars && data.missingVars.length > 0) {
-        throw new Error("Payment gateway configuration missing");
+        console.error("Missing BML configuration variables:", data.missingVars);
+        throw new Error(`Payment gateway configuration missing: ${data.missingVars.join(', ')}`);
       }
       
       if (!data || !data.id) {
@@ -75,6 +78,8 @@ export const bmlPaymentService = {
         
         throw new Error("Invalid payment response received");
       }
+      
+      console.log("BML payment created successfully:", data);
       
       // For QR code, handle case where it might not be returned
       const finalRedirectUrl = data.qrcode?.url || `${window.location.origin}/payment?error=qr_missing`;
