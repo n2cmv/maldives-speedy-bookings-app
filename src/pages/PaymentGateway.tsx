@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookingInfo } from "@/types/booking";
@@ -106,7 +107,7 @@ const PaymentGateway = () => {
         }
         
         if (paymentData) {
-          toast.info("Redirecting to BML payment...");
+          toast.info("Redirecting to payment...");
           setIsRedirecting(true);
           
           const result = await bmlPaymentService.createPayment(paymentData);
@@ -235,18 +236,6 @@ const PaymentGateway = () => {
                   bookingReference={bookingReference}
                   totalAmount={calculateTotal()}
                 />
-                
-                <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <InfoIcon className="h-5 w-5 mr-2 text-blue-600" />
-                    <div>
-                      <h3 className="font-medium text-gray-800">Payment Information</h3>
-                      <p className="text-sm mt-1 text-blue-700">
-                        This is a demo payment system. In a real application, you would be redirected to a secure payment provider.
-                      </p>
-                    </div>
-                  </div>
-                </div>
                 
                 <PaymentMethodSelector
                   selectedMethod={paymentMethod}

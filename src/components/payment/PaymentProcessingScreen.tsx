@@ -12,7 +12,7 @@ const PaymentProcessingScreen: React.FC<PaymentProcessingScreenProps> = ({ bankL
         <div className="flex flex-col items-center justify-center space-y-4">
           <img 
             src={bankLogo} 
-            alt="Payment Provider" 
+            alt="Bank of Maldives" 
             className="h-16 mb-4"
           />
           <div className="w-16 h-16 border-4 border-ocean border-t-transparent rounded-full animate-spin"></div>

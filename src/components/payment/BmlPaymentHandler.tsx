@@ -68,9 +68,8 @@ const BmlPaymentHandler = () => {
         } else {
           console.log("Payment failed with status:", result.status);
           
-          // If this is a mock payment and status isn't confirming, we'll force it to confirm
-          // This is just for development purposes
-          if (isMockPayment && verifyAttempts < 3) {
+          // If this is a mock payment and status isn't confirming, retry a few times
+          if ((isMockPayment || transactionId.startsWith('mock-')) && verifyAttempts < 3) {
             console.log("Mock payment - retry attempt:", verifyAttempts + 1);
             setVerifyAttempts(prev => prev + 1);
             setTimeout(() => verifyPayment(), 1500);

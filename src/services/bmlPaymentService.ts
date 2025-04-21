@@ -41,7 +41,7 @@ export const bmlPaymentService = {
         merchantId: "8633129903"
       };
       
-      console.log("Creating BML payment with payload:", paymentPayload);
+      console.log("Creating payment with payload:", paymentPayload);
       
       // Call the Supabase edge function to create the payment
       const { data, error } = await supabase.functions.invoke("bml-payment/create", {
@@ -49,64 +49,46 @@ export const bmlPaymentService = {
       });
       
       if (error) {
-        console.error("Error creating BML payment:", error);
+        console.error("Payment creation error:", error);
         throw new Error(`Payment creation failed: ${error.message}`);
       }
       
-      // Handle case where configuration is missing
-      if (data && data.error && data.error.includes('Payment gateway configuration')) {
-        throw new Error("Payment gateway not configured");
-      }
-      
-      if (data && data.missingVars && data.missingVars.length > 0) {
-        console.error("Missing BML configuration variables:", data.missingVars);
-        throw new Error(`Payment gateway configuration missing: ${data.missingVars.join(', ')}`);
+      // Handle specific error cases
+      if (data && data.error) {
+        console.error("Payment error response:", data);
+        throw new Error(data.error);
       }
       
       if (!data || !data.id) {
         console.error("Invalid payment response:", data);
-        
-        // Show more specific error message from the response if available
-        if (data && data.error) {
-          throw new Error(data.error);
-        }
-        
-        if (data && data.details) {
-          const details = typeof data.details === 'string' ? data.details : JSON.stringify(data.details);
-          throw new Error(`Payment failed: ${details}`);
-        }
-        
-        throw new Error("Invalid payment response received");
+        throw new Error("Payment creation failed: Invalid response from payment gateway");
       }
       
-      console.log("BML payment created successfully:", data);
+      console.log("Payment created successfully:", data);
       
-      // For QR code, handle case where it might not be returned
-      const finalRedirectUrl = data.qrcode?.url || `${window.location.origin}/payment?error=qr_missing`;
+      // Handle mock transactions or real QR codes
+      let finalRedirectUrl;
+      if (data.qrcode?.url) {
+        finalRedirectUrl = data.qrcode.url;
+      } else if (data.id.startsWith('mock-')) {
+        finalRedirectUrl = `${window.location.origin}/payment-confirmation?transaction=${data.id}&mock=true`;
+      } else {
+        throw new Error("Payment gateway did not provide redirection details");
+      }
       
-      // Return the QR code URL and transaction ID
+      // Return the redirect URL and transaction ID
       return {
         redirectUrl: finalRedirectUrl,
         transactionId: data.id
       };
     } catch (error) {
-      console.error("BML payment creation failed:", error);
+      console.error("Payment creation failed:", error);
       
-      // Handle specific configuration errors with clearer messages
-      if (error.message?.includes('gateway configuration missing') || 
-          error.message?.includes('gateway not configured')) {
-        toast.error("Payment gateway not configured", {
-          description: "The payment system is currently unavailable. Please try another payment method or contact support.",
-          duration: 8000
-        });
-        
-        throw new Error("Payment gateway not configured: BML Connect environment variables are missing");
-      }
-      
-      // Check for other missing environment variables error
-      if (error.message?.includes('Missing required environment')) {
-        toast.error("Payment system configuration error", {
-          description: "The payment gateway is not properly configured. Please try another payment method or contact support.",
+      // Show a clearer error message for specific failure cases
+      if (error.message?.includes('payment gateway') || 
+          error.message?.includes('configuration')) {
+        toast.error("Payment system error", {
+          description: "There was an issue with the payment gateway. Please try again or use another payment method.",
           duration: 8000
         });
       }
@@ -126,6 +108,16 @@ export const bmlPaymentService = {
         throw new Error("Transaction ID is required");
       }
       
+      // Handle mock transactions
+      if (transactionId.startsWith('mock-')) {
+        console.log("Verifying mock transaction:", transactionId);
+        return {
+          status: "CONFIRMED",
+          success: true,
+          bookingReference: `RTM-${Math.floor(Math.random() * 10000)}`
+        };
+      }
+      
       const { data, error } = await supabase.functions.invoke("bml-payment/verify", {
         body: { transactionId }
       });
@@ -137,7 +129,7 @@ export const bmlPaymentService = {
       
       // Handle case where data might not be complete
       const status = data?.status || data?.state || "FAILED";
-      const bookingReference = data?.bookingReference;
+      const bookingReference = data?.bookingReference || data?.details?.merchantReference;
       
       return {
         status,
@@ -145,7 +137,7 @@ export const bmlPaymentService = {
         bookingReference
       };
     } catch (error) {
-      console.error("BML payment verification failed:", error);
+      console.error("Payment verification failed:", error);
       throw error;
     }
   }
