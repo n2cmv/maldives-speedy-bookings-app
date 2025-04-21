@@ -26,39 +26,34 @@ const BML_CONNECT_API = {
   verifyPayment: "https://api.merchant.bankofmaldives.com.mv/payments/"
 };
 
+// Check environment configuration
+function checkEnvironmentConfig() {
+  const missingVars = [];
+  
+  if (!BML_API_KEY) missingVars.push('BML_API_KEY');
+  if (!BML_MERCHANT_DETAILS.applicationId) missingVars.push('BML_APPLICATION_ID');
+  if (!BML_MERCHANT_DETAILS.merchantId) missingVars.push('BML_MERCHANT_ID');
+  
+  return missingVars;
+}
+
 // Create payment transaction with BML Connect
 async function createPayment(req: Request) {
   try {
     // Log incoming request information for debugging
     console.log("Received payment creation request");
     
-    // Validate API key and application ID
-    if (!BML_API_KEY) {
-      console.error('Missing BML API key in environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Payment gateway configuration missing: API key' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
+    // Check environment configuration
+    const missingVars = checkEnvironmentConfig();
     
-    if (!BML_MERCHANT_DETAILS.applicationId) {
-      console.error('Missing BML Application ID in environment variables');
+    if (missingVars.length > 0) {
+      console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
       return new Response(
-        JSON.stringify({ error: 'Payment gateway configuration missing: Application ID' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-    
-    if (!BML_MERCHANT_DETAILS.merchantId) {
-      console.error('Missing BML Merchant ID in environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Payment gateway configuration missing: Merchant ID' }),
+        JSON.stringify({ 
+          error: 'Payment gateway configuration missing', 
+          details: `Missing required environment variables: ${missingVars.join(', ')}`,
+          missingVars
+        }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -70,12 +65,15 @@ async function createPayment(req: Request) {
     
     console.log('Received payment payload:', JSON.stringify(paymentPayload));
 
+    // Create a unique reference if none is provided
+    const merchantReference = paymentPayload.paymentReference || `RTM-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
     const bmlRequestPayload = {
       amount: paymentPayload.amount,
       currency: BML_MERCHANT_DETAILS.currency,
       redirectUrl: paymentPayload.redirectUrl || `${BML_MERCHANT_DETAILS.domain}/payment-confirmation`,
       customerReference: paymentPayload.customerReference || "Booking Payment",
-      merchantReference: paymentPayload.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
+      merchantReference,
       merchantId: BML_MERCHANT_DETAILS.merchantId
     };
 
@@ -119,6 +117,13 @@ async function createPayment(req: Request) {
 
       const bmlResponse = await apiResponse.json();
       console.log('BML API success response:', JSON.stringify(bmlResponse));
+
+      // For testing purposes, if in a development environment, provide a mock QR code
+      if (!bmlResponse.qrcode && Deno.env.get('ENVIRONMENT') === 'development') {
+        bmlResponse.qrcode = {
+          url: `${BML_MERCHANT_DETAILS.domain}/payment-confirmation?mock=true&transaction=${bmlResponse.id}`
+        };
+      }
 
       return new Response(
         JSON.stringify(bmlResponse),
@@ -172,10 +177,16 @@ async function verifyPayment(req: Request) {
     
     console.log('Verifying payment transaction:', transactionId);
     
-    if (!BML_API_KEY || !BML_MERCHANT_DETAILS.applicationId) {
-      console.error('Missing BML API configuration for verification');
+    // Check environment configuration
+    const missingVars = checkEnvironmentConfig();
+    
+    if (missingVars.length > 0) {
+      console.error(`Missing required environment variables for verification: ${missingVars.join(', ')}`);
       return new Response(
-        JSON.stringify({ error: 'Payment gateway not configured for verification' }),
+        JSON.stringify({ 
+          error: 'Payment gateway not configured for verification',
+          details: `Missing required environment variables: ${missingVars.join(', ')}`
+        }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

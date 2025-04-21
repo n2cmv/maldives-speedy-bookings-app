@@ -1,6 +1,7 @@
 
 import { BookingInfo } from "@/types/booking";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 // BML Connect integration service with updated configuration
 export const bmlPaymentService = {
@@ -35,7 +36,6 @@ export const bmlPaymentService = {
         paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
         customerReference,
         redirectUrl: confirmationBaseUrl,
-        merchantId: "8633129903", // Merchant ID provided
         appVersion: "RetourMaldives_1.0"
       };
       
@@ -53,6 +53,17 @@ export const bmlPaymentService = {
       
       if (!data || !data.id) {
         console.error("Invalid payment response:", data);
+        
+        // Show more specific error message from the response if available
+        if (data && data.error) {
+          throw new Error(data.error);
+        }
+        
+        if (data && data.details) {
+          const details = typeof data.details === 'string' ? data.details : JSON.stringify(data.details);
+          throw new Error(`Payment failed: ${details}`);
+        }
+        
         throw new Error("Invalid payment response received");
       }
       
@@ -66,6 +77,14 @@ export const bmlPaymentService = {
       };
     } catch (error) {
       console.error("BML payment creation failed:", error);
+      
+      // Check for missing environment variables error
+      if (error.message?.includes('Missing required environment variables')) {
+        toast.error("Payment gateway configuration error", {
+          description: "The payment gateway is not properly configured. Please contact support."
+        });
+      }
+      
       throw error;
     }
   },
@@ -91,7 +110,7 @@ export const bmlPaymentService = {
       }
       
       // Handle case where data might not be complete
-      const status = data?.state || "FAILED";
+      const status = data?.status || data?.state || "FAILED";
       const bookingReference = data?.bookingReference;
       
       return {
