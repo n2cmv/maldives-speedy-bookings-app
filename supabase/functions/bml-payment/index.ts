@@ -8,19 +8,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// BML merchant details from the dashboard
+// BML merchant details
 const BML_MERCHANT_DETAILS = {
   applicationId: Deno.env.get('BML_APPLICATION_ID'),
   merchantId: Deno.env.get('BML_MERCHANT_ID'),
   currency: "USD",
-  domain: "https://visitdhigurah.com", // Use the provided website URL
+  domain: "https://visitdhigurah.com", // Website URL from your BML configuration
   publicKey: Deno.env.get('BML_PUBLIC_KEY')
 };
 
-// Add the secret API key from the environment
+// BML API key from environment
 const BML_API_KEY = Deno.env.get('BML_API_KEY');
 
-// BML API endpoints with improved error handling
+// BML API endpoints
 const BML_CONNECT_API = {
   createPayment: "https://api.merchant.bankofmaldives.com.mv/payments",
   verifyPayment: "https://api.merchant.bankofmaldives.com.mv/payments/"
@@ -29,11 +29,36 @@ const BML_CONNECT_API = {
 // Create payment transaction with BML Connect
 async function createPayment(req: Request) {
   try {
-    // Validate API key and application ID are present
-    if (!BML_API_KEY || !BML_MERCHANT_DETAILS.applicationId) {
-      console.error('Missing BML API configuration');
+    // Log incoming request information for debugging
+    console.log("Received payment creation request");
+    
+    // Validate API key and application ID
+    if (!BML_API_KEY) {
+      console.error('Missing BML API key in environment variables');
       return new Response(
-        JSON.stringify({ error: 'Payment gateway not configured' }),
+        JSON.stringify({ error: 'Payment gateway configuration missing: API key' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    if (!BML_MERCHANT_DETAILS.applicationId) {
+      console.error('Missing BML Application ID in environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Payment gateway configuration missing: Application ID' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    if (!BML_MERCHANT_DETAILS.merchantId) {
+      console.error('Missing BML Merchant ID in environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Payment gateway configuration missing: Merchant ID' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -55,10 +80,12 @@ async function createPayment(req: Request) {
     };
 
     console.log('Prepared BML request payload:', JSON.stringify(bmlRequestPayload));
+    console.log('Using API key:', BML_API_KEY ? 'Present (hidden for security)' : 'Missing');
+    console.log('Using Application ID:', BML_MERCHANT_DETAILS.applicationId);
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30-second timeout
 
       const apiResponse = await fetch(BML_CONNECT_API.createPayment, {
         method: 'POST',
@@ -80,7 +107,8 @@ async function createPayment(req: Request) {
         return new Response(
           JSON.stringify({ 
             error: 'Payment creation failed', 
-            details: errorText 
+            details: errorText,
+            status: apiResponse.status
           }),
           { 
             status: apiResponse.status, 
@@ -127,6 +155,114 @@ async function createPayment(req: Request) {
   }
 }
 
+// Verify BML payment transaction
+async function verifyPayment(req: Request) {
+  try {
+    const { transactionId } = await req.json();
+    
+    if (!transactionId) {
+      return new Response(
+        JSON.stringify({ error: 'Transaction ID is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    console.log('Verifying payment transaction:', transactionId);
+    
+    if (!BML_API_KEY || !BML_MERCHANT_DETAILS.applicationId) {
+      console.error('Missing BML API configuration for verification');
+      return new Response(
+        JSON.stringify({ error: 'Payment gateway not configured for verification' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30-second timeout
+      
+      const apiResponse = await fetch(`${BML_CONNECT_API.verifyPayment}${transactionId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${BML_API_KEY}`,
+          'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
+        },
+        signal: controller.signal
+      }).finally(() => clearTimeout(timeoutId));
+      
+      console.log('BML Verification API Response Status:', apiResponse.status);
+      
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        console.error('BML API verification error:', errorText);
+        
+        return new Response(
+          JSON.stringify({ 
+            error: 'Payment verification failed', 
+            details: errorText,
+            status: 'FAILED' 
+          }),
+          { 
+            status: apiResponse.status, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      const verificationResponse = await apiResponse.json();
+      console.log('BML verification response:', JSON.stringify(verificationResponse));
+      
+      return new Response(
+        JSON.stringify({
+          status: verificationResponse.state || 'UNKNOWN',
+          success: verificationResponse.state === 'CONFIRMED',
+          details: verificationResponse
+        }),
+        { 
+          status: 200, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+      
+    } catch (apiError) {
+      console.error('Error calling BML verification API:', apiError);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Payment verification communication error', 
+          details: apiError.message,
+          status: 'ERROR' 
+        }),
+        { 
+          status: 502, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Unexpected error in payment verification:', error);
+    
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal verification error', 
+        message: error.message,
+        status: 'ERROR'
+      }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
+}
+
 // Route handler for different endpoints
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -136,8 +272,12 @@ serve(async (req) => {
   
   const url = new URL(req.url);
   
+  console.log(`Processing request: ${req.method} ${url.pathname}`);
+  
   if (url.pathname === '/bml-payment/create') {
     return createPayment(req);
+  } else if (url.pathname === '/bml-payment/verify') {
+    return verifyPayment(req);
   }
   
   return new Response(
@@ -148,4 +288,3 @@ serve(async (req) => {
     }
   );
 });
-

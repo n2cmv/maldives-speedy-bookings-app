@@ -9,4 +9,3 @@ verify_jwt = false
 
 [functions.bml-payment]
 verify_jwt = false
-
