@@ -51,6 +51,15 @@ export const bmlPaymentService = {
         throw new Error(`Payment creation failed: ${error.message}`);
       }
       
+      // Handle case where configuration is missing
+      if (data && data.error && data.error.includes('Payment gateway configuration')) {
+        throw new Error("Payment gateway not configured");
+      }
+      
+      if (data && data.missingVars && data.missingVars.length > 0) {
+        throw new Error("Payment gateway configuration missing");
+      }
+      
       if (!data || !data.id) {
         console.error("Invalid payment response:", data);
         
@@ -78,10 +87,22 @@ export const bmlPaymentService = {
     } catch (error) {
       console.error("BML payment creation failed:", error);
       
-      // Check for missing environment variables error
-      if (error.message?.includes('Missing required environment variables')) {
-        toast.error("Payment gateway configuration error", {
-          description: "The payment gateway is not properly configured. Please contact support."
+      // Handle specific configuration errors with clearer messages
+      if (error.message?.includes('gateway configuration missing') || 
+          error.message?.includes('gateway not configured')) {
+        toast.error("Payment gateway not configured", {
+          description: "The payment system is currently unavailable. Please try another payment method or contact support.",
+          duration: 8000
+        });
+        
+        throw new Error("Payment gateway not configured: BML Connect environment variables are missing");
+      }
+      
+      // Check for other missing environment variables error
+      if (error.message?.includes('Missing required environment')) {
+        toast.error("Payment system configuration error", {
+          description: "The payment gateway is not properly configured. Please try another payment method or contact support.",
+          duration: 8000
         });
       }
       
