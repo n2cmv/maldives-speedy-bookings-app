@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
@@ -50,6 +51,12 @@ function generateMockBmlResponse(payload: BmlPaymentRequest) {
     }
   };
 }
+
+// BML API endpoints
+const BML_CONNECT_API = {
+  createPayment: "https://api.merchant.bankofmaldives.com.mv/payments",
+  verifyPayment: "https://api.merchant.bankofmaldives.com.mv/payments/" // + transactionId
+};
 
 // Create payment transaction with BML Connect
 async function createPayment(req: Request) {
@@ -104,8 +111,16 @@ async function createPayment(req: Request) {
       bmlResponse = generateMockBmlResponse(bmlPayload as BmlPaymentRequest);
       apiResponse = { ok: true };
     } else {
-      // Call real BML API with updated API endpoint
+      // Call real BML API with improved error handling
       try {
+        console.log('Calling BML API with payload:', JSON.stringify(bmlPayload));
+        console.log('Auth header:', `Bearer ${apiKey?.substring(0, 10)}...`);
+        console.log('Application ID:', BML_MERCHANT_DETAILS.applicationId);
+        
+        const controller = new AbortController();
+        // Set a timeout for the request
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
         apiResponse = await fetch(BML_CONNECT_API.createPayment, {
           method: 'POST',
           headers: {
@@ -113,21 +128,49 @@ async function createPayment(req: Request) {
             'Authorization': `Bearer ${apiKey}`,
             'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
           },
-          body: JSON.stringify(bmlPayload)
-        });
+          body: JSON.stringify(bmlPayload),
+          signal: controller.signal
+        }).finally(() => clearTimeout(timeoutId));
         
-        // Log response status and headers for debugging
         console.log('BML API Response Status:', apiResponse.status);
         console.log('BML API Response Status Text:', apiResponse.statusText);
         
-        bmlResponse = await apiResponse.json();
+        if (!apiResponse.ok) {
+          const errorText = await apiResponse.text();
+          console.error('BML API error response:', errorText);
+          
+          // Try to parse as JSON, but handle text responses gracefully
+          try {
+            bmlResponse = JSON.parse(errorText);
+          } catch {
+            bmlResponse = { error: errorText };
+          }
+        } else {
+          bmlResponse = await apiResponse.json();
+          console.log('BML API success response:', JSON.stringify(bmlResponse));
+        }
       } catch (apiError) {
         console.error('Error calling BML API:', apiError);
         
-        // Fall back to mock response in case of error
-        console.log('Falling back to mock response due to API error');
-        bmlResponse = generateMockBmlResponse(bmlPayload as BmlPaymentRequest);
-        apiResponse = { ok: true };
+        // Check if we can fall back to mock mode
+        if (USE_MOCK_BML_API) {
+          console.log('Falling back to mock response due to API error');
+          bmlResponse = generateMockBmlResponse(bmlPayload as BmlPaymentRequest);
+          apiResponse = { ok: true };
+        } else {
+          // Return the error directly
+          return new Response(
+            JSON.stringify({ 
+              error: 'Payment gateway communication error', 
+              details: apiError.message,
+              stack: apiError.stack
+            }),
+            {
+              status: 502,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
       }
     }
     
@@ -148,8 +191,7 @@ async function createPayment(req: Request) {
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
       const supabase = createClient(supabaseUrl, supabaseKey);
       
-      // Check if 'is_mock' column exists in bml_transactions table
-      // If it doesn't exist, we'll create an object without that property
+      // Prepare transaction data
       const transactionData = {
         transaction_id: bmlResponse.id,
         local_id: localId,
@@ -167,7 +209,6 @@ async function createPayment(req: Request) {
         .insert(transactionData);
         
       if (error) {
-        // If there's an error about is_mock column, log it but continue
         console.error('Error storing transaction:', error);
         // Continue even if database storage fails
       }
@@ -202,12 +243,6 @@ async function createPayment(req: Request) {
     );
   }
 }
-
-// BML API endpoints
-const BML_CONNECT_API = {
-  createPayment: "https://api.merchant.bankofmaldives.com.mv/payments",
-  verifyPayment: "https://api.merchant.bankofmaldives.com.mv/payments/" // + transactionId
-};
 
 // Verify payment status with BML Connect
 async function verifyPayment(req: Request) {
@@ -266,26 +301,50 @@ async function verifyPayment(req: Request) {
       }
       
       try {
+        console.log(`Verifying payment at: ${BML_CONNECT_API.verifyPayment}${transactionId}`);
+        
+        const controller = new AbortController();
+        // Set a timeout for the request
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
         const response = await fetch(`${BML_CONNECT_API.verifyPayment}${transactionId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'X-Application-Id': BML_MERCHANT_DETAILS.applicationId
-          }
-        });
+          },
+          signal: controller.signal
+        }).finally(() => clearTimeout(timeoutId));
         
-        const bmlResponse = await response.json();
+        console.log('BML verification API Response Status:', response.status);
         
         if (!response.ok) {
-          console.error('BML API error during verification:', bmlResponse);
-          return new Response(
-            JSON.stringify({ error: 'Payment verification failed', details: bmlResponse }),
-            {
-              status: response.status,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            }
-          );
+          const errorText = await response.text();
+          console.error('BML verification API error response:', errorText);
+          
+          // Try to parse error as JSON if possible
+          try {
+            const bmlResponse = JSON.parse(errorText);
+            return new Response(
+              JSON.stringify({ error: 'Payment verification failed', details: bmlResponse }),
+              {
+                status: response.status,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            );
+          } catch {
+            return new Response(
+              JSON.stringify({ error: 'Payment verification failed', details: errorText }),
+              {
+                status: response.status,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            );
+          }
         }
+        
+        const bmlResponse = await response.json();
+        console.log('BML verification success response:', JSON.stringify(bmlResponse));
         
         paymentStatus = {
           state: bmlResponse.state,
@@ -307,7 +366,8 @@ async function verifyPayment(req: Request) {
             JSON.stringify({
               state: 'FAILED',
               error: 'Payment verification error',
-              message: apiError.message
+              message: apiError.message,
+              stack: apiError.stack
             }),
             {
               status: 502,
