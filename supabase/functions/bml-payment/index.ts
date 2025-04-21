@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
@@ -21,18 +20,19 @@ interface BmlPaymentRequest {
 }
 
 // For development/testing when BML API isn't available
-const USE_MOCK_BML_API = true;
+const USE_MOCK_BML_API = false;
 
 // BML merchant details from the dashboard (updated with correct values)
 const BML_MERCHANT_DETAILS = {
-  applicationId: "b83c8c6b-12bc-4b2e-8640-5d9e66786adc",
+  applicationId: "dcd72b0c-19c8-4dd9-adde-737732f2141b",
   merchantId: "8633129903", // Added Merchant ID
   currency: "USD",
   domain: "https://maldives-speedy-bookings-app.lovable.app/",
-  publicKey: "pk_production_ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpJam9pTmpKbFlqTmtOV0kyTnpVNU1tSXdNREE1Wm1SbU1UQXhJaXdpYUNJNkltaDBkSEJ6T2k4dmJXRnNaR2wyWlhNdGMzQmxaV1I1TFdKdmIydHBibWR6TFdGd2NDNXNiM1poWW14bExtRndjQzhpTENKaElqb2lZamd6WXpoak5tSXRNVEppWXkwMFlqSmxMVGcyTkRBdE5XUTVaVFkyTnpnMllXUmpJaXdpZFhFaU9pSXpNREE1WWpSak9TMHhaV001TFRRMVlqa3RPRFprT0MxbU5qY3pZelptTlRFeFlqTWlMQ0pwWVhRaU9qRTNORFF6T0RNNU16WXNJbVY0Y0NJNk5Ea3dNREExTnpVek5uMC5LdFJJQ0pVb0VQaHY1clM4YWFoOG53U3k5WE92NHRNb1hIb0RrNzdqNlVz",
-  // Add the secret API key from the image (this will be used securely on the server)
-  secretApiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHJJZCI6ImR5cCI6IkpXVCJ9.eyJhcHJJZCI6ImVyJhbGcxM2M4YzZiLTEyYmMtNGIyZS04NjQwLTV0ZWYwMDU2NjJjNmFkYyIsImNvbXBJZDo0TAwMDU3ZjEwMS00NjczLWNlwjIXhwIjo0OTAwMDQ1NzUzfQ._09EMmA2kYHhHdIytmBlEvOoAgn_8pakQkviFlno9Vo"
+  publicKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImRjZDcyYjBjLTE5YzgtNGRkOS1hZGRlLTczNzczMmYyMTQxYiIsImNvbXBhbnlJZCI6IjYyZWIzZDViNjc1OTJiMDAwOWZkZjEwMSIsImlhdCI6MTc0NTI2NjA0NywiZXhwIjo0OTAwOTM5NjQ3fQ.Nv1QncJb-pMvZHgsFBoifch-mimHD8RWKg3zxYQYypQ"
 };
+
+// Add the secret API key from the image (this will be used securely on the server)
+const BML_API_KEY = Deno.env.get('BML_API_KEY');
 
 // Mock BML API response for development/testing
 function generateMockBmlResponse(payload: BmlPaymentRequest) {
@@ -96,7 +96,7 @@ async function createPayment(req: Request) {
     let apiResponse;
     
     // Use mock API if flag is enabled or API key isn't available
-    const apiKey = BML_MERCHANT_DETAILS.secretApiKey;
+    const apiKey = BML_API_KEY;
     const useMock = USE_MOCK_BML_API || !apiKey;
     
     if (useMock) {
@@ -253,7 +253,7 @@ async function verifyPayment(req: Request) {
       };
     } else {
       // Get API key from environment variable
-      const apiKey = Deno.env.get('BML_API_KEY');
+      const apiKey = BML_API_KEY;
       if (!apiKey) {
         console.error('BML API key not configured');
         return new Response(
