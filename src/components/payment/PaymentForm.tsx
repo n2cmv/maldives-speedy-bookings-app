@@ -15,13 +15,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   bankLogoUrl 
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-        <p className="text-sm text-blue-800">
-          This is a simulated payment system. In a real application, you would be redirected to a secure payment gateway.
-        </p>
-      </div>
-      
+    <div className="space-y-6">      
       <Button
         onClick={onPayment}
         disabled={isProcessing}
@@ -35,7 +29,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         ) : (
           <>
             <CreditCard className="mr-2 h-5 w-5" />
-            Complete Payment
+            Pay Now
           </>
         )}
       </Button>
@@ -43,14 +37,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <div className="flex items-center justify-center mt-6">
         <img 
           src={bankLogoUrl} 
-          alt="Payment Provider" 
+          alt="Bank of Maldives" 
           className="h-8 md:h-10 w-auto"
         />
       </div>
-      
-      <p className="text-xs text-gray-500 text-center mt-4">
-        This is a demo payment system. No actual payments will be processed.
-      </p>
     </div>
   );
 };
