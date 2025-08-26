@@ -29,7 +29,7 @@ const PaymentGateway = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [bookingReference, setBookingReference] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentMethod, setPaymentMethod] = useState("bml_connect");
   const [paymentError, setPaymentError] = useState<string | null>(null);
   
   useScrollToTop();
