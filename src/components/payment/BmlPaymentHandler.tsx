@@ -17,86 +17,115 @@ const BmlPaymentHandler = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        // Extract transaction ID from URL parameters
+        // Extract transaction ID from URL parameters or localStorage
         const searchParams = new URLSearchParams(location.search);
-        const transactionId = searchParams.get('transaction');
-        const isMockPayment = searchParams.get('mock') === 'true';
+        let transactionId = searchParams.get('transaction');
+        
+        // Fallback to localStorage if no transaction in URL
+        if (!transactionId) {
+          transactionId = localStorage.getItem('lastTransactionId');
+        }
         
         if (!transactionId) {
           setIsVerifying(false);
-          toast.error("Invalid payment return URL");
+          toast.error("No transaction found");
           navigate("/payment");
           return;
         }
         
-        console.log("Verifying payment transaction:", transactionId, isMockPayment ? "(mock)" : "");
+        console.log("Polling payment verification for:", transactionId);
         
-        // Verify the payment status
-        const result = await bmlPaymentService.verifyPayment(transactionId);
-        
-        if (result.success) {
-          toast.success("Payment successful!");
-          
-          // Retrieve pending booking from local storage
-          const pendingBooking = localStorage.getItem('pendingBooking');
-          const pendingActivityBooking = localStorage.getItem('pendingActivityBooking');
-          
-          let bookingData = null;
-          if (pendingBooking) {
-            bookingData = JSON.parse(pendingBooking);
-            localStorage.removeItem('pendingBooking');
-          } else if (pendingActivityBooking) {
-            bookingData = JSON.parse(pendingActivityBooking);
-            localStorage.removeItem('pendingActivityBooking');
-          }
-          
-          // Navigate to confirmation page with booking data
-          if (bookingData) {
-            // Add payment status to booking data
-            const completedBooking = {
-              ...bookingData,
-              paymentComplete: true,
-              paymentReference: bookingData.paymentReference || result.bookingReference || transactionId
-            };
+        // Poll for payment confirmation
+        const pollPayment = async (): Promise<boolean> => {
+          try {
+            const result = await bmlPaymentService.verifyPayment(transactionId);
+            console.log("Payment status:", result.status);
             
-            // Navigate to confirmation with completed booking data
-            navigate("/confirmation", { state: completedBooking });
-          } else {
-            // If no pending booking data found, just navigate to confirmation
-            navigate("/confirmation");
+            if (result.status === 'CONFIRMED') {
+              toast.success("Payment confirmed!");
+              
+              // Retrieve pending booking from local storage
+              const pendingBooking = localStorage.getItem('pendingBooking');
+              const pendingActivityBooking = localStorage.getItem('pendingActivityBooking');
+              
+              let bookingData = null;
+              if (pendingBooking) {
+                bookingData = JSON.parse(pendingBooking);
+                localStorage.removeItem('pendingBooking');
+              } else if (pendingActivityBooking) {
+                bookingData = JSON.parse(pendingActivityBooking);
+                localStorage.removeItem('pendingActivityBooking');
+              }
+              
+              // Clean up transaction ID
+              localStorage.removeItem('lastTransactionId');
+              
+              // Navigate to confirmation page with booking data
+              if (bookingData) {
+                const completedBooking = {
+                  ...bookingData,
+                  paymentComplete: true,
+                  paymentReference: bookingData.paymentReference || result.bookingReference || transactionId
+                };
+                
+                navigate("/confirmation", { state: completedBooking });
+              } else {
+                navigate("/confirmation");
+              }
+              return true;
+            } else if (result.status === 'FAILED' || result.status === 'CANCELLED') {
+              toast.error(`Payment ${result.status.toLowerCase()}`);
+              localStorage.removeItem('lastTransactionId');
+              navigate("/payment", { 
+                state: { 
+                  failed: true, 
+                  reason: result.status,
+                  transactionId
+                } 
+              });
+              return true;
+            }
+            
+            return false; // Continue polling
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            return false;
           }
-        } else {
-          console.log("Payment failed with status:", result.status);
-          
-          // If this is a mock payment and status isn't confirming, retry a few times
-          if ((isMockPayment || transactionId.startsWith('mock-')) && verifyAttempts < 3) {
-            console.log("Mock payment - retry attempt:", verifyAttempts + 1);
-            setVerifyAttempts(prev => prev + 1);
-            setTimeout(() => verifyPayment(), 1500);
-            return;
+        };
+        
+        // Start polling
+        const pollInterval = setInterval(async () => {
+          const completed = await pollPayment();
+          if (completed) {
+            clearInterval(pollInterval);
+            setIsVerifying(false);
           }
-          
-          toast.error(`Payment ${result.status.toLowerCase()}`);
-          navigate("/payment", { 
-            state: { 
-              failed: true, 
-              reason: result.status,
-              transactionId
-            } 
-          });
+        }, 3000); // Poll every 3 seconds
+        
+        // Initial check
+        const initialResult = await pollPayment();
+        if (initialResult) {
+          clearInterval(pollInterval);
+          setIsVerifying(false);
         }
+        
+        // Cleanup on unmount or timeout
+        setTimeout(() => {
+          clearInterval(pollInterval);
+          if (isVerifying) {
+            toast.error("Payment verification timeout");
+            navigate("/payment", { 
+              state: { 
+                failed: true, 
+                reason: "TIMEOUT"
+              } 
+            });
+            setIsVerifying(false);
+          }
+        }, 300000); // 5 minute timeout
+        
       } catch (error) {
-        console.error("Payment verification error:", error);
-        
-        // If we've tried less than 3 times, try again
-        if (verifyAttempts < 2) {
-          setVerifyAttempts(prev => prev + 1);
-          toast.warning("Verification attempt failed, retrying...");
-          // Try again after a delay
-          setTimeout(() => verifyPayment(), 2000);
-          return;
-        }
-        
+        console.error("Payment verification setup error:", error);
         toast.error("Failed to verify payment");
         navigate("/payment", { 
           state: { 
@@ -104,20 +133,12 @@ const BmlPaymentHandler = () => {
             reason: "VERIFICATION_ERROR"
           } 
         });
-      } finally {
         setIsVerifying(false);
       }
     };
     
-    // Check if we're returning from a payment (URL contains transaction parameter)
-    if (location.search.includes('transaction=')) {
-      console.log("BML Handler: Verifying payment. Path:", location.pathname, "Search:", location.search);
-      verifyPayment();
-    } else {
-      console.log("BML Handler: Not verifying payment. Path:", location.pathname, "Search:", location.search);
-      setIsVerifying(false);
-    }
-  }, [location.search, location.pathname, navigate, verifyAttempts]);
+    verifyPayment();
+  }, [location.search, location.pathname, navigate, isVerifying]);
   
   // Show processing screen while verifying payment
   if (isVerifying) {

@@ -85,67 +85,44 @@ const PaymentGateway = () => {
     try {
       const paymentReference = bookingReference;
       
-      if (paymentMethod === "bml_connect") {
-        let paymentData;
+      let paymentData;
+      
+      if (activityBooking) {
+        paymentData = {
+          ...activityBooking,
+          paymentReference,
+          paymentMethod,
+          from: "Male",
+          to: activityBooking.activityName || "Activity",
+          island: activityBooking.location || "Maldives",
+          seats: activityBooking.adultCount + (activityBooking.childCount || 0)
+        };
+      } else if (bookingInfo) {
+        paymentData = {
+          ...bookingInfo,
+          paymentReference,
+          paymentMethod
+        };
+      }
+      
+      if (paymentData) {
+        toast.info("Redirecting to payment...");
+        setIsRedirecting(true);
         
+        const result = await bmlPaymentService.createPayment(paymentData);
+        
+        // Save transaction ID to localStorage
+        localStorage.setItem('lastTransactionId', result.transactionId);
+        
+        // Save pending booking data
         if (activityBooking) {
-          paymentData = {
-            ...activityBooking,
-            paymentReference,
-            paymentMethod,
-            from: "Male",
-            to: activityBooking.activityName || "Activity",
-            island: activityBooking.location || "Maldives",
-            seats: activityBooking.adultCount + (activityBooking.childCount || 0)
-          };
-        } else if (bookingInfo) {
-          paymentData = {
-            ...bookingInfo,
-            paymentReference,
-            paymentMethod
-          };
+          localStorage.setItem("pendingActivityBooking", JSON.stringify(paymentData));
+        } else {
+          localStorage.setItem("pendingBooking", JSON.stringify(paymentData));
         }
         
-        if (paymentData) {
-          toast.info("Redirecting to payment...");
-          setIsRedirecting(true);
-          
-          const result = await bmlPaymentService.createPayment(paymentData);
-          
-          if (activityBooking) {
-            localStorage.setItem("pendingActivityBooking", JSON.stringify(paymentData));
-          } else {
-            localStorage.setItem("pendingBooking", JSON.stringify(paymentData));
-          }
-          
-          window.location.href = result.redirectUrl;
-        }
-      } else {
-        toast.info("Processing payment...");
-        
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        if (activityBooking) {
-          const completedBooking = {
-            ...activityBooking,
-            paymentComplete: true,
-            paymentReference,
-            paymentMethod
-          };
-          
-          navigate("/confirmation", { state: completedBooking });
-        } else if (bookingInfo) {
-          const completedBooking = {
-            ...bookingInfo,
-            paymentComplete: true,
-            paymentReference,
-            paymentMethod
-          };
-          
-          navigate("/confirmation", { state: completedBooking });
-        }
-        
-        toast.success("Payment successful!");
+        // Redirect to payment gateway
+        window.location.href = result.redirectUrl;
       }
     } catch (error) {
       console.error("Payment error:", error);
