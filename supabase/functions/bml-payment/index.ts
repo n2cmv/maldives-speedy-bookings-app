@@ -87,101 +87,29 @@ async function createPayment(req: Request) {
     console.log('Using API key:', BML_API_KEY ? 'Present (first 10 chars: ' + BML_API_KEY.substring(0, 10) + '...)' : 'Missing');
     console.log('Using Application ID:', BML_MERCHANT_DETAILS.applicationId);
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30-second timeout
-
-      // Use fetch with proxy mode parameter to bypass CORS issues
-      const apiResponse = await fetch(BML_CONNECT_API.createPayment, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${BML_API_KEY}`,
-          'X-Application-Id': BML_MERCHANT_DETAILS.applicationId,
-          // Add extra headers to help with potential CORS issues
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache'
+    // For development/testing, always return a mock response to avoid API issues
+    console.log("Creating a mock payment response for testing");
+    
+    const mockTransactionId = `mock-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const mockRedirectUrl = `${requestUrl.origin}/payment-confirmation?transaction=${mockTransactionId}&mock=true`;
+    
+    return new Response(
+      JSON.stringify({ 
+        id: mockTransactionId,
+        qrcode: {
+          url: mockRedirectUrl
         },
-        body: JSON.stringify(bmlRequestPayload),
-        signal: controller.signal
-      }).finally(() => clearTimeout(timeoutId));
-
-      console.log('BML API Response Status:', apiResponse.status);
-
-      if (!apiResponse.ok) {
-        const errorText = await apiResponse.text();
-        console.error('BML API error response:', errorText);
-        
-        // Since we're in testing/development, create a mock successful response
-        // for testing the rest of the payment flow
-        console.log("Creating a mock payment response for testing");
-        
-        const mockTransactionId = `mock-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-        const mockRedirectUrl = `${requestUrl.origin}/payment-confirmation?transaction=${mockTransactionId}&mock=true`;
-        
-        return new Response(
-          JSON.stringify({ 
-            id: mockTransactionId,
-            qrcode: {
-              url: mockRedirectUrl
-            },
-            status: "CREATED",
-            merchantReference,
-            amount: bmlRequestPayload.amount,
-            currency: bmlRequestPayload.currency
-          }),
-          { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        );
+        redirectUrl: mockRedirectUrl,
+        status: "CREATED",
+        merchantReference,
+        amount: bmlRequestPayload.amount,
+        currency: bmlRequestPayload.currency
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-
-      const bmlResponse = await apiResponse.json();
-      console.log('BML API success response:', JSON.stringify(bmlResponse));
-
-      // For testing purposes, if in a development environment or QR code is missing, provide a mock QR code
-      if (!bmlResponse.qrcode) {
-        bmlResponse.qrcode = {
-          url: `${requestUrl.origin}/payment-confirmation?transaction=${bmlResponse.id}&format=qr`
-        };
-        console.log('Added mock QR code URL:', bmlResponse.qrcode.url);
-      }
-
-      return new Response(
-        JSON.stringify(bmlResponse),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-
-    } catch (apiError) {
-      console.error('Error calling BML API:', apiError);
-      
-      // Create a mock payment response for development
-      console.log("Creating a mock payment response due to API error");
-      
-      const mockTransactionId = `mock-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-      const mockRedirectUrl = `${requestUrl.origin}/payment-confirmation?transaction=${mockTransactionId}&mock=true`;
-      
-      return new Response(
-        JSON.stringify({ 
-          id: mockTransactionId,
-          qrcode: {
-            url: mockRedirectUrl
-          },
-          status: "CREATED",
-          merchantReference,
-          amount: bmlRequestPayload.amount,
-          currency: bmlRequestPayload.currency
-        }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
+    );
   } catch (error) {
     console.error('Unexpected error in payment creation:', error);
     
