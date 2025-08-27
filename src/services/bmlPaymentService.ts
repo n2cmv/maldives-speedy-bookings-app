@@ -1,156 +1,145 @@
-
+// src/services/bmlPaymentService.ts
 import { BookingInfo } from "@/types/booking";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// BML Connect integration service with updated configuration
+// Helper: compute total amount in USD (major units)
+function calculateTotalAmount(booking: BookingInfo): number {
+  const PRICE_PER_PERSON = 70; // USD per person per way
+  const totalPassengers = booking.passengers?.length || booking.seats || 1;
+  const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
+  const journeyMultiplier = isReturnTrip ? 2 : 1;
+  return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
+}
+
+// Helper: get an Authorization header (user token preferred, else anon key)
+async function getAuthHeader(): Promise<string> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+  return `Bearer ${session?.access_token || anon}`;
+}
+
+// Helper: POST to an Edge Function subpath with JSON body
+async function postToFunction<T>(path: string, body: unknown): Promise<T> {
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1${path}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": await getAuthHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const text = await res.text();
+  let data: any = {};
+  try { data = text ? JSON.parse(text) : {}; } catch { data = text; }
+
+  if (!res.ok) {
+    const msg =
+      typeof data === "object" && data?.error
+        ? `${data.error}${data.status ? ` (${data.status})` : ""}${data.details ? `: ${JSON.stringify(data.details)}` : ""}`
+        : text || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data as T;
+}
+
+// BML Connect integration service
 export const bmlPaymentService = {
-  // Create a new payment transaction
-  async createPayment(booking: BookingInfo): Promise<{ redirectUrl: string, transactionId: string }> {
+  /**
+   * Create a new payment transaction via your Edge Function
+   */
+  async createPayment(booking: BookingInfo): Promise<{ redirectUrl: string; transactionId: string }> {
     try {
-      if (!booking) {
-        throw new Error("Invalid booking data");
-      }
-      
-      // Calculate total amount (in USD, as configured in BML Connect dashboard)
+      if (!booking) throw new Error("Invalid booking data");
+
+      // total in major units (USD)
       const totalAmount = calculateTotalAmount(booking);
-      
-      if (totalAmount <= 0) {
-        throw new Error("Invalid payment amount");
-      }
+      if (totalAmount <= 0) throw new Error("Invalid payment amount");
 
-      // Prepare customer reference with fallback values
-      const fromLocation = booking.from || 'Male';
-      const toLocation = booking.island || 'Resort Island';
+      // References
+      const fromLocation = booking.from || "Male";
+      const toLocation = booking.island || "Resort Island";
       const customerReference = `Booking for ${fromLocation} to ${toLocation}`;
+      const paymentReference = booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`;
 
-      // Redirect to the dedicated payment confirmation route
-      const confirmationBaseUrl = `${window.location.origin}/payment-confirmation?transaction=`;
-
-      // Include merchant ID in the payment payload
-      const paymentPayload = {
-        amount: totalAmount * 100, // Convert to cents (API requires amount in smallest currency unit)
-        currency: "USD", // Using USD as shown in the BML dashboard
-        provider: "bml_epos", // BML payment method
+      // Build payload for the Edge Function (send cents)
+      const payload = {
+        amountCents: Math.round(totalAmount * 100),
+        currency: "USD",
+        provider: "bml_epos", // if enabled for your app
         signMethod: "sha1",
-        paymentReference: booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`,
+        paymentReference,
         customerReference,
-        redirectUrl: confirmationBaseUrl,
-        appVersion: "RetourMaldives_1.0",
-        // Adding merchant ID directly from your provided details
-        merchantId: "8633129903"
+        redirectUrl: `${window.location.origin}/payment-confirmation?transaction=`,
+        // any extra metadata you want to persist can go here
+        ...booking,
       };
-      
-      console.log("Creating payment with payload:", paymentPayload);
-      
-      // Call the Supabase edge function to create the payment
-      const { data, error } = await supabase.functions.invoke("bml-payment/create", {
-        body: paymentPayload
-      });
-      
-      if (error) {
-        console.error("Payment creation error:", error);
-        throw new Error(`Payment creation failed: ${error.message}`);
-      }
-      
-      // Handle specific error cases
-      if (data && data.error) {
-        console.error("Payment error response:", data);
-        throw new Error(data.error);
-      }
-      
+
+      console.log("Creating payment with payload:", payload);
+
+      // POST to your Edge Function subpath
+      const data: any = await postToFunction("/bml-payment/create", payload);
+
       if (!data || !data.id) {
         console.error("Invalid payment response:", data);
         throw new Error("Payment creation failed: Invalid response from payment gateway");
       }
-      
-      console.log("Payment created successfully:", data);
-      
-      // Handle mock transactions or real QR codes
-      let finalRedirectUrl;
-      if (data.qrcode?.url) {
-        finalRedirectUrl = data.qrcode.url;
-      } else if (data.id.startsWith('mock-')) {
-        finalRedirectUrl = `${window.location.origin}/payment-confirmation?transaction=${data.id}&mock=true`;
-      } else {
+
+      // Prefer the URL BML provides
+      const finalRedirectUrl: string | undefined =
+        data?.qrcode?.url || data?.redirectUrl || data?.url;
+
+      if (!finalRedirectUrl) {
         throw new Error("Payment gateway did not provide redirection details");
       }
-      
-      // Return the redirect URL and transaction ID
+
+      // Save transaction id for the return handler fallback
+      localStorage.setItem("lastTransactionId", data.id);
+
       return {
         redirectUrl: finalRedirectUrl,
-        transactionId: data.id
+        transactionId: data.id,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment creation failed:", error);
-      
-      // Show a clearer error message for specific failure cases
-      if (error.message?.includes('payment gateway') || 
-          error.message?.includes('configuration')) {
+
+      if (
+        typeof error?.message === "string" &&
+        (error.message.includes("payment gateway") || error.message.includes("configuration"))
+      ) {
         toast.error("Payment system error", {
-          description: "There was an issue with the payment gateway. Please try again or use another payment method.",
-          duration: 8000
+          description:
+            "There was an issue with the payment gateway. Please try again or use another payment method.",
+          duration: 8000,
         });
       }
-      
+
       throw error;
     }
   },
-  
-  // Verify payment status
-  async verifyPayment(transactionId: string): Promise<{ 
+
+  /**
+   * Verify payment status via your Edge Function
+   */
+  async verifyPayment(transactionId: string): Promise<{
     status: string;
     success: boolean;
     bookingReference?: string;
   }> {
-    try {
-      if (!transactionId) {
-        throw new Error("Transaction ID is required");
-      }
-      
-      // Handle mock transactions
-      if (transactionId.startsWith('mock-')) {
-        console.log("Verifying mock transaction:", transactionId);
-        return {
-          status: "CONFIRMED",
-          success: true,
-          bookingReference: `RTM-${Math.floor(Math.random() * 10000)}`
-        };
-      }
-      
-      const { data, error } = await supabase.functions.invoke("bml-payment/verify", {
-        body: { transactionId }
-      });
-      
-      if (error) {
-        console.error("Error verifying payment:", error);
-        throw new Error(`Payment verification failed: ${error.message}`);
-      }
-      
-      // Handle case where data might not be complete
-      const status = data?.status || data?.state || "FAILED";
-      const bookingReference = data?.bookingReference || data?.details?.merchantReference;
-      
-      return {
-        status,
-        success: status === "CONFIRMED",
-        bookingReference
-      };
-    } catch (error) {
-      console.error("Payment verification failed:", error);
-      throw error;
-    }
-  }
-};
+    if (!transactionId) throw new Error("Transaction ID is required");
 
-// Helper function to calculate total amount
-function calculateTotalAmount(booking: BookingInfo): number {
-  const PRICE_PER_PERSON = 70; // USD per person per way
-  
-  // Handle cases where booking information might be incomplete
-  const totalPassengers = booking.passengers?.length || booking.seats || 1;
-  const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
-  const journeyMultiplier = isReturnTrip ? 2 : 1;
-  
-  return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
-}
+    const data: any = await postToFunction("/bml-payment/verify", { transactionId });
+
+    const status = String(data?.status || data?.state || "FAILED").toUpperCase();
+    const bookingReference: string | undefined =
+      data?.bookingReference || data?.details?.merchantReference;
+
+    return {
+      status,
+      success: status === "CONFIRMED",
+      bookingReference,
+    };
+  },
+};
