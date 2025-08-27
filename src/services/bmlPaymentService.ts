@@ -14,7 +14,7 @@ function calculateTotalAmount(booking: BookingInfo): number {
 
 // Helper: get an Authorization header (user token preferred, else anon key)
 async function getAuthHeader(): Promise<string> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session} } = await supabase.auth.getSession();
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
   return `Bearer ${session?.access_token || anon}`;
 }
@@ -54,32 +54,27 @@ export const bmlPaymentService = {
     try {
       if (!booking) throw new Error("Invalid booking data");
 
-      // total in major units (USD)
       const totalAmount = calculateTotalAmount(booking);
       if (totalAmount <= 0) throw new Error("Invalid payment amount");
 
-      // References
       const fromLocation = booking.from || "Male";
       const toLocation = booking.island || "Resort Island";
       const customerReference = `Booking for ${fromLocation} to ${toLocation}`;
       const paymentReference = booking.paymentReference || `RTM-${Math.floor(Math.random() * 10000)}`;
 
-      // Build payload for the Edge Function (send cents)
+      // Lean payload: server sets redirectUrl & any provider
       const payload = {
         amountCents: Math.round(totalAmount * 100),
         currency: "USD",
-        provider: "bml_epos", // if enabled for your app
         signMethod: "sha1",
         paymentReference,
         customerReference,
-        redirectUrl: `${window.location.origin}/payment-confirmation?transaction=`,
-        // any extra metadata you want to persist can go here
+        // do not send redirectUrl/provider — server enforces whitelisted domain
         ...booking,
       };
 
       console.log("Creating payment with payload:", payload);
 
-      // POST to your Edge Function subpath
       const data: any = await postToFunction("/bml-payment/create", payload);
 
       if (!data || !data.id) {
@@ -87,7 +82,6 @@ export const bmlPaymentService = {
         throw new Error("Payment creation failed: Invalid response from payment gateway");
       }
 
-      // Prefer the URL BML provides
       const finalRedirectUrl: string | undefined =
         data?.qrcode?.url || data?.redirectUrl || data?.url;
 
