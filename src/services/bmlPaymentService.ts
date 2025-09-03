@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 // Compute total amount in USD (major units)
 function calculateTotalAmount(booking: BookingInfo): number {
-  return 1;
+  return 10;
   const PRICE_PER_PERSON = 70;
   const totalPassengers = booking.passengers?.length || booking.seats || 1;
   const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
