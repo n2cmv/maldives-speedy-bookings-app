@@ -63,6 +63,8 @@ export const bmlPaymentService = {
 
     const data: any = await postToFunction("/bml-payment/create", payload);
 
+    console.log(data);
+
     if (!data || !data.id) throw new Error("Payment creation failed: Invalid response from payment gateway");
 
     const finalRedirectUrl: string | undefined = data?.qrcode?.url || data?.redirectUrl || data?.url;
