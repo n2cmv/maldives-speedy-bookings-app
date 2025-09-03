@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 // Compute total amount in USD (major units)
 function calculateTotalAmount(booking: BookingInfo): number {
+  return 1;
   const PRICE_PER_PERSON = 70;
   const totalPassengers = booking.passengers?.length || booking.seats || 1;
   const isReturnTrip = booking.returnTrip && booking.returnTripDetails;
@@ -50,7 +51,8 @@ export const bmlPaymentService = {
     // Lean payload: server sets redirectUrl and (optionally) provider
     const payload: Record<string, unknown> = {
       amountCents: Math.round(totalAmount * 100),
-      currency: "USD",
+      //currency: "USD",
+      currency: "MVR",
       signMethod: "sha1",
       paymentReference,
       customerReference,
