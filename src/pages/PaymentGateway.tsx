@@ -122,7 +122,7 @@ const PaymentGateway = () => {
         }
         
         // Redirect to payment gateway
-        window.location.href = result.url;
+        window.location.href = result.redirectUrl;
       }
     } catch (error) {
       console.error("Payment error:", error);
