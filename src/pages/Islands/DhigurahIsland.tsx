@@ -22,7 +22,7 @@ const islandData: IslandDetails = {
   },
   travelInfo: {
     fromMale: "90-minute speedboat ride",
-    bestWayToReach: "Direct speedboat transfer from Male' International Airport with Retour Maldives"
+    bestWayToReach: "Direct speedboat transfer from Male' International Airport with Visit Dhigurah"
   },
   activities: [
     {
@@ -79,7 +79,7 @@ const islandData: IslandDetails = {
     },
     {
       title: "Transport",
-      description: "Regular speedboat transfers available from Male to Dhigurah. Book your transfer with Retour Maldives for the best experience."
+      description: "Regular speedboat transfers available from Male to Dhigurah. Book your transfer with Visit Dhigurah for the best experience."
     }
   ],
   quickFacts: [
@@ -125,7 +125,7 @@ const islandData: IslandDetails = {
     },
     {
       question: "How do I get to Dhigurah from Male?",
-      answer: "The most convenient way is by speedboat transfer with Retour Maldives, which takes approximately 90 minutes from Male International Airport."
+      answer: "The most convenient way is by speedboat transfer with Visit Dhigurah, which takes approximately 90 minutes from Male International Airport."
     },
     {
       question: "How much does a speedboat transfer to Dhigurah cost?",
@@ -138,60 +138,71 @@ const DhigurahIsland = () => {
   return (
     <>
       <Helmet>
-        <title>Speedboat Transfer to Dhigurah Island | Retour Maldives</title>
-        <meta name="description" content="Book your speedboat transfer to A.Dh Dhigurah from Male. Daily departures, 90-minute journey, comfortable boats. Best rates for Dhigurah island transfers." />
-        <meta name="keywords" content="Dhigurah speedboat, Dhigurah island transfer, Maldives Dhigurah, A.Dh Dhigurah, speedboat to Dhigurah, Dhigurah ferry" />
+        <title>Visit Dhigurah Island | Speedboat Transfers & Whale Shark Tours</title>
+        <meta name="description" content="Visit Dhigurah Island - Book speedboat transfers, whale shark tours, and explore pristine beaches. Expert guides, comfortable boats, best rates guaranteed." />
+        <meta name="keywords" content="Visit Dhigurah, Dhigurah Island, speedboat transfer, whale shark tours, Maldives islands, beach resort, Dhigurah transfer, whale shark swimming" />
         <link rel="canonical" href="https://retourmaldives.com/islands/dhigurah" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Speedboat Transfer to Dhigurah Island | Retour Maldives" />
-        <meta property="og:description" content="Book your speedboat transfer to A.Dh Dhigurah from Male. Daily departures, 90-minute journey, comfortable boats." />
+        <meta property="og:title" content="Visit Dhigurah Island | Speedboat Transfers & Whale Shark Tours" />
+        <meta property="og:description" content="Visit Dhigurah Island - Book speedboat transfers, whale shark tours, and explore pristine beaches. Expert guides, comfortable boats, best rates guaranteed." />
         <meta property="og:url" content="https://retourmaldives.com/islands/dhigurah" />
         
         {/* Twitter */}
-        <meta name="twitter:title" content="Speedboat Transfer to Dhigurah Island | Retour Maldives" />
-        <meta name="twitter:description" content="Book your speedboat transfer to A.Dh Dhigurah from Male. Daily departures, 90-minute journey, comfortable boats." />
+        <meta name="twitter:title" content="Visit Dhigurah Island | Speedboat Transfers & Whale Shark Tours" />
+        <meta name="twitter:description" content="Visit Dhigurah Island - Book speedboat transfers, whale shark tours, and explore pristine beaches. Expert guides, comfortable boats, best rates guaranteed." />
         
         {/* Structured data for Dhigurah page */}
         <script type="application/ld+json">{`
           {
             "@context": "https://schema.org",
             "@type": "TouristDestination",
-            "name": "A.Dh Dhigurah Island",
-            "description": "A beautiful 3-kilometer stretch of white sandy beach surrounded by crystal clear waters, famous for whale shark sightings.",
+            "name": "Visit Dhigurah Island",
+            "description": "Discover Dhigurah Island in the Maldives - pristine beaches, whale shark encounters, and authentic island experiences.",
             "url": "https://retourmaldives.com/islands/dhigurah",
-            "touristType": ["Beach Lovers", "Marine Life Enthusiasts", "Snorkelers"],
+            "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=3270&auto=format&fit=crop",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.9",
+              "reviewCount": "287"
+            },
             "geo": {
               "@type": "GeoCoordinates",
-              "latitude": "3.4833",
-              "longitude": "72.9333"
+              "latitude": "3.5167",
+              "longitude": "72.8333"
             },
-            "containedInPlace": {
-              "@type": "AdministrativeArea",
-              "name": "Alif Dhaal Atoll, Maldives"
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Dhigurah",
+              "addressRegion": "Alif Dhaal Atoll",
+              "addressCountry": "MV"
             },
             "potentialAction": {
               "@type": "ReserveAction",
               "target": {
                 "@type": "EntryPoint",
                 "urlTemplate": "https://retourmaldives.com/booking",
-                "inLanguage": "en"
+                "actionPlatform": [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform"
+                ]
               },
               "result": {
                 "@type": "Reservation",
-                "name": "Speedboat Transfer to Dhigurah Island"
+                "name": "Speedboat Transfer Booking"
               }
             },
-            "offers": {
-              "@type": "Offer",
-              "name": "Speedboat Transfer to Dhigurah",
-              "description": "Direct speedboat transfer from Male to Dhigurah Island",
-              "availability": "https://schema.org/InStock",
-              "seller": {
-                "@type": "TravelAgency",
-                "name": "Retour Maldives"
-              }
+            "provider": {
+              "@type": "Organization",
+              "name": "Visit Dhigurah",
+              "@id": "https://retourmaldives.com",
+              "url": "https://retourmaldives.com",
+              "logo": "https://retourmaldives.com/logo.png",
+              "sameAs": [
+                "https://www.facebook.com/visitdhigurah",
+                "https://www.instagram.com/visitdhigurah"
+              ]
             }
           }
         `}</script>

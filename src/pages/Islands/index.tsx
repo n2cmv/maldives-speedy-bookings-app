@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import SearchSection from "@/components/islands/SearchSection";
 import FeaturedIslands from "@/components/islands/FeaturedIslands";
 import WhyVisitSection from "@/components/islands/WhyVisitSection";
+import { Helmet } from "react-helmet-async";
 
 const Islands = () => {
   useScrollToTop();
@@ -75,6 +76,13 @@ const Islands = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Helmet>
+        <title>Discover Maldives Islands | Visit Dhigurah</title>
+        <meta name="description" content="Explore beautiful Maldivian local islands including Dhigurah, Dhangethi, and more. Book speedboat transfers, discover pristine beaches, and authentic island experiences." />
+        <meta name="keywords" content="Maldives islands, local islands Maldives, Dhigurah, Dhangethi, island hopping Maldives, Maldives travel" />
+        <link rel="canonical" href="https://retourmaldives.com/islands" />
+      </Helmet>
+      
       <Header />
       <div className="h-16 pb-safe"></div>
       

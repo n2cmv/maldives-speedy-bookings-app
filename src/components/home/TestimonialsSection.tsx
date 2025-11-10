@@ -35,7 +35,7 @@ const TestimonialsSection = () => {
     },
     {
       rating: 5,
-      text: "\"The captain was professional and the journey was smooth. Will definitely use Retour again!\"",
+      text: "\"The captain was professional and the journey was smooth. Will definitely use Visit Dhigurah again!\"",
       author: "- Emma L."
     }
   ];

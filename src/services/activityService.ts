@@ -5,7 +5,7 @@ export async function saveActivityBookingToDatabase(booking: any): Promise<{ dat
   try {
     const bookingData = {
       user_email: booking.email || "",
-      from_location: "Retour Office", // Default start point
+      from_location: "Visit Dhigurah Office", // Default start point
       to_location: "Activity Location",
       departure_time: "As scheduled",
       departure_date: booking.date ? new Date(booking.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],

@@ -8,6 +8,7 @@ import StepIndicator from "@/components/StepIndicator";
 import { motion } from "framer-motion";
 import HeaderExtras from "@/components/HeaderExtras";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
+import { Helmet } from "react-helmet-async";
 
 const BookingForm = () => {
   const location = useLocation();
@@ -18,6 +19,13 @@ const BookingForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50">
+      <Helmet>
+        <title>Book Speedboat Transfer | Visit Dhigurah</title>
+        <meta name="description" content="Book your speedboat transfer to Dhigurah Island. Easy online booking, best rates, comfortable boats. Transfer from Male Airport to Dhigurah in 90 minutes." />
+        <meta name="keywords" content="book speedboat Dhigurah, Dhigurah transfer booking, Male to Dhigurah, speedboat booking Maldives" />
+        <link rel="canonical" href="https://retourmaldives.com/booking" />
+      </Helmet>
+      
       <div className="h-16 pb-safe"></div>
       
       <div className="absolute top-4 right-4 z-20">

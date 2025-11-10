@@ -5,6 +5,7 @@ import HeaderExtras from "@/components/HeaderExtras";
 import ActivityForm from "@/components/activities/ActivityForm";
 import { motion } from "framer-motion";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
+import { Helmet } from "react-helmet-async";
 
 const Activities = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,6 +13,13 @@ const Activities = () => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
+      <Helmet>
+        <title>Book Activities & Tours | Visit Dhigurah</title>
+        <meta name="description" content="Book whale shark tours, snorkeling, diving, and island excursions in Dhigurah. Expert guides, best rates, unforgettable experiences in the Maldives." />
+        <meta name="keywords" content="Dhigurah activities, whale shark tour, snorkeling Dhigurah, diving Maldives, island tours, Dhigurah excursions" />
+        <link rel="canonical" href="https://retourmaldives.com/activities" />
+      </Helmet>
+      
       <div className="h-16 pb-safe"></div>
       
       <div className="absolute top-4 right-4 z-20">

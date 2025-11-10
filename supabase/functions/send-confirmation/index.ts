@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log("[send-confirmation] Sending OTP email with code:", bookingDetails.otpCode);
         
         const emailResponse = await resend.emails.send({
-          from: "Retour Maldives <onboarding@resend.dev>",
+          from: "Visit Dhigurah <onboarding@resend.dev>",
           to: [email],
           subject: "Your Island Ferry Verification Code",
           html: `
@@ -254,10 +254,10 @@ const handler = async (req: Request): Promise<Response> => {
           `;
         }
 
-        emailHtml = emailHtml.replace(/Island Ferry Services/g, 'Retour Maldives');
+        emailHtml = emailHtml.replace(/Island Ferry Services/g, 'Visit Dhigurah');
 
         const emailResponse = await resend.emails.send({
-          from: "Retour Maldives <onboarding@resend.dev>",
+          from: "Visit Dhigurah <onboarding@resend.dev>",
           to: [email],
           subject: emailSubject,
           html: emailHtml,
@@ -345,7 +345,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         // Attempt to send the email
         const emailResponse = await resend.emails.send({
-          from: "Retour Maldives <onboarding@resend.dev>",
+          from: "Visit Dhigurah <onboarding@resend.dev>",
           to: [email],
           subject: "Your Island Ferry Booking Confirmation",
           html: `
@@ -440,11 +440,11 @@ const handler = async (req: Request): Promise<Response> => {
   // Update in regular ferry booking confirmation email
   const footer = `
     <div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">
-      <p>Retour Maldives &copy; ${new Date().getFullYear()}</p>
+      <p>Visit Dhigurah &copy; ${new Date().getFullYear()}</p>
     </div>
   `;
 
-  // Replace the Island Ferry Services footer with the Retour Maldives footer
+  // Replace the Island Ferry Services footer with the Visit Dhigurah footer
   const responseHtml = (await new Response(emailHtml).text()).replace(/<div style="text-align: center; padding-top: 20px; border-top: 1px solid #eaeaea; font-size: 12px; color: #666;">\s*<p>Island Ferry Services &copy; 2025<\/p>\s*<\/div>/g, footer);
 
   return new Response(responseHtml, {
