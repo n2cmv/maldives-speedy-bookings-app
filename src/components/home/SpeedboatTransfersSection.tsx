@@ -8,7 +8,7 @@ const SpeedboatTransfersSection = () => {
     <div className="py-12 -mt-10">
       <ContentSection
         tagline="Speed boat transfers"
-        title="Popular Speedboat Transfers"
+        title="Cheapest Speedboat Transfers"
         description="Discover unique island landscapes and hidden gems. Experience the untouched beauty of the Maldivian archipelago."
         items={speedboatTransfers}
         ctaLink="/booking"
