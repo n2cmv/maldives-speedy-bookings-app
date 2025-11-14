@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { scrollToTopWithoutRouter } from "@/hooks/use-scroll-top";
+import { HelmetProvider } from "react-helmet-async";
 
 // Import pages
 import Index from "./pages/Index";
@@ -63,12 +64,13 @@ const App = () => {
   }, []);
   
   return (
-    <I18nextProvider i18n={i18n}>
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster position="top-center" richColors closeButton />
-            <BrowserRouter>
+    <HelmetProvider>
+      <I18nextProvider i18n={i18n}>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster position="top-center" richColors closeButton />
+              <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/booking" element={<BookingForm />} />
@@ -89,11 +91,12 @@ const App = () => {
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </LanguageProvider>
-    </I18nextProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </LanguageProvider>
+      </I18nextProvider>
+    </HelmetProvider>
   );
 };
 
