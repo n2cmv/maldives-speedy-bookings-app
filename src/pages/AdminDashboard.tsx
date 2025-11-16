@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import BookingsManager from "@/components/admin/BookingsManager";
 import RoutesManager from "@/components/admin/RoutesManager";
 import IslandsManager from "@/components/admin/IslandsManager";
+import ActivitiesManager from "@/components/admin/ActivitiesManager";
 import { Shield, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,10 +144,11 @@ const AdminDashboard = () => {
         </div>
         
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8">
+          <TabsList className="grid grid-cols-4 mb-8">
             <TabsTrigger value="bookings">Bookings Management</TabsTrigger>
             <TabsTrigger value="routes">Routes Management</TabsTrigger>
             <TabsTrigger value="islands">Islands Management</TabsTrigger>
+            <TabsTrigger value="activities">Activities Management</TabsTrigger>
           </TabsList>
           
           <TabsContent value="bookings" className="space-y-4">
@@ -181,6 +183,18 @@ const AdminDashboard = () => {
               </CardHeader>
               <CardContent>
                 <IslandsManager />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="activities" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Activities Management</CardTitle>
+                <CardDescription>Add, edit, or remove activities and tours</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ActivitiesManager />
               </CardContent>
             </Card>
           </TabsContent>

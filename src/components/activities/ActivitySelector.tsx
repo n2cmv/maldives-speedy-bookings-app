@@ -1,8 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Activity } from "./ActivityForm";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { 
   Anchor, 
   Sailboat, 
@@ -27,57 +29,6 @@ interface ActivitySelectorProps {
   passengers: number;
   onPassengerChange: (passengers: number) => void;
 }
-
-const activities: Activity[] = [
-  {
-    id: "manta",
-    name: "Manta",
-    price: 70,
-    description: "Swim with magnificent manta rays in their natural habitat."
-  },
-  {
-    id: "whaleshark",
-    name: "Whaleshark",
-    price: 80,
-    description: "Experience the thrill of swimming alongside the gentle giants of the ocean."
-  },
-  {
-    id: "turtle",
-    name: "Turtle",
-    price: 50,
-    description: "Explore turtle habitats and swim with these amazing creatures."
-  },
-  {
-    id: "sandbank_trip",
-    name: "Sand Bank Trip",
-    price: 120,
-    description: "Visit a secluded sandbank near Machafushi resort for a private beach experience."
-  },
-  {
-    id: "resort_day_trip",
-    name: "Resort Day Trip",
-    price: 75,
-    description: "Spend a relaxing day at one of the luxury resorts in the Maldives."
-  },
-  {
-    id: "resort_transfer",
-    name: "Resort Transfer",
-    price: 45,
-    description: "Comfortable speedboat transfer to your chosen resort. Price per way."
-  },
-  {
-    id: "sunset_fishing",
-    name: "Sunset Fishing",
-    price: 55,
-    description: "Traditional line fishing experience while enjoying a breathtaking Maldivian sunset."
-  },
-  {
-    id: "nurse_shark",
-    name: "Nurse Shark Trip",
-    price: 80,
-    description: "See nurse sharks up close in their natural environment."
-  }
-];
 
 const getActivityIcon = (id: string) => {
   switch (id) {
@@ -108,7 +59,40 @@ const ActivitySelector = ({
   passengers,
   onPassengerChange
 }: ActivitySelectorProps) => {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const passengerOptions = Array.from({ length: 10 }, (_, i) => i + 1);
+
+  useEffect(() => {
+    fetchActivities();
+  }, []);
+
+  const fetchActivities = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedActivities: Activity[] = (data || []).map(activity => ({
+        id: activity.activity_id,
+        name: activity.name,
+        price: Number(activity.price),
+        description: activity.description
+      }));
+
+      setActivities(formattedActivities);
+    } catch (error) {
+      console.error('Error fetching activities:', error);
+      toast.error('Failed to load activities');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const handleActivityChange = (activityId: string) => {
     const activity = activities.find(a => a.id === activityId);
@@ -116,6 +100,14 @@ const ActivitySelector = ({
       onSelectActivity(activity);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
