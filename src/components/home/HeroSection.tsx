@@ -75,7 +75,7 @@ const HeroSection = () => {
           Speedboat Transfers to Dhigurah Island & All-Inclusive Packages
         </h1>
         
-        <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl leading-relaxed drop-shadow-md">The most affordable way to reach Dhigurah Island. Book speedboat transfers or choose our complete packages with stays, breakfast, and tours included.
+        <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl leading-relaxed drop-shadow-md">The most affordable way to reach Dhigurah Island. Book speedboat transfers or choose our complete packages with stays, meals, and tours included.
 
 
 
