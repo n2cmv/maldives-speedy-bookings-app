@@ -15,6 +15,7 @@ interface BookingFormProps {
   isLoading: boolean;
   timeRestrictions: Record<string, Time[]>;
   allTimes: Time[];
+  onFromLocationChange?: (location: string) => void;
 }
 
 const MAX_PASSENGERS = 15;
@@ -24,7 +25,8 @@ const BookingForm = ({
   islandNames,
   isLoading: externalIsLoading,
   timeRestrictions,
-  allTimes
+  allTimes,
+  onFromLocationChange
 }: BookingFormProps) => {
   // Get route data
   const { 
@@ -68,6 +70,13 @@ const BookingForm = ({
   useEffect(() => {
     setIsLoading(externalIsLoading || routesLoading);
   }, [externalIsLoading, routesLoading]);
+  
+  // Notify parent when from location changes
+  useEffect(() => {
+    if (onFromLocationChange) {
+      onFromLocationChange(booking.from);
+    }
+  }, [booking.from, onFromLocationChange]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full isolate">
