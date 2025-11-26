@@ -44,10 +44,20 @@ const RouteSelectionForm = ({
       isLoading={isLoading}
       onFromChange={(value) => {
         // Clear destination if it's the same as the selected origin
+        // or if it creates a Male' City/Airport conflict
+        let newIsland = booking.island;
+        if (value === booking.island) {
+          newIsland = '';
+        } else if (value === "Male' City" && booking.island === "Male' Airport") {
+          newIsland = '';
+        } else if (value === "Male' Airport" && booking.island === "Male' City") {
+          newIsland = '';
+        }
+        
         onBookingChange({ 
           ...booking, 
           from: value,
-          island: value === booking.island ? '' : booking.island,
+          island: newIsland,
           time: '' // Reset time as available times may change
         });
       }}
