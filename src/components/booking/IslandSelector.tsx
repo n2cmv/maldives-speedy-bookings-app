@@ -51,7 +51,7 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
             className="custom-select-trigger opacity-0 absolute top-0 left-0 w-full h-full" 
           />
           <SelectContent 
-            className="select-content z-50 bg-white shadow-lg"
+            className="select-content z-[100] bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700"
             position="popper"
             sideOffset={5}
           >
@@ -62,7 +62,7 @@ const IslandSelector = forwardRef<HTMLButtonElement, IslandSelectorProps>(({
                 <SelectItem 
                   key={islandName} 
                   value={islandName}
-                  className="select-item"
+                  className="select-item cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 bg-white dark:bg-gray-800"
                 >
                   {islandName}
                 </SelectItem>
