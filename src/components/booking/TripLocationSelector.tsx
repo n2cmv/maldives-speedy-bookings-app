@@ -27,7 +27,13 @@ const TripLocationSelector = ({
   const { t } = useTranslation();
   
   // Filter out the currently selected fromLocation from toLocations
-  const filteredToLocations = toLocations.filter(island => island !== fromLocation);
+  // Also filter Male' Airport if from is Male' City, and vice versa
+  const filteredToLocations = toLocations.filter(island => {
+    if (island === fromLocation) return false;
+    if (fromLocation === "Male' City" && island === "Male' Airport") return false;
+    if (fromLocation === "Male' Airport" && island === "Male' City") return false;
+    return true;
+  });
   
   return (
     <div className="route-selectors-container relative space-y-6">

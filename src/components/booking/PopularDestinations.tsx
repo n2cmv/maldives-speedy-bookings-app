@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Sun, Building, Anchor, Plane, ChevronRight } from "lucide-react";
+import { Sun, TreePine, Anchor, Plane, ChevronRight } from "lucide-react";
 
 interface PopularDestinationsProps {
   onSelectToIsland: (island: string) => void;
@@ -9,14 +9,14 @@ interface PopularDestinationsProps {
 const PopularDestinations = ({ onSelectToIsland }: PopularDestinationsProps) => {
   const popularIslands = [
     { name: "Dhigurah", icon: <Sun className="text-yellow-500" size={16} /> },
-    { name: "Dhangethi", icon: <Building className="text-blue-500" size={16} /> },
+    { name: "Dhangethi", icon: <TreePine className="text-green-500" size={16} /> },
     { name: "Male' City", icon: <Anchor className="text-teal-500" size={16} /> },
     { name: "Male' Airport", icon: <Plane className="text-gray-500" size={16} /> }
   ];
 
   return (
     <div className="mt-4 mb-6">
-      <p className="text-lg font-medium text-ocean-dark mb-4 text-center">Popular Islands</p>
+      <p className="text-lg font-medium text-ocean-dark mb-4 text-center">Popular Destinations</p>
       <div className="flex flex-wrap justify-center gap-3">
         {popularIslands.map((island) => (
           <Button
