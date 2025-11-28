@@ -11,7 +11,7 @@ interface PackageCardProps {
 const PackageCard = ({ package: pkg }: PackageCardProps) => {
   const handleInquiry = () => {
     const message = `Hi, I'm interested in the "${pkg.name}" package. Can you provide more details?`;
-    const whatsappUrl = `https://wa.me/9607780739?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/9607443777?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
