@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,40 +5,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ActivityForm from "./ActivityForm";
-import { ActivityData } from "./hooks/useActivityManager";
+import PackageForm from "./PackageForm";
+import { PackageData } from "./hooks/usePackageManager";
 
-interface ActivityFormDialogProps {
+interface PackageFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  currentActivity: ActivityData | null;
+  currentPackage: PackageData | null;
   onSave: (values: any) => Promise<void>;
   onCancel: () => void;
 }
 
-const ActivityFormDialog = ({
+const PackageFormDialog = ({
   isOpen,
   onOpenChange,
-  currentActivity,
+  currentPackage,
   onSave,
-  onCancel
-}: ActivityFormDialogProps) => {
+  onCancel,
+}: PackageFormDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {currentActivity ? "Edit Activity" : "Add New Activity"}
+            {currentPackage ? "Edit Package" : "Add New Package"}
           </DialogTitle>
           <DialogDescription>
-            {currentActivity
-              ? "Update activity details"
-              : "Enter new activity information"}
+            {currentPackage
+              ? "Update package details"
+              : "Create a new tour package"}
           </DialogDescription>
         </DialogHeader>
-        
-        <ActivityForm 
-          activity={currentActivity} 
+
+        <PackageForm
+          package={currentPackage}
           onSave={onSave}
           onCancel={onCancel}
         />
@@ -48,4 +47,4 @@ const ActivityFormDialog = ({
   );
 };
 
-export default ActivityFormDialog;
+export default PackageFormDialog;
