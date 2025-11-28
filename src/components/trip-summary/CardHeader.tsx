@@ -7,9 +7,9 @@ interface TripSummaryCardHeaderProps {
   className?: string;
 }
 
-const TripSummaryCardHeader = ({ 
-  title = "Booking Summary", 
-  className = "bg-ocean-light/10 border-b border-ocean-light/20" 
+const TripSummaryCardHeader = ({
+  title = "Booking Summary",
+  className = "border-b border-ocean-light/20"
 }: TripSummaryCardHeaderProps) => {
   return (
     <motion.div

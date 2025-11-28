@@ -17,7 +17,7 @@ const PassengerDetails = () => {
   const navigate = useNavigate();
   const [bookingInfo, setBookingInfo] = useState<BookingInfo | null>(null);
   const [passengers, setPassengers] = useState<Passenger[]>([]);
-  
+
   // Initialize from location state
   useEffect(() => {
     const booking = location.state as BookingInfo | null;
@@ -25,14 +25,14 @@ const PassengerDetails = () => {
       navigate("/booking");
       return;
     }
-    
+
     setBookingInfo(booking);
-    
+
     // Initialize passenger list based on counts
     if (booking.passengerCounts) {
       const initialPassengers: Passenger[] = [];
       let id = 1;
-      
+
       // Add adults
       for (let i = 0; i < booking.passengerCounts.adults; i++) {
         initialPassengers.push({
@@ -46,7 +46,7 @@ const PassengerDetails = () => {
         });
         id++;
       }
-      
+
       // Add children
       for (let i = 0; i < booking.passengerCounts.children; i++) {
         initialPassengers.push({
@@ -60,7 +60,7 @@ const PassengerDetails = () => {
         });
         id++;
       }
-      
+
       // Add seniors
       for (let i = 0; i < booking.passengerCounts.seniors; i++) {
         initialPassengers.push({
@@ -74,7 +74,7 @@ const PassengerDetails = () => {
         });
         id++;
       }
-      
+
       setPassengers(initialPassengers);
     }
   }, [location.state, navigate]);
@@ -90,7 +90,7 @@ const PassengerDetails = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
-      
+
       <div className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -102,23 +102,23 @@ const PassengerDetails = () => {
           >
             <StepIndicator />
           </motion.div>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             onClick={handleGoBack}
-            className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark hover:bg-ocean-light/20"
+            className="mb-6 flex items-center gap-2 text-ocean-dark border-ocean-dark bg-transparent hover:bg-ocean-light/20"
           >
             <ChevronLeft className="h-4 w-4" />
-            {t("common.previous", "Previous")}
+            {t("common.back", "Back")}
           </Button>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <div className="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100 mb-6">
-                <div className="bg-ocean-light/10 py-4 px-6 border-b border-gray-200">
+                <div className="py-4 px-6 border-b border-gray-200">
                   <h2 className="text-2xl font-bold text-ocean-dark">{t("booking.passenger.details", "Passenger Details")}</h2>
                 </div>
-                
+
                 <div className="p-6">
                   <div className="border-b border-gray-200 pb-4 mb-6">
                     <p className="text-sm text-gray-600">
@@ -128,8 +128,8 @@ const PassengerDetails = () => {
                       </span>
                     </p>
                   </div>
-                  
-                  <PassengerForm 
+
+                  <PassengerForm
                     bookingInfo={bookingInfo}
                     passengers={passengers}
                     setPassengers={setPassengers}
@@ -137,10 +137,10 @@ const PassengerDetails = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Trip Summary Card */}
             <div className="md:col-span-1">
-              <TripSummaryCard bookingInfo={{...bookingInfo, passengers}} />
+              <TripSummaryCard bookingInfo={{ ...bookingInfo, passengers }} />
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ const AdminLoginForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
     setFormError(null);
     if (!email) {
@@ -33,7 +33,7 @@ const AdminLoginForm = ({
       setFormError("Password is required");
       return;
     }
-    
+
     await onSubmit(email, password);
   };
 
@@ -44,11 +44,11 @@ const AdminLoginForm = ({
           {formError || authError}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input 
+          <Input
             id="email"
             placeholder="Enter your email"
             type="email"
@@ -58,7 +58,15 @@ const AdminLoginForm = ({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <a
+              href="/admin/forgot-password"
+              className="text-sm text-ocean hover:text-ocean-dark hover:underline"
+            >
+              Forgot password?
+            </a>
+          </div>
           <Input
             id="password"
             type="password"
@@ -68,9 +76,9 @@ const AdminLoginForm = ({
             placeholder="Enter your password"
           />
         </div>
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? (

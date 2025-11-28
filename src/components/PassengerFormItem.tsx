@@ -25,14 +25,14 @@ const PassengerFormItem = ({
   return (
     <div className="mb-8 border border-ocean/20 rounded-lg p-6 bg-white shadow-sm relative">
       {/* Removing the blue line that was here */}
-      
+
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <div className="bg-ocean/10 p-2 rounded-full mr-3">
             <User className="h-5 w-5 text-ocean" />
           </div>
           <h3 className="font-medium text-lg text-ocean-dark">
-            {isPrimaryPassenger ? "Primary Passenger" : `Passenger ${index + 1}`} 
+            {isPrimaryPassenger ? "Primary Passenger" : `Passenger ${index + 1}`}
             <span className="ml-2 text-sm font-normal text-gray-500">({passenger.type})</span>
           </h3>
         </div>
@@ -42,14 +42,14 @@ const PassengerFormItem = ({
             variant="outline"
             size="sm"
             onClick={() => onRemove(passenger.id)}
-            className="text-red-500 border-red-200 hover:text-red-700 hover:bg-red-50 hover:border-red-300"
+            className="text-red-500 border-red-200 bg-transparent hover:text-red-700 hover:bg-red-50 hover:border-red-300"
           >
             <Trash2 className="h-4 w-4 mr-1" />
             Remove
           </Button>
         )}
       </div>
-      
+
       <div className="space-y-5">
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -69,7 +69,7 @@ const PassengerFormItem = ({
             />
           </div>
         </div>
-        
+
         {/* Only show email field for primary passenger */}
         {isPrimaryPassenger && (
           <div className="space-y-2">
@@ -91,7 +91,7 @@ const PassengerFormItem = ({
             </div>
           </div>
         )}
-        
+
         {/* Only show phone field for primary passenger */}
         {isPrimaryPassenger && (
           <div className="space-y-2">
@@ -99,7 +99,7 @@ const PassengerFormItem = ({
               Phone Number <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center gap-2">
-              <CountryCodeSelector 
+              <CountryCodeSelector
                 value={passenger.countryCode}
                 onChange={(value) => onChange(passenger.id, "countryCode", value)}
               />

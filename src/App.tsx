@@ -19,6 +19,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
 import TourPackages from "./pages/TourPackages";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import Islands pages
@@ -40,12 +42,12 @@ import { BookingInfo } from "./types/booking";
 const App = () => {
   // Create a client instance inside the component to avoid React hook issues
   const [queryClient] = useState(() => new QueryClient());
-  
+
   // Initial scroll to top on app load without using Router hooks
   useEffect(() => {
     scrollToTopWithoutRouter();
   }, []);
-  
+
   // Set up listener to save booking info to local storage when navigation happens
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -55,14 +57,14 @@ const App = () => {
         saveBookingToLocalStorage(booking);
       }
     };
-    
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
-  
+
   return (
     <HelmetProvider>
       <I18nextProvider i18n={i18n}>
@@ -71,26 +73,28 @@ const App = () => {
             <TooltipProvider>
               <Toaster position="top-center" richColors closeButton />
               <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/booking" element={<BookingForm />} />
-                <Route path="/passenger-details" element={<PassengerDetails />} />
-                <Route path="/payment" element={<PaymentGateway />} />
-                <Route path="/confirmation" element={<Confirmation />} />
-                <Route path="/confirmation/:reference" element={<Confirmation />} />
-                <Route path="/my-bookings" element={<MyBookings />} />
-                <Route path="/booking-lookup" element={<BookingLookup />} />
-                <Route path="/packages" element={<TourPackages />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/payment-confirmation" element={<BmlPaymentHandler />} />
-                
-                {/* Islands routes */}
-                <Route path="/islands" element={<Islands />} />
-                <Route path="/islands/:slug" element={<IslandDetailsPage />} />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/booking" element={<BookingForm />} />
+                  <Route path="/passenger-details" element={<PassengerDetails />} />
+                  <Route path="/payment" element={<PaymentGateway />} />
+                  <Route path="/confirmation" element={<Confirmation />} />
+                  <Route path="/confirmation/:reference" element={<Confirmation />} />
+                  <Route path="/my-bookings" element={<MyBookings />} />
+                  <Route path="/booking-lookup" element={<BookingLookup />} />
+                  <Route path="/packages" element={<TourPackages />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/admin/reset-password" element={<ResetPassword />} />
+                  <Route path="/payment-confirmation" element={<BmlPaymentHandler />} />
+
+                  {/* Islands routes */}
+                  <Route path="/islands" element={<Islands />} />
+                  <Route path="/islands/:slug" element={<IslandDetailsPage />} />
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
               </BrowserRouter>
             </TooltipProvider>
           </QueryClientProvider>

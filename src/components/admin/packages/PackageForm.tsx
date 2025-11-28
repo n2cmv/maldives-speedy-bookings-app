@@ -2,7 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
-import { Plus, X, Upload } from "lucide-react";
+import { Plus, X, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +43,8 @@ const PackageForm = ({ package: pkg, onSave, onCancel }: PackageFormProps) => {
   const [newInclusion, setNewInclusion] = useState("");
   const [newRule, setNewRule] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
   const form = useForm<PackageFormValues>({
     resolver: zodResolver(packageFormSchema),
@@ -75,6 +79,45 @@ const PackageForm = ({ package: pkg, onSave, onCancel }: PackageFormProps) => {
 
   const removeRule = (index: number) => {
     setRules(rules.filter((_, i) => i !== index));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('package-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('package-images')
+        .getPublicUrl(filePath);
+
+      form.setValue('image_url', data.publicUrl);
+      toast({
+        title: "Image uploaded",
+        description: "Package image has been uploaded successfully",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Upload failed",
+        description: (error as Error).message || "There was an error uploading the image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const onSubmit = async (values: PackageFormValues) => {
@@ -174,9 +217,57 @@ const PackageForm = ({ package: pkg, onSave, onCancel }: PackageFormProps) => {
             name="image_url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Image URL</FormLabel>
+                <FormLabel>Package Image</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://..." {...field} />
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Upload Image
+                          </>
+                        )}
+                      </Button>
+                      <Input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+                    {field.value && (
+                      <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                        <img
+                          src={field.value}
+                          alt="Package preview"
+                          className="h-full w-full object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute right-2 top-2 h-6 w-6"
+                          onClick={() => field.onChange("")}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    <Input {...field} placeholder="Or enter image URL manually" />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

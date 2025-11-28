@@ -72,7 +72,7 @@ const HeroSection = () => {
       
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight mb-6 drop-shadow-md">
-          Speedboat Transfers to Dhigurah Island & All-Inclusive Packages
+          Speedboat Transfers & Tour Packages
         </h1>
         
         <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl leading-relaxed drop-shadow-md">The most affordable way to reach Dhigurah Island. Book speedboat transfers or choose our complete packages with stays, meals, and tours included.

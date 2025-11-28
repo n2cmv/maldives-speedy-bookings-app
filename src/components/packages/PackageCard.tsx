@@ -19,8 +19,8 @@ const PackageCard = ({ package: pkg }: PackageCardProps) => {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <div className="relative h-48 overflow-hidden">
         {pkg.image_url ? (
-          <img 
-            src={pkg.image_url} 
+          <img
+            src={pkg.image_url}
             alt={pkg.name}
             className="w-full h-full object-cover"
           />
@@ -33,33 +33,30 @@ const PackageCard = ({ package: pkg }: PackageCardProps) => {
           {pkg.duration}
         </Badge>
       </div>
-      
+
       <CardHeader className="pb-2">
         <h3 className="text-xl font-bold text-ocean-dark">{pkg.name}</h3>
         {pkg.description && (
-          <p className="text-gray-600 text-sm line-clamp-2">{pkg.description}</p>
+          <p className="text-gray-600 text-sm">{pkg.description}</p>
         )}
       </CardHeader>
-      
+
       <CardContent className="flex-1">
         <div className="space-y-3">
           {pkg.inclusions.length > 0 && (
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">Includes:</p>
               <ul className="space-y-1">
-                {pkg.inclusions.slice(0, 4).map((item, index) => (
+                {pkg.inclusions.map((item, index) => (
                   <li key={index} className="flex items-center text-sm text-gray-600">
                     <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
-                {pkg.inclusions.length > 4 && (
-                  <li className="text-sm text-ocean">+{pkg.inclusions.length - 4} more</li>
-                )}
               </ul>
             </div>
           )}
-          
+
           {pkg.rules.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
               {pkg.rules.map((rule, index) => (
@@ -71,7 +68,7 @@ const PackageCard = ({ package: pkg }: PackageCardProps) => {
           )}
         </div>
       </CardContent>
-      
+
       <CardFooter className="flex flex-col gap-3 border-t pt-4">
         <div className="flex items-center justify-between w-full">
           <div>
@@ -85,7 +82,7 @@ const PackageCard = ({ package: pkg }: PackageCardProps) => {
             </div>
           )}
         </div>
-        <Button 
+        <Button
           onClick={handleInquiry}
           className="w-full bg-ocean hover:bg-ocean-dark"
         >
