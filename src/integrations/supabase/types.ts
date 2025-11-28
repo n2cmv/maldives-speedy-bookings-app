@@ -320,6 +320,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_packages: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          duration: string
+          gallery_images: string[] | null
+          id: string
+          image_url: string | null
+          inclusions: string[] | null
+          is_active: boolean | null
+          min_pax: number | null
+          name: string
+          price_per_person: number
+          rules: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          duration: string
+          gallery_images?: string[] | null
+          id?: string
+          image_url?: string | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          min_pax?: number | null
+          name: string
+          price_per_person: number
+          rules?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          duration?: string
+          gallery_images?: string[] | null
+          id?: string
+          image_url?: string | null
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          min_pax?: number | null
+          name?: string
+          price_per_person?: number
+          rules?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

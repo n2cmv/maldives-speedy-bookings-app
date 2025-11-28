@@ -1,4 +1,3 @@
-import React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,24 +9,25 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface DeleteActivityDialogProps {
+interface DeletePackageDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
 }
 
-const DeleteActivityDialog = ({
+const DeletePackageDialog = ({
   isOpen,
   onOpenChange,
-  onDelete
-}: DeleteActivityDialogProps) => {
+  onDelete,
+}: DeletePackageDialogProps) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the activity.
+            This action cannot be undone. This will permanently delete the
+            tour package.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -39,4 +39,4 @@ const DeleteActivityDialog = ({
   );
 };
 
-export default DeleteActivityDialog;
+export default DeletePackageDialog;

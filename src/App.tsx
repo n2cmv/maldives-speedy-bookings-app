@@ -18,7 +18,7 @@ import MyBookings from "./pages/MyBookings";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import BookingLookup from "./pages/BookingLookup";
-import Activities from "./pages/Activities";
+import TourPackages from "./pages/TourPackages";
 import BmlPaymentHandler from "./components/payment/BmlPaymentHandler";
 
 // Import Islands pages
@@ -80,7 +80,7 @@ const App = () => {
                 <Route path="/confirmation/:reference" element={<Confirmation />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/booking-lookup" element={<BookingLookup />} />
-                <Route path="/activities" element={<Activities />} />
+                <Route path="/packages" element={<TourPackages />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/payment-confirmation" element={<BmlPaymentHandler />} />

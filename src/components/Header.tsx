@@ -45,9 +45,9 @@ const Header = () => {
                   <Sailboat className="h-4 w-4" />
                   <span>Popular Speedboat Transfers</span>
                 </Link>
-                <Link to="/activities" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
+                <Link to="/packages" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
                   <Compass className="h-4 w-4" />
-                  <span>Popular Activities</span>
+                  <span>Tour Packages</span>
                 </Link>
                 <Link to="/islands" className="flex items-center space-x-2 text-[#005C99] hover:text-[#0AB3B8] py-1 text-sm">
                   <Map className="h-4 w-4" />
