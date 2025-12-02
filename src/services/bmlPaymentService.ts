@@ -67,7 +67,7 @@ export const bmlPaymentService = {
 
     if (!data || !data.id) throw new Error("Payment creation failed: Invalid response from payment gateway");
     console.log(data);
-    const finalRedirectUrl: string | undefined = data?.url;
+    const finalRedirectUrl: string | undefined = data?.redirectUrl || data?.url;
     if (!finalRedirectUrl) throw new Error("Payment gateway did not provide redirection details");
 
     localStorage.setItem("lastTransactionId", data.id);
