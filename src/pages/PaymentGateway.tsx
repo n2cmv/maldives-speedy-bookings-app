@@ -17,9 +17,9 @@ import { generatePaymentReference } from "@/services/bookingService";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { bmlPaymentService } from "@/services/bmlPaymentService";
 import { useScrollToTop } from "@/hooks/use-scroll-top";
+import { supabase } from "@/integrations/supabase/client";
 
 const BANK_LOGO = "/lovable-uploads/05a88421-85a4-4019-8124-9aea2cda32b4.png";
-const PRICE_PER_PERSON = 35;
 
 const PaymentGateway = () => {
   const location = useLocation();
@@ -31,10 +31,50 @@ const PaymentGateway = () => {
   const [bookingReference, setBookingReference] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("bml_connect");
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [outboundPrice, setOutboundPrice] = useState<number>(0);
+  const [returnPrice, setReturnPrice] = useState<number>(0);
   
   useScrollToTop();
 
   useEffect(() => {
+    const fetchRoutePrices = async (booking: BookingInfo) => {
+      try {
+        // Fetch outbound route price
+        const { data: outboundRoute, error: outboundError } = await supabase
+          .from('routes')
+          .select('price')
+          .eq('from_location', booking.from)
+          .eq('to_location', booking.island)
+          .single();
+        
+        if (outboundError) {
+          console.error("Error fetching outbound route price:", outboundError);
+          toast.error("Failed to fetch route pricing");
+          return;
+        }
+        
+        setOutboundPrice(outboundRoute?.price || 0);
+        
+        // Fetch return route price if applicable
+        if (booking.returnTrip && booking.returnTripDetails) {
+          const { data: returnRoute, error: returnError } = await supabase
+            .from('routes')
+            .select('price')
+            .eq('from_location', booking.returnTripDetails.from)
+            .eq('to_location', booking.returnTripDetails.island)
+            .single();
+          
+          if (returnError) {
+            console.error("Error fetching return route price:", returnError);
+          } else {
+            setReturnPrice(returnRoute?.price || 0);
+          }
+        }
+      } catch (error) {
+        console.error("Exception fetching route prices:", error);
+      }
+    };
+    
     if (!location.state?.isActivityBooking) {
       const booking = location.state as BookingInfo | null;
       if (!booking) {
@@ -43,6 +83,7 @@ const PaymentGateway = () => {
       }
       
       setBookingInfo(booking);
+      fetchRoutePrices(booking);
     } else {
       const activityData = location.state;
       if (!activityData) {
@@ -145,10 +186,12 @@ const PaymentGateway = () => {
     if (!bookingInfo?.passengers) return 0;
     
     const totalPassengers = bookingInfo.passengers.length || 0;
-    const isReturnTrip = bookingInfo.returnTrip && bookingInfo.returnTripDetails;
-    const journeyMultiplier = isReturnTrip ? 2 : 1;
+    const outboundTotal = totalPassengers * outboundPrice;
+    const returnTotal = bookingInfo.returnTrip && bookingInfo.returnTripDetails 
+      ? totalPassengers * returnPrice 
+      : 0;
     
-    return totalPassengers * PRICE_PER_PERSON * journeyMultiplier;
+    return outboundTotal + returnTotal;
   };
 
   if (!bookingInfo && !activityBooking) {
