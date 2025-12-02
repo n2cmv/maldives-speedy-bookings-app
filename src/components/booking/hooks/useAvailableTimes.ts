@@ -27,12 +27,12 @@ export const useAvailableTimes = (
   // Get available times for outbound journey
   const availableTimes = booking.from && booking.island 
     ? getRouteTimings(booking.from, booking.island)
-    : allTimes;
+    : [];
   
   // Get available times for return journey if applicable
   const returnAvailableTimes = booking.returnTrip && booking.returnTripDetails?.from && booking.returnTripDetails?.island
     ? getRouteTimings(booking.returnTripDetails.from, booking.returnTripDetails.island)
-    : allTimes;
+    : [];
 
   // Effect to validate that selected time is available in current route
   useEffect(() => {
